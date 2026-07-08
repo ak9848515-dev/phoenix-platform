@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/phoenix_card.dart';
+import '../../shared/widgets/phoenix_progress_indicator.dart';
+import '../../shared/widgets/phoenix_section_header.dart';
 import '../../theme/colors.dart';
 import '../../theme/radius.dart';
 import '../../theme/spacing.dart';
@@ -66,17 +69,49 @@ class MissionCenterScreen extends StatelessWidget {
                 subtitle: 'You are 2 steps away from your next milestone.',
               ),
               const SizedBox(height: AppSpacing.lg),
-              _MissionCard(
-                title: 'Today\'s Mission',
-                description:
-                    'Complete the onboarding sprint and unlock the next level of your learning path.',
-                badgeLabel: 'Priority Focus',
+              PhoenixCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Today\'s Mission',
+                            style: theme.textTheme.titleMedium,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.xs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary.withValues(alpha: 0.16),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
+                          ),
+                          child: Text(
+                            'Priority Focus',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Complete the onboarding sprint and unlock the next level of your learning path.',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    const PhoenixProgressIndicator(value: 0.45),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(
-                'Quick Actions',
-                style: theme.textTheme.titleMedium,
-              ),
+              PhoenixSectionHeader(title: 'Quick Actions'),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.md,
@@ -91,10 +126,7 @@ class MissionCenterScreen extends StatelessWidget {
                     .toList(),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(
-                'Academies',
-                style: theme.textTheme.titleMedium,
-              ),
+              PhoenixSectionHeader(title: 'Academies'),
               const SizedBox(height: AppSpacing.sm),
               ...academies.map(
                 (academy) => Padding(
@@ -106,10 +138,33 @@ class MissionCenterScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _KnowledgeDnaCard(
-                progress: 0.72,
-                label: 'Knowledge DNA',
-                summary: '72% of your curated learning map is now activated.',
+              PhoenixCard(
+                color: AppColors.darkBackground,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Knowledge DNA',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: AppColors.onDarkBackground,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      '72% of your curated learning map is now activated.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.onDarkBackground.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    PhoenixProgressIndicator(
+                      value: 0.72,
+                      minHeight: 10,
+                      backgroundColor: AppColors.onDarkBackground.withValues(alpha: 0.2),
+                      valueColor: AppColors.primary,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -161,76 +216,6 @@ class _GreetingSection extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MissionCard extends StatelessWidget {
-  const _MissionCard({
-    required this.title,
-    required this.description,
-    required this.badgeLabel,
-  });
-
-  final String title;
-  final String description;
-  final String badgeLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                  ),
-                  child: Text(
-                    badgeLabel,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.secondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              description,
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            LinearProgressIndicator(
-              value: 0.45,
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              minHeight: 8,
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -295,62 +280,6 @@ class _AcademyTile extends StatelessWidget {
       title: Text(title, style: theme.textTheme.titleSmall),
       subtitle: Text(subtitle, style: theme.textTheme.bodySmall),
       trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-    );
-  }
-}
-
-class _KnowledgeDnaCard extends StatelessWidget {
-  const _KnowledgeDnaCard({
-    required this.progress,
-    required this.label,
-    required this.summary,
-  });
-
-  final double progress;
-  final String label;
-  final String summary;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      elevation: 0,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      color: AppColors.darkBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: AppColors.onDarkBackground,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              summary,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.onDarkBackground.withValues(alpha: 0.8),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 10,
-                backgroundColor: AppColors.onDarkBackground.withValues(alpha: 0.2),
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

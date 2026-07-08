@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/phoenix_card.dart';
 import '../../../theme/colors.dart';
-import '../../../theme/radius.dart';
 import '../../../theme/spacing.dart';
 import '../models/knowledge_dna.dart';
 import 'widgets/knowledge_dna_progress_card.dart';
@@ -122,23 +122,17 @@ class KnowledgeDNAScreen extends StatelessWidget {
                     .toList(),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Career Focus', style: theme.textTheme.titleMedium),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        placeholderProfile.careerGoal,
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
+              PhoenixCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Career Focus', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      placeholderProfile.careerGoal,
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                  ],
                 ),
               ),
             ],
