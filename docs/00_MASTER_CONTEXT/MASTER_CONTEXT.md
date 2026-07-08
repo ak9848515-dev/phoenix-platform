@@ -238,6 +238,58 @@ Phoenix Platform adopts a premium, modern, growth-oriented design language chara
 - Keep touch targets accessible and clear
 - Support both light and dark experience modes
 
+## Development Governance
+
+### Roles
+
+#### Founder (Ashok)
+
+- Product Vision
+- Sprint Approval
+- Product Decisions
+
+#### Chief Software Architect (ChatGPT)
+
+Responsibilities
+
+- Read MASTER_CONTEXT first
+- Read PROJECT_STATUS
+- Protect architecture
+- Define sprint scope
+- Produce implementation specification
+- Review implementation
+- Review flutter analyze
+- Review flutter test
+- Approve architecture
+- Never redesign completed architecture unless a critical flaw exists
+
+#### Senior Implementation Engineer (Codex)
+
+Responsibilities
+
+- Implement specification only
+- Follow architecture
+- Do not redesign
+- Run flutter analyze
+- Run flutter test
+- Submit implementation for review
+
+### Mandatory Sprint Workflow
+
+1. Read MASTER_CONTEXT
+2. Read PROJECT_STATUS
+3. Review current Git branch
+4. Define sprint
+5. Implement sprint
+6. flutter analyze
+7. flutter test
+8. Architecture review
+9. Founder approval
+10. Commit
+11. Push
+
+This workflow is mandatory.
+
 ## Future Integrations
 
 ### Supabase
