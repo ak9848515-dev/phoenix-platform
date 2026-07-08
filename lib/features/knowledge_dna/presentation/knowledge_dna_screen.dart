@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../services/sample_data_service.dart';
 import '../../../shared/widgets/phoenix_card.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
-import '../models/knowledge_dna.dart';
 import 'widgets/knowledge_dna_progress_card.dart';
 import 'widgets/knowledge_dna_stat_card.dart';
 
@@ -17,20 +17,8 @@ class KnowledgeDNAScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    final placeholderProfile = KnowledgeDNA(
-      knowledge: 'Design Systems',
-      skill: 'Product Strategy',
-      confidence: 0.82,
-      retention: 0.74,
-      consistency: 0.79,
-      learningVelocity: 0.88,
-      missionsCompleted: 12,
-      projectsCompleted: 7,
-      weakAreas: const ['Stakeholder alignment', 'Presentation pacing'],
-      strongAreas: const ['Systems thinking', 'Execution clarity'],
-      careerGoal: 'Lead platform experience strategy',
-    );
+    final sampleData = const SampleDataService();
+    final profile = sampleData.knowledgeProfile;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -57,7 +45,7 @@ class KnowledgeDNAScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              KnowledgeDNATopProgressCard(profile: placeholderProfile),
+              KnowledgeDNATopProgressCard(profile: profile),
               const SizedBox(height: AppSpacing.lg),
               GridView.count(
                 crossAxisCount: 2,
@@ -69,22 +57,22 @@ class KnowledgeDNAScreen extends StatelessWidget {
                 children: [
                   KnowledgeDNAStatCard(
                     title: 'Confidence',
-                    value: '${(placeholderProfile.confidence * 100).toInt()}%',
+                    value: '${(profile.confidence * 100).toInt()}%',
                     accentColor: AppColors.primary,
                   ),
                   KnowledgeDNAStatCard(
                     title: 'Retention',
-                    value: '${(placeholderProfile.retention * 100).toInt()}%',
+                    value: '${(profile.retention * 100).toInt()}%',
                     accentColor: AppColors.success,
                   ),
                   KnowledgeDNAStatCard(
                     title: 'Consistency',
-                    value: '${(placeholderProfile.consistency * 100).toInt()}%',
+                    value: '${(profile.consistency * 100).toInt()}%',
                     accentColor: AppColors.warning,
                   ),
                   KnowledgeDNAStatCard(
                     title: 'Velocity',
-                    value: '${(placeholderProfile.learningVelocity * 100).toInt()}%',
+                    value: '${(profile.learningVelocity * 100).toInt()}%',
                     accentColor: AppColors.secondary,
                   ),
                 ],
@@ -95,7 +83,7 @@ class KnowledgeDNAScreen extends StatelessWidget {
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
-                children: placeholderProfile.strongAreas
+                children: profile.strongAreas
                     .map(
                       (area) => Chip(
                         label: Text(area),
@@ -111,7 +99,7 @@ class KnowledgeDNAScreen extends StatelessWidget {
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
-                children: placeholderProfile.weakAreas
+                children: profile.weakAreas
                     .map(
                       (area) => Chip(
                         label: Text(area),
@@ -129,7 +117,7 @@ class KnowledgeDNAScreen extends StatelessWidget {
                     Text('Career Focus', style: theme.textTheme.titleMedium),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      placeholderProfile.careerGoal,
+                      profile.careerGoal,
                       style: theme.textTheme.bodyLarge,
                     ),
                   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../services/sample_data_service.dart';
 import '../../shared/widgets/phoenix_card.dart';
 import '../../shared/widgets/phoenix_progress_indicator.dart';
 import '../../shared/widgets/phoenix_section_header.dart';
@@ -18,18 +19,20 @@ class MissionCenterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    final quickActions = <_QuickActionData>[
-      _QuickActionData('Daily Check-in', Icons.task_alt_outlined),
-      _QuickActionData('Focus Session', Icons.bolt_outlined),
-      _QuickActionData('Learning Sprint', Icons.school_outlined),
-    ];
-
-    final academies = <_AcademyData>[
-      _AcademyData('Leadership Lab', 'Growth • 4 lessons'),
-      _AcademyData('Product Thinking', 'Strategy • 6 lessons'),
-      _AcademyData('Design Systems', 'Craft • 3 lessons'),
-    ];
+    final sampleData = const SampleDataService();
+    final featuredMission = sampleData.featuredMission;
+    final quickActions = sampleData.quickActions;
+    final academies = sampleData.academySummaries;
+    final dashboardSections = sampleData.dashboardSections;
+    final knowledgeProgress = sampleData.knowledgeProgress.first;
+    final knowledgeSummary =
+        '${(knowledgeProgress.value * 100).toInt()}% of your curated learning map is now activated.';
+    final quickActionsHeader = dashboardSections
+        .firstWhere((section) => section.id == 'section-quick-actions')
+        .label;
+    final academiesHeader = dashboardSections
+        .firstWhere((section) => section.id == 'section-academies')
+        .label;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -77,7 +80,7 @@ class MissionCenterScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Today\'s Mission',
+                            featuredMission.title,
                             style: theme.textTheme.titleMedium,
                           ),
                         ),
@@ -102,16 +105,16 @@ class MissionCenterScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Complete the onboarding sprint and unlock the next level of your learning path.',
+                      featuredMission.description,
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    const PhoenixProgressIndicator(value: 0.45),
+                    PhoenixProgressIndicator(value: knowledgeProgress.value),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              PhoenixSectionHeader(title: 'Quick Actions'),
+              PhoenixSectionHeader(title: quickActionsHeader),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.md,
@@ -126,14 +129,14 @@ class MissionCenterScreen extends StatelessWidget {
                     .toList(),
               ),
               const SizedBox(height: AppSpacing.lg),
-              PhoenixSectionHeader(title: 'Academies'),
+              PhoenixSectionHeader(title: academiesHeader),
               const SizedBox(height: AppSpacing.sm),
               ...academies.map(
                 (academy) => Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: _AcademyTile(
                     title: academy.title,
-                    subtitle: academy.subtitle,
+                    subtitle: academy.description,
                   ),
                 ),
               ),
@@ -151,14 +154,14 @@ class MissionCenterScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '72% of your curated learning map is now activated.',
+                      knowledgeSummary,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: AppColors.onDarkBackground.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     PhoenixProgressIndicator(
-                      value: 0.72,
+                      value: knowledgeProgress.value,
                       minHeight: 10,
                       backgroundColor: AppColors.onDarkBackground.withValues(alpha: 0.2),
                       valueColor: AppColors.primary,
@@ -282,18 +285,4 @@ class _AcademyTile extends StatelessWidget {
       trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
     );
   }
-}
-
-class _QuickActionData {
-  const _QuickActionData(this.label, this.icon);
-
-  final String label;
-  final IconData icon;
-}
-
-class _AcademyData {
-  const _AcademyData(this.title, this.subtitle);
-
-  final String title;
-  final String subtitle;
 }
