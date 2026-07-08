@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../services/sample_data_service.dart';
 import '../../../shared/widgets/phoenix_card.dart';
 import '../../mission_engine/mission_service.dart';
+import '../../progress_engine/progress_service.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import 'widgets/knowledge_dna_progress_card.dart';
@@ -20,8 +21,10 @@ class KnowledgeDNAScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final sampleData = const SampleDataService();
     final missionService = MissionService(seedSource: sampleData);
+    final progressService = ProgressService(seedSource: sampleData);
     final profile = sampleData.knowledgeProfile;
     final missionStats = missionService.buildStatistics();
+    final progressSummary = progressService.buildSummary();
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -56,6 +59,11 @@ class KnowledgeDNAScreen extends StatelessWidget {
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       '${missionStats.completedCount} completed • ${missionStats.pendingCount} pending • ${missionStats.streak} day streak',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Level ${progressSummary.level} • ${progressSummary.totalXp} XP • ${progressSummary.streaks.daily} day streak',
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],

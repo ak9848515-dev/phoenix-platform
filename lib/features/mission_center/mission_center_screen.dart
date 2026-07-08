@@ -5,6 +5,7 @@ import '../../shared/widgets/phoenix_card.dart';
 import '../../routes/app_routes.dart';
 import '../../shared/widgets/phoenix_progress_indicator.dart';
 import '../mission_engine/mission_service.dart';
+import '../progress_engine/progress_service.dart';
 import '../../shared/widgets/phoenix_section_header.dart';
 import '../../theme/colors.dart';
 import '../../theme/radius.dart';
@@ -23,13 +24,15 @@ class MissionCenterScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final sampleData = const SampleDataService();
     final missionService = MissionService(seedSource: sampleData);
+    final progressService = ProgressService(seedSource: sampleData);
     final missionProgress = missionService.buildProgress();
+    final progressSummary = progressService.buildSummary();
     final featuredMission = missionProgress.featuredMission;
     final quickActions = sampleData.quickActions;
     final academies = sampleData.academySummaries;
     final dashboardSections = sampleData.dashboardSections;
     final knowledgeSummary =
-        '${(missionProgress.completionPercentage * 100).toInt()}% of your mission engine is now active.';
+        '${(progressSummary.completionPercentage * 100).toInt()}% of your growth engine is now active.';
     final quickActionsHeader = dashboardSections
         .firstWhere((section) => section.id == 'section-quick-actions')
         .label;
@@ -116,7 +119,7 @@ class MissionCenterScreen extends StatelessWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      PhoenixProgressIndicator(value: missionProgress.completionPercentage),
+                      PhoenixProgressIndicator(value: progressSummary.completionPercentage),
                     ],
                   ),
                 ),
@@ -169,7 +172,7 @@ class MissionCenterScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     PhoenixProgressIndicator(
-                      value: missionProgress.completionPercentage,
+                      value: progressSummary.completionPercentage,
                       minHeight: 10,
                       backgroundColor: AppColors.onDarkBackground.withValues(alpha: 0.2),
                       valueColor: AppColors.primary,

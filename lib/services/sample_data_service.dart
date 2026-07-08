@@ -71,9 +71,9 @@ class SampleDataService {
           category: 'weekly',
           priority: 'medium',
           estimatedDuration: 45,
-          completed: false,
+          completed: true,
           completionDate: null,
-          xpReward: 140,
+          xpReward: 250,
           academyId: 'academy-design',
         ),
         mission_engine.Mission(
