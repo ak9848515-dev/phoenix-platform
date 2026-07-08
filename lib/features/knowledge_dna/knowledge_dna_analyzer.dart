@@ -16,6 +16,7 @@ class KnowledgeDNAAnalyzer {
     final knowledgeScore = (missionStats.completionPercentage * 0.6) + (progressSummary.completionPercentage * 0.4);
     final confidenceScore = (knowledgeScore + (progressSummary.level / 10)) / 1.1;
     final retentionScore = (knowledgeScore + (missionStats.streak / 10)) / 1.2;
+    final consistencyScore = (missionStats.completionPercentage + (missionStats.streak / 10)) / 2;
     final learningVelocity = (confidenceScore + retentionScore) / 2;
 
     final strengths = <String>[
@@ -35,9 +36,11 @@ class KnowledgeDNAAnalyzer {
       knowledgeScore: knowledgeScore.clamp(0.0, 1.0),
       confidenceScore: confidenceScore.clamp(0.0, 1.0),
       retentionScore: retentionScore.clamp(0.0, 1.0),
+      consistencyScore: consistencyScore.clamp(0.0, 1.0),
       learningVelocity: learningVelocity.clamp(0.0, 1.0),
       skillStrengths: strengths.isEmpty ? const <String>['Execution clarity'] : strengths,
       skillWeaknesses: weaknesses.isEmpty ? const <String>['Momentum building'] : weaknesses,
+      careerDirection: 'Lead platform experience strategy',
       recommendedMissions: recommendedMissions,
       recommendedAcademies: recommendedAcademies,
       summary: '${(knowledgeScore * 100).toInt()}% knowledge readiness',
