@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../services/sample_data_service.dart';
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../mission_engine/mission_service.dart';
-import '../../progress_engine/progress_service.dart';
+import '../knowledge_dna_service.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
-import 'widgets/knowledge_dna_progress_card.dart';
 import 'widgets/knowledge_dna_stat_card.dart';
 
 /// Presentation-only screen for the Knowledge DNA experience.
@@ -20,11 +18,8 @@ class KnowledgeDNAScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sampleData = const SampleDataService();
-    final missionService = MissionService(seedSource: sampleData);
-    final progressService = ProgressService(seedSource: sampleData);
-    final profile = sampleData.knowledgeProfile;
-    final missionStats = missionService.buildStatistics();
-    final progressSummary = progressService.buildSummary();
+    final knowledgeService = KnowledgeDNAService(seedSource: sampleData);
+    final analysis = knowledgeService.buildAnalysis();
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -48,22 +43,17 @@ class KnowledgeDNAScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Mission engine', style: theme.textTheme.titleMedium),
+                    Text('Knowledge DNA', style: theme.textTheme.titleMedium),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      missionStats.summary,
+                      analysis.summary,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '${missionStats.completedCount} completed • ${missionStats.pendingCount} pending • ${missionStats.streak} day streak',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Level ${progressSummary.level} • ${progressSummary.totalXp} XP • ${progressSummary.streaks.daily} day streak',
+                      'Confidence ${((analysis.confidenceScore) * 100).toInt()}% • Retention ${((analysis.retentionScore) * 100).toInt()}%',
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],
@@ -77,7 +67,18 @@ class KnowledgeDNAScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              KnowledgeDNATopProgressCard(profile: profile),
+              PhoenixCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Learning intelligence', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text('Knowledge ${((analysis.knowledgeScore) * 100).toInt()}%'),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text('Velocity ${((analysis.learningVelocity) * 100).toInt()}%'),
+                  ],
+                ),
+              ),
               const SizedBox(height: AppSpacing.lg),
               GridView.count(
                 crossAxisCount: 2,
@@ -88,23 +89,23 @@ class KnowledgeDNAScreen extends StatelessWidget {
                 childAspectRatio: 1.1,
                 children: [
                   KnowledgeDNAStatCard(
-                    title: 'Confidence',
-                    value: '${(profile.confidence * 100).toInt()}%',
+                    title: 'Knowledge',
+                    value: '${(analysis.knowledgeScore * 100).toInt()}%',
                     accentColor: AppColors.primary,
                   ),
                   KnowledgeDNAStatCard(
-                    title: 'Retention',
-                    value: '${(profile.retention * 100).toInt()}%',
+                    title: 'Confidence',
+                    value: '${(analysis.confidenceScore * 100).toInt()}%',
                     accentColor: AppColors.success,
                   ),
                   KnowledgeDNAStatCard(
-                    title: 'Consistency',
-                    value: '${(profile.consistency * 100).toInt()}%',
+                    title: 'Retention',
+                    value: '${(analysis.retentionScore * 100).toInt()}%',
                     accentColor: AppColors.warning,
                   ),
                   KnowledgeDNAStatCard(
                     title: 'Velocity',
-                    value: '${(profile.learningVelocity * 100).toInt()}%',
+                    value: '${(analysis.learningVelocity * 100).toInt()}%',
                     accentColor: AppColors.secondary,
                   ),
                 ],
@@ -115,7 +116,7 @@ class KnowledgeDNAScreen extends StatelessWidget {
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
-                children: profile.strongAreas
+                children: analysis.skillStrengths
                     .map(
                       (area) => Chip(
                         label: Text(area),
@@ -131,7 +132,7 @@ class KnowledgeDNAScreen extends StatelessWidget {
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
-                children: profile.weakAreas
+                children: analysis.skillWeaknesses
                     .map(
                       (area) => Chip(
                         label: Text(area),
@@ -146,11 +147,19 @@ class KnowledgeDNAScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Career Focus', style: theme.textTheme.titleMedium),
+                    Text('Recommended focus', style: theme.textTheme.titleMedium),
                     const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      profile.careerGoal,
-                      style: theme.textTheme.bodyLarge,
+                    ...analysis.recommendedMissions.map(
+                      (mission) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                        child: Text('- ${mission.title}', style: theme.textTheme.bodyMedium),
+                      ),
+                    ),
+                    ...analysis.recommendedAcademies.map(
+                      (academy) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                        child: Text('- $academy', style: theme.textTheme.bodyMedium),
+                      ),
                     ),
                   ],
                 ),
