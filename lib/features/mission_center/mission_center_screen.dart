@@ -4,6 +4,7 @@ import '../../services/sample_data_service.dart';
 import '../../shared/widgets/phoenix_card.dart';
 import '../../routes/app_routes.dart';
 import '../../shared/widgets/phoenix_progress_indicator.dart';
+import '../mission_engine/mission_service.dart';
 import '../../shared/widgets/phoenix_section_header.dart';
 import '../../theme/colors.dart';
 import '../../theme/radius.dart';
@@ -21,13 +22,14 @@ class MissionCenterScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final sampleData = const SampleDataService();
-    final featuredMission = sampleData.featuredMission;
+    final missionService = MissionService(seedSource: sampleData);
+    final missionProgress = missionService.buildProgress();
+    final featuredMission = missionProgress.featuredMission;
     final quickActions = sampleData.quickActions;
     final academies = sampleData.academySummaries;
     final dashboardSections = sampleData.dashboardSections;
-    final knowledgeProgress = sampleData.knowledgeProgress.first;
     final knowledgeSummary =
-        '${(knowledgeProgress.value * 100).toInt()}% of your curated learning map is now activated.';
+        '${(missionProgress.completionPercentage * 100).toInt()}% of your mission engine is now active.';
     final quickActionsHeader = dashboardSections
         .firstWhere((section) => section.id == 'section-quick-actions')
         .label;
@@ -114,7 +116,7 @@ class MissionCenterScreen extends StatelessWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      PhoenixProgressIndicator(value: knowledgeProgress.value),
+                      PhoenixProgressIndicator(value: missionProgress.completionPercentage),
                     ],
                   ),
                 ),
@@ -167,7 +169,7 @@ class MissionCenterScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     PhoenixProgressIndicator(
-                      value: knowledgeProgress.value,
+                      value: missionProgress.completionPercentage,
                       minHeight: 10,
                       backgroundColor: AppColors.onDarkBackground.withValues(alpha: 0.2),
                       valueColor: AppColors.primary,

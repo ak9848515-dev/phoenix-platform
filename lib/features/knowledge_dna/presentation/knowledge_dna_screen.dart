@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../services/sample_data_service.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../mission_engine/mission_service.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import 'widgets/knowledge_dna_progress_card.dart';
@@ -18,7 +19,9 @@ class KnowledgeDNAScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sampleData = const SampleDataService();
+    final missionService = MissionService(seedSource: sampleData);
     final profile = sampleData.knowledgeProfile;
+    final missionStats = missionService.buildStatistics();
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -36,6 +39,27 @@ class KnowledgeDNAScreen extends StatelessWidget {
               Text(
                 'Your learning profile',
                 style: theme.textTheme.headlineSmall,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              PhoenixCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Mission engine', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      missionStats.summary,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      '${missionStats.completedCount} completed • ${missionStats.pendingCount} pending • ${missionStats.streak} day streak',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(

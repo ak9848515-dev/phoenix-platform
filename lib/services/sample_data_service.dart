@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/knowledge_dna/models/knowledge_dna.dart';
+import '../features/mission_engine/mission_engine.dart' as mission_engine;
 import '../models/academy.dart';
 import '../models/lesson.dart';
 import '../models/level.dart';
@@ -21,6 +22,72 @@ class SampleDataService {
 
   List<Progress> get missionProgress => const <Progress>[
         Progress(id: 'mission-progress', label: 'Current focus', value: 0.45),
+      ];
+
+  List<mission_engine.Mission> get dailyMissions => const <mission_engine.Mission>[
+        mission_engine.Mission(
+          id: 'daily-1',
+          title: 'Daily Reflect',
+          description: 'Capture one insight from your day.',
+          category: 'daily',
+          priority: 'high',
+          estimatedDuration: 15,
+          completed: true,
+          completionDate: null,
+          xpReward: 120,
+          academyId: 'academy-leadership',
+        ),
+        mission_engine.Mission(
+          id: 'daily-2',
+          title: 'Weekly Sprint Plan',
+          description: 'Sketch the next three priorities for the week.',
+          category: 'daily',
+          priority: 'medium',
+          estimatedDuration: 20,
+          completed: true,
+          completionDate: null,
+          xpReward: 90,
+          academyId: 'academy-product',
+        ),
+      ];
+
+  List<mission_engine.Mission> get weeklyMissions => const <mission_engine.Mission>[
+        mission_engine.Mission(
+          id: 'weekly-1',
+          title: 'Leadership Review',
+          description: 'Review one team signal and document an action.',
+          category: 'weekly',
+          priority: 'high',
+          estimatedDuration: 30,
+          completed: false,
+          completionDate: null,
+          xpReward: 180,
+          academyId: 'academy-leadership',
+        ),
+        mission_engine.Mission(
+          id: 'weekly-2',
+          title: 'Design Systems Audit',
+          description: 'Check one reusable pattern and improve it.',
+          category: 'weekly',
+          priority: 'medium',
+          estimatedDuration: 45,
+          completed: false,
+          completionDate: null,
+          xpReward: 140,
+          academyId: 'academy-design',
+        ),
+        mission_engine.Mission(
+          id: 'weekly-3',
+          title: 'Opportunity Capture',
+          description: 'Capture one new product opportunity from customer feedback.',
+          category: 'weekly',
+          priority: 'low',
+          estimatedDuration: 25,
+          completed: false,
+          completionDate: null,
+          xpReward: 110,
+          academyId: 'academy-product',
+        ),
       ];
 
   List<Progress> get knowledgeProgress => const <Progress>[
