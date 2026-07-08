@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../features/academy/academy_screen.dart';
 import '../features/knowledge_dna/presentation/knowledge_dna_screen.dart';
 import '../features/mission_center/mission_center_screen.dart';
 import 'app_routes.dart';
@@ -18,6 +19,11 @@ class RouteGenerator {
         return MaterialPageRoute<dynamic>(
           settings: settings,
           builder: (_) => const KnowledgeDNAScreen(),
+        );
+      case AppRoutes.academy:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const AcademyScreen(),
         );
       default:
         return MaterialPageRoute<dynamic>(

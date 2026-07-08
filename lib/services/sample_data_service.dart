@@ -6,6 +6,7 @@ import '../models/lesson.dart';
 import '../models/level.dart';
 import '../models/mission.dart';
 import '../models/progress.dart';
+import '../models/stage.dart';
 
 class SampleDataService {
   const SampleDataService();
@@ -46,6 +47,32 @@ class SampleDataService {
           levels: <Level>[],
         ),
       ];
+
+  Academy get featuredAcademy => const Academy(
+        id: 'academy-leadership',
+        title: 'Leadership Lab',
+        description: 'Craft high-leverage habits for leading product and platform teams.',
+        levels: <Level>[
+          Level(
+            id: 'level-1',
+            title: 'Foundation',
+            stages: <Stage>[
+              Stage(
+                id: 'stage-1',
+                title: 'Mindset',
+                missions: <Mission>[
+                  Mission(
+                    id: 'mission-1',
+                    title: 'Daily Reflect',
+                    description: 'Capture one insight from your day.',
+                    lessons: <Lesson>[],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
 
   List<Progress> get dashboardSections => const <Progress>[
         Progress(id: 'section-quick-actions', label: 'Quick Actions', value: 0.0),

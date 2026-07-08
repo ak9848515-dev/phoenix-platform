@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/sample_data_service.dart';
 import '../../shared/widgets/phoenix_card.dart';
+import '../../routes/app_routes.dart';
 import '../../shared/widgets/phoenix_progress_indicator.dart';
 import '../../shared/widgets/phoenix_section_header.dart';
 import '../../theme/colors.dart';
@@ -72,45 +73,50 @@ class MissionCenterScreen extends StatelessWidget {
                 subtitle: 'You are 2 steps away from your next milestone.',
               ),
               const SizedBox(height: AppSpacing.lg),
-              PhoenixCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            featuredMission.title,
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm,
-                            vertical: AppSpacing.xs,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.secondary.withValues(alpha: 0.16),
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                          ),
-                          child: Text(
-                            'Priority Focus',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushNamed(AppRoutes.academy);
+                },
+                child: PhoenixCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              featuredMission.title,
+                              style: theme.textTheme.titleMedium,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      featuredMission.description,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    PhoenixProgressIndicator(value: knowledgeProgress.value),
-                  ],
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: AppSpacing.xs,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withValues(alpha: 0.16),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
+                            ),
+                            child: Text(
+                              'Priority Focus',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        featuredMission.description,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      PhoenixProgressIndicator(value: knowledgeProgress.value),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),

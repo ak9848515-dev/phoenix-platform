@@ -3,4 +3,5 @@ class AppRoutes {
 
   static const String missionCenter = '/';
   static const String knowledgeDna = '/knowledge-dna';
+  static const String academy = '/academy';
 }
