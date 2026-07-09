@@ -17,7 +17,7 @@ class PhoenixApp extends StatelessWidget {
       title: 'Phoenix Platform',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      initialRoute: AppRoutes.missionCenter,
+      initialRoute: AppRoutes.dashboard,
       onGenerateRoute: AppRouter.generateRoute,
     );
   }
