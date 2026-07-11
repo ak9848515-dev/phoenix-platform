@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/experience/experience_secondary_button.dart';
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../../shared/widgets/phoenix_primary_button.dart';
 import '../../../theme/spacing.dart';
 
 class QuickActionsCard extends StatelessWidget {
   const QuickActionsCard({
     super.key,
-    required this.onContinueLearning,
-    required this.onViewAcademy,
-    required this.onViewMissions,
+    required this.onMission,
+    required this.onLearn,
+    required this.onProgress,
+    required this.onProfile,
   });
 
-  final VoidCallback onContinueLearning;
-  final VoidCallback onViewAcademy;
-  final VoidCallback onViewMissions;
+  final VoidCallback onMission;
+  final VoidCallback onLearn;
+  final VoidCallback onProgress;
+  final VoidCallback onProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -26,26 +28,84 @@ class QuickActionsCard extends StatelessWidget {
         children: [
           Text('Quick Actions', style: theme.textTheme.titleMedium),
           const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              PhoenixPrimaryButton(
-                onPressed: onContinueLearning,
-                label: 'Continue Learning',
-                icon: Icons.play_arrow_outlined,
-              ),
-              PhoenixPrimaryButton(
-                onPressed: onViewAcademy,
-                label: 'View Academy',
-                icon: Icons.school_outlined,
-              ),
-              PhoenixPrimaryButton(
-                onPressed: onViewMissions,
-                label: 'View Missions',
-                icon: Icons.rocket_launch_outlined,
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final useTwoColumns = constraints.maxWidth >= 400;
+
+              if (useTwoColumns) {
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ExperienceSecondaryButton(
+                            icon: Icons.rocket_launch_outlined,
+                            label: 'Mission',
+                            onTap: onMission,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: ExperienceSecondaryButton(
+                            icon: Icons.school_outlined,
+                            label: 'Learn',
+                            onTap: onLearn,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ExperienceSecondaryButton(
+                            icon: Icons.trending_up_outlined,
+                            label: 'Progress',
+                            onTap: onProgress,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: ExperienceSecondaryButton(
+                            icon: Icons.person_outlined,
+                            label: 'Profile',
+                            onTap: onProfile,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }
+
+              return Column(
+                children: [
+                  ExperienceSecondaryButton(
+                    icon: Icons.rocket_launch_outlined,
+                    label: 'Mission',
+                    onTap: onMission,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ExperienceSecondaryButton(
+                    icon: Icons.school_outlined,
+                    label: 'Learn',
+                    onTap: onLearn,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ExperienceSecondaryButton(
+                    icon: Icons.trending_up_outlined,
+                    label: 'Progress',
+                    onTap: onProgress,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ExperienceSecondaryButton(
+                    icon: Icons.person_outlined,
+                    label: 'Profile',
+                    onTap: onProfile,
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),

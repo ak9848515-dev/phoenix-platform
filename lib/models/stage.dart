@@ -4,11 +4,7 @@ import 'mission.dart';
 
 /// Immutable representation of a stage within a level.
 class Stage {
-  const Stage({
-    required this.id,
-    required this.title,
-    required this.missions,
-  });
+  const Stage({required this.id, required this.title, required this.missions});
 
   final String id;
   final String title;
@@ -39,14 +35,18 @@ class Stage {
       missions: missionsData == null
           ? const <Mission>[]
           : (missionsData as List)
-              .map((item) => Mission.fromMap(Map<String, dynamic>.from(item as Map)))
-              .toList(),
+                .map(
+                  (item) =>
+                      Mission.fromMap(Map<String, dynamic>.from(item as Map)),
+                )
+                .toList(),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Stage.fromJson(String source) => Stage.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Stage.fromJson(String source) =>
+      Stage.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -54,7 +54,10 @@ class Stage {
       return true;
     }
 
-    return other is Stage && other.id == id && other.title == title && other.missions.length == missions.length;
+    return other is Stage &&
+        other.id == id &&
+        other.title == title &&
+        other.missions.length == missions.length;
   }
 
   @override

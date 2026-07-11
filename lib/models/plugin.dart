@@ -16,7 +16,12 @@ class Plugin {
   final String description;
   final Academy academy;
 
-  Plugin copyWith({String? id, String? name, String? description, Academy? academy}) {
+  Plugin copyWith({
+    String? id,
+    String? name,
+    String? description,
+    Academy? academy,
+  }) {
     return Plugin(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -39,13 +44,16 @@ class Plugin {
       id: map['id'] as String,
       name: map['name'] as String,
       description: map['description'] as String,
-      academy: Academy.fromMap(Map<String, dynamic>.from(map['academy'] as Map)),
+      academy: Academy.fromMap(
+        Map<String, dynamic>.from(map['academy'] as Map),
+      ),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Plugin.fromJson(String source) => Plugin.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Plugin.fromJson(String source) =>
+      Plugin.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {

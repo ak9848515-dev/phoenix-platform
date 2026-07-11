@@ -91,7 +91,9 @@ class KnowledgeDNATopProgressCard extends StatelessWidget {
                 value: profile.confidence,
                 minHeight: 10,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.16),
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppColors.primary,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),

@@ -6,13 +6,15 @@ import 'knowledge_dna_engine.dart';
 
 /// Orchestrates Knowledge DNA analysis from mission and progress data.
 class KnowledgeDNAService {
-  KnowledgeDNAService({SampleDataService? seedSource}) : seedSource = seedSource ?? const SampleDataService();
+  KnowledgeDNAService({SampleDataService? seedSource})
+    : seedSource = seedSource ?? const SampleDataService();
 
   final SampleDataService seedSource;
 
   MissionService get missionService => MissionService(seedSource: seedSource);
 
-  ProgressService get progressService => ProgressService(seedSource: seedSource);
+  ProgressService get progressService =>
+      ProgressService(seedSource: seedSource);
 
   KnowledgeDNAEngine buildAnalysis() {
     final missionStats = missionService.buildStatistics();
@@ -21,8 +23,11 @@ class KnowledgeDNAService {
     return KnowledgeDNAAnalyzer().analyze(
       missionStats: missionStats,
       progressSummary: progressSummary,
-      availableMissions: missionService.dailyMissions + missionService.weeklyMissions,
-      availableAcademies: seedSource.academySummaries.map((academy) => academy.title).toList(),
+      availableMissions:
+          missionService.dailyMissions + missionService.weeklyMissions,
+      availableAcademies: seedSource.academySummaries
+          .map((academy) => academy.title)
+          .toList(),
     );
   }
 }

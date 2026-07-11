@@ -5,7 +5,8 @@ import 'mission_statistics.dart';
 
 /// Central service for deriving mission progress and statistics from seeded data.
 class MissionService {
-  MissionService({SampleDataService? seedSource}) : seedSource = seedSource ?? const SampleDataService();
+  MissionService({SampleDataService? seedSource})
+    : seedSource = seedSource ?? const SampleDataService();
 
   final SampleDataService seedSource;
 
@@ -23,9 +24,13 @@ class MissionService {
 
   MissionProgress buildProgress() {
     final missions = <Mission>[...dailyMissions, ...weeklyMissions];
-    final completedCount = missions.where((mission) => mission.completed).length;
+    final completedCount = missions
+        .where((mission) => mission.completed)
+        .length;
     final pendingCount = missions.length - completedCount;
-    final completionPercentage = missions.isEmpty ? 0.0 : completedCount / missions.length;
+    final completionPercentage = missions.isEmpty
+        ? 0.0
+        : completedCount / missions.length;
     final streak = _calculateStreak(missions);
 
     return MissionProgress(
@@ -44,7 +49,8 @@ class MissionService {
     final progress = buildProgress();
 
     return MissionStatistics(
-      totalMissions: progress.dailyMissions.length + progress.weeklyMissions.length,
+      totalMissions:
+          progress.dailyMissions.length + progress.weeklyMissions.length,
       completedCount: progress.completedCount,
       pendingCount: progress.pendingCount,
       completionPercentage: progress.completionPercentage,

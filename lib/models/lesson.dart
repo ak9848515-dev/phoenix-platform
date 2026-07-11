@@ -2,11 +2,7 @@ import 'dart:convert';
 
 /// Immutable representation of a lesson within a mission.
 class Lesson {
-  const Lesson({
-    required this.id,
-    required this.title,
-    required this.duration,
-  });
+  const Lesson({required this.id, required this.title, required this.duration});
 
   final String id;
   final String title;
@@ -21,11 +17,7 @@ class Lesson {
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'title': title,
-      'duration': duration,
-    };
+    return <String, dynamic>{'id': id, 'title': title, 'duration': duration};
   }
 
   factory Lesson.fromMap(Map<String, dynamic> map) {
@@ -38,7 +30,8 @@ class Lesson {
 
   String toJson() => json.encode(toMap());
 
-  factory Lesson.fromJson(String source) => Lesson.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Lesson.fromJson(String source) =>
+      Lesson.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -46,7 +39,10 @@ class Lesson {
       return true;
     }
 
-    return other is Lesson && other.id == id && other.title == title && other.duration == duration;
+    return other is Lesson &&
+        other.id == id &&
+        other.title == title &&
+        other.duration == duration;
   }
 
   @override

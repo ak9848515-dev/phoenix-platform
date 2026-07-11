@@ -10,24 +10,47 @@ import 'xp_calculator.dart';
 
 /// Orchestrates progress metrics from mission completion data.
 class ProgressService {
-  ProgressService({SampleDataService? seedSource}) : seedSource = seedSource ?? const SampleDataService();
+  ProgressService({SampleDataService? seedSource})
+    : seedSource = seedSource ?? const SampleDataService();
 
   final SampleDataService seedSource;
 
   MissionService get missionService => MissionService(seedSource: seedSource);
 
   ProgressSummary buildSummary() {
-    final missions = <Mission>[...missionService.dailyMissions, ...missionService.weeklyMissions];
-    final completedMissions = missions.where((mission) => mission.completed).toList();
-    final totalXp = XPCalculator().calculate(completedMissions.map((mission) => mission.xpReward).toList());
-    final level = LevelCalculator().calculate(totalXp);
-    final completionPercentage = missions.isEmpty ? 0.0 : completedMissions.length / missions.length;
-    final streaks = Streaks(
-      daily: StreakCalculator().calculateDaily(missionService.dailyMissions.map((mission) => mission.completed).toList()),
-      weekly: StreakCalculator().calculateWeekly(missionService.weeklyMissions.map((mission) => mission.completed).toList()),
-      monthly: StreakCalculator().calculateMonthly(missions.map((mission) => mission.completed).toList()),
+    final missions = <Mission>[
+      ...missionService.dailyMissions,
+      ...missionService.weeklyMissions,
+    ];
+    final completedMissions = missions
+        .where((mission) => mission.completed)
+        .toList();
+    final totalXp = XPCalculator().calculate(
+      completedMissions.map((mission) => mission.xpReward).toList(),
     );
-    final achievements = AchievementEngine().calculate(completedMissions.length, missions.length);
+    final level = LevelCalculator().calculate(totalXp);
+    final completionPercentage = missions.isEmpty
+        ? 0.0
+        : completedMissions.length / missions.length;
+    final streaks = Streaks(
+      daily: StreakCalculator().calculateDaily(
+        missionService.dailyMissions
+            .map((mission) => mission.completed)
+            .toList(),
+      ),
+      weekly: StreakCalculator().calculateWeekly(
+        missionService.weeklyMissions
+            .map((mission) => mission.completed)
+            .toList(),
+      ),
+      monthly: StreakCalculator().calculateMonthly(
+        missions.map((mission) => mission.completed).toList(),
+      ),
+    );
+    final achievements = AchievementEngine().calculate(
+      completedMissions.length,
+      missions.length,
+    );
 
     return ProgressSummary(
       totalXp: totalXp,
@@ -35,7 +58,8 @@ class ProgressService {
       completionPercentage: completionPercentage,
       streaks: streaks,
       achievements: achievements,
-      summary: '$level • ${completedMissions.length}/${missions.length} missions complete',
+      summary:
+          '$level • ${completedMissions.length}/${missions.length} missions complete',
     );
   }
 }

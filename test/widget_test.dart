@@ -10,11 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:phoenix_platform/main.dart';
 
 void main() {
-  testWidgets('Phoenix app starts with mission center route', (
+  testWidgets('Phoenix app starts with dashboard route', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const PhoenixApp());
 
-    expect(find.text('Mission Center'), findsOneWidget);
+    expect(find.text('Dashboard'), findsAtLeastNWidgets(1));
+    expect(find.text('Good morning'), findsOneWidget);
   });
 }

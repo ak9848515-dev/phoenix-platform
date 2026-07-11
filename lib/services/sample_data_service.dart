@@ -13,18 +13,19 @@ class SampleDataService {
   const SampleDataService();
 
   Mission get featuredMission => const Mission(
-        id: 'mission-daily',
-        title: "Today's Mission",
-        description:
-            'Complete the onboarding sprint and unlock the next level of your learning path.',
-        lessons: <Lesson>[],
-      );
+    id: 'mission-daily',
+    title: "Today's Mission",
+    description:
+        'Complete the onboarding sprint and unlock the next level of your learning path.',
+    lessons: <Lesson>[],
+  );
 
   List<Progress> get missionProgress => const <Progress>[
-        Progress(id: 'mission-progress', label: 'Current focus', value: 0.45),
-      ];
+    Progress(id: 'mission-progress', label: 'Current focus', value: 0.45),
+  ];
 
-  List<mission_engine.Mission> get dailyMissions => const <mission_engine.Mission>[
+  List<mission_engine.Mission> get dailyMissions =>
+      const <mission_engine.Mission>[
         mission_engine.Mission(
           id: 'daily-1',
           title: 'Daily Reflect',
@@ -51,7 +52,8 @@ class SampleDataService {
         ),
       ];
 
-  List<mission_engine.Mission> get weeklyMissions => const <mission_engine.Mission>[
+  List<mission_engine.Mission> get weeklyMissions =>
+      const <mission_engine.Mission>[
         mission_engine.Mission(
           id: 'weekly-1',
           title: 'Leadership Review',
@@ -79,7 +81,8 @@ class SampleDataService {
         mission_engine.Mission(
           id: 'weekly-3',
           title: 'Opportunity Capture',
-          description: 'Capture one new product opportunity from customer feedback.',
+          description:
+              'Capture one new product opportunity from customer feedback.',
           category: 'weekly',
           priority: 'low',
           estimatedDuration: 25,
@@ -91,81 +94,82 @@ class SampleDataService {
       ];
 
   List<Progress> get knowledgeProgress => const <Progress>[
-        Progress(id: 'knowledge-coverage', label: 'Knowledge DNA', value: 0.72),
-      ];
+    Progress(id: 'knowledge-coverage', label: 'Knowledge DNA', value: 0.72),
+  ];
 
   List<Academy> get academySummaries => const <Academy>[
-        Academy(
-          id: 'academy-leadership',
-          title: 'Leadership Lab',
-          description: 'Growth • 4 lessons',
-          levels: <Level>[],
-        ),
-        Academy(
-          id: 'academy-product',
-          title: 'Product Thinking',
-          description: 'Strategy • 6 lessons',
-          levels: <Level>[],
-        ),
-        Academy(
-          id: 'academy-design',
-          title: 'Design Systems',
-          description: 'Craft • 3 lessons',
-          levels: <Level>[],
-        ),
-      ];
+    Academy(
+      id: 'academy-leadership',
+      title: 'Leadership Lab',
+      description: 'Growth • 4 lessons',
+      levels: <Level>[],
+    ),
+    Academy(
+      id: 'academy-product',
+      title: 'Product Thinking',
+      description: 'Strategy • 6 lessons',
+      levels: <Level>[],
+    ),
+    Academy(
+      id: 'academy-design',
+      title: 'Design Systems',
+      description: 'Craft • 3 lessons',
+      levels: <Level>[],
+    ),
+  ];
 
   Academy get featuredAcademy => const Academy(
-        id: 'academy-leadership',
-        title: 'Leadership Lab',
-        description: 'Craft high-leverage habits for leading product and platform teams.',
-        levels: <Level>[
-          Level(
-            id: 'level-1',
-            title: 'Foundation',
-            stages: <Stage>[
-              Stage(
-                id: 'stage-1',
-                title: 'Mindset',
-                missions: <Mission>[
-                  Mission(
-                    id: 'mission-1',
-                    title: 'Daily Reflect',
-                    description: 'Capture one insight from your day.',
-                    lessons: <Lesson>[],
-                  ),
-                ],
+    id: 'academy-leadership',
+    title: 'Leadership Lab',
+    description:
+        'Craft high-leverage habits for leading product and platform teams.',
+    levels: <Level>[
+      Level(
+        id: 'level-1',
+        title: 'Foundation',
+        stages: <Stage>[
+          Stage(
+            id: 'stage-1',
+            title: 'Mindset',
+            missions: <Mission>[
+              Mission(
+                id: 'mission-1',
+                title: 'Daily Reflect',
+                description: 'Capture one insight from your day.',
+                lessons: <Lesson>[],
               ),
             ],
           ),
         ],
-      );
+      ),
+    ],
+  );
 
   List<Progress> get dashboardSections => const <Progress>[
-        Progress(id: 'section-quick-actions', label: 'Quick Actions', value: 0.0),
-        Progress(id: 'section-academies', label: 'Academies', value: 0.0),
-        Progress(id: 'section-knowledge-dna', label: 'Knowledge DNA', value: 0.72),
-      ];
+    Progress(id: 'section-quick-actions', label: 'Quick Actions', value: 0.0),
+    Progress(id: 'section-academies', label: 'Academies', value: 0.0),
+    Progress(id: 'section-knowledge-dna', label: 'Knowledge DNA', value: 0.72),
+  ];
 
   KnowledgeDNA get knowledgeProfile => const KnowledgeDNA(
-        knowledge: 'Design Systems',
-        skill: 'Product Strategy',
-        confidence: 0.82,
-        retention: 0.74,
-        consistency: 0.79,
-        learningVelocity: 0.88,
-        missionsCompleted: 12,
-        projectsCompleted: 7,
-        weakAreas: <String>['Stakeholder alignment', 'Presentation pacing'],
-        strongAreas: <String>['Systems thinking', 'Execution clarity'],
-        careerGoal: 'Lead platform experience strategy',
-      );
+    knowledge: 'Design Systems',
+    skill: 'Product Strategy',
+    confidence: 0.82,
+    retention: 0.74,
+    consistency: 0.79,
+    learningVelocity: 0.88,
+    missionsCompleted: 12,
+    projectsCompleted: 7,
+    weakAreas: <String>['Stakeholder alignment', 'Presentation pacing'],
+    strongAreas: <String>['Systems thinking', 'Execution clarity'],
+    careerGoal: 'Lead platform experience strategy',
+  );
 
   List<QuickActionItem> get quickActions => const <QuickActionItem>[
-        QuickActionItem(label: 'Daily Check-in', icon: Icons.task_alt_outlined),
-        QuickActionItem(label: 'Focus Session', icon: Icons.bolt_outlined),
-        QuickActionItem(label: 'Learning Sprint', icon: Icons.school_outlined),
-      ];
+    QuickActionItem(label: 'Daily Check-in', icon: Icons.task_alt_outlined),
+    QuickActionItem(label: 'Focus Session', icon: Icons.bolt_outlined),
+    QuickActionItem(label: 'Learning Sprint', icon: Icons.school_outlined),
+  ];
 }
 
 class QuickActionItem {

@@ -13,8 +13,11 @@ class KnowledgeDNAAnalyzer {
     required List<Mission> availableMissions,
     required List<String> availableAcademies,
   }) {
-    final knowledgeScore = (missionStats.completionPercentage * 0.6) + (progressSummary.completionPercentage * 0.4);
-    final confidenceScore = (knowledgeScore + (progressSummary.level / 10)) / 1.1;
+    final knowledgeScore =
+        (missionStats.completionPercentage * 0.6) +
+        (progressSummary.completionPercentage * 0.4);
+    final confidenceScore =
+        (knowledgeScore + (progressSummary.level / 10)) / 1.1;
     final retentionScore = (knowledgeScore + (missionStats.streak / 10)) / 1.2;
     final learningVelocity = (confidenceScore + retentionScore) / 2;
 
@@ -28,7 +31,10 @@ class KnowledgeDNAAnalyzer {
       if (progressSummary.totalXp < 500) 'Momentum building',
     ];
 
-    final recommendedMissions = availableMissions.where((mission) => !mission.completed).take(2).toList();
+    final recommendedMissions = availableMissions
+        .where((mission) => !mission.completed)
+        .take(2)
+        .toList();
     final recommendedAcademies = availableAcademies.take(2).toList();
 
     return KnowledgeDNAEngine(
@@ -36,8 +42,12 @@ class KnowledgeDNAAnalyzer {
       confidenceScore: confidenceScore.clamp(0.0, 1.0),
       retentionScore: retentionScore.clamp(0.0, 1.0),
       learningVelocity: learningVelocity.clamp(0.0, 1.0),
-      skillStrengths: strengths.isEmpty ? const <String>['Execution clarity'] : strengths,
-      skillWeaknesses: weaknesses.isEmpty ? const <String>['Momentum building'] : weaknesses,
+      skillStrengths: strengths.isEmpty
+          ? const <String>['Execution clarity']
+          : strengths,
+      skillWeaknesses: weaknesses.isEmpty
+          ? const <String>['Momentum building']
+          : weaknesses,
       recommendedMissions: recommendedMissions,
       recommendedAcademies: recommendedAcademies,
       summary: '${(knowledgeScore * 100).toInt()}% knowledge readiness',

@@ -1,135 +1,105 @@
 import 'package:flutter/material.dart';
 
-import '../../models/level.dart';
-import '../../models/stage.dart';
+import '../../routes/app_routes.dart';
 import '../../services/sample_data_service.dart';
-import '../../shared/widgets/phoenix_card.dart';
-import '../../shared/widgets/phoenix_progress_indicator.dart';
-import '../../shared/widgets/phoenix_section_header.dart';
-import '../../theme/colors.dart';
-import '../../theme/radius.dart';
 import '../../theme/spacing.dart';
+import 'widgets/academy_header.dart';
+import 'widgets/continue_learning_card.dart';
+import 'widgets/course_progress_card.dart';
+import 'widgets/learning_actions_card.dart';
+import 'widgets/learning_statistics_card.dart';
+import 'widgets/lesson_list_card.dart';
 
 class AcademyScreen extends StatelessWidget {
   const AcademyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final sampleData = const SampleDataService();
     final academy = sampleData.featuredAcademy;
+    final academies = sampleData.academySummaries;
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: Text('Academy', style: theme.textTheme.titleLarge),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              PhoenixCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(academy.title, style: theme.textTheme.headlineSmall),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      academy.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    PhoenixProgressIndicator(value: 0.35),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              PhoenixSectionHeader(title: 'Learning Path'),
-              const SizedBox(height: AppSpacing.sm),
-              ...academy.levels.map(
-                (level) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: _AcademyLevelTile(level: level),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+    // Derive lesson data from the featured academy structure
+    final allMissions = academy.levels
+        .expand((level) => level.stages)
+        .expand((stage) => stage.missions)
+        .toList();
 
-class _AcademyLevelTile extends StatelessWidget {
-  const _AcademyLevelTile({required this.level});
+    final allLessons = allMissions
+        .expand((mission) => mission.lessons)
+        .toList();
 
-  final Level level;
+    final totalLessons = allLessons.length;
+    final completedLessons = allMissions.isNotEmpty
+        ? 1
+        : 0; // First mission as "completed"
+    final remainingLessons = totalLessons - completedLessons;
+    final progressPercentage = totalLessons > 0
+        ? completedLessons / totalLessons
+        : 0.35;
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // Build lesson list items from the learning path
+    final lessonItems = academy.levels.expand((level) {
+      return level.stages.expand((stage) {
+        return stage.missions.map((mission) {
+          final isFirst = stage.missions.first == mission;
+          return LessonListItem(
+            title: mission.title,
+            subtitle: '${stage.title} • ${level.title}',
+            status: isFirst ? LessonStatus.completed : LessonStatus.current,
+          );
+        });
+      });
+    }).toList();
 
-    return PhoenixCard(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(level.title, style: theme.textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.sm),
-          ...level.stages.map(
-            (stage) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-              child: _StageTile(stage: stage),
-            ),
+          AcademyHeader(
+            courseTitle: academy.title,
+            currentLesson: allMissions.isNotEmpty
+                ? allMissions.first.title
+                : 'Getting Started',
+            completionPercentage: progressPercentage,
+            welcomeMessage: academy.description,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StageTile extends StatelessWidget {
-  const _StageTile({required this.stage});
-
-  final Stage stage;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(stage.title, style: theme.textTheme.titleSmall),
-          const SizedBox(height: AppSpacing.sm),
-          ...stage.missions.map(
-            (mission) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.radio_button_checked, size: 16, color: AppColors.primary),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      mission.title,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const SizedBox(height: AppSpacing.lg),
+          ContinueLearningCard(
+            lessonTitle: allMissions.isNotEmpty
+                ? allMissions.first.title
+                : 'Introduction',
+            lessonDescription: allMissions.isNotEmpty
+                ? allMissions.first.description
+                : 'Begin your learning journey',
+            onContinue: () =>
+                Navigator.of(context).pushNamed(AppRoutes.academy),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          CourseProgressCard(
+            lessonsCompleted: completedLessons,
+            lessonsRemaining: remainingLessons,
+            progressPercentage: progressPercentage,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          LessonListCard(lessons: lessonItems),
+          const SizedBox(height: AppSpacing.lg),
+          LearningStatisticsCard(
+            totalLessons: totalLessons,
+            completedLessons: completedLessons,
+            remainingLessons: remainingLessons,
+            estimatedStudyTime: '${academies.length}h',
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          LearningActionsCard(
+            onContinueLearning: () =>
+                Navigator.of(context).pushNamed(AppRoutes.academy),
+            onDashboard: () =>
+                Navigator.of(context).pushNamed(AppRoutes.dashboard),
+            onMission: () =>
+                Navigator.of(context).pushNamed(AppRoutes.missionCenter),
+            onProfile: () => Navigator.of(context).pushNamed(AppRoutes.profile),
           ),
         ],
       ),

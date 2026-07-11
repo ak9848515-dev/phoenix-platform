@@ -49,14 +49,18 @@ class Academy {
       levels: levelsData == null
           ? const <Level>[]
           : (levelsData as List)
-              .map((item) => Level.fromMap(Map<String, dynamic>.from(item as Map)))
-              .toList(),
+                .map(
+                  (item) =>
+                      Level.fromMap(Map<String, dynamic>.from(item as Map)),
+                )
+                .toList(),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Academy.fromJson(String source) => Academy.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Academy.fromJson(String source) =>
+      Academy.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -72,7 +76,8 @@ class Academy {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, description, Object.hashAll(levels));
+  int get hashCode =>
+      Object.hash(id, title, description, Object.hashAll(levels));
 
   @override
   String toString() {

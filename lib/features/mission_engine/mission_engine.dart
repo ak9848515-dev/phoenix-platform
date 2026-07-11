@@ -86,7 +86,8 @@ class Mission {
 
   String toJson() => json.encode(toMap());
 
-  factory Mission.fromJson(String source) => Mission.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Mission.fromJson(String source) =>
+      Mission.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -109,17 +110,17 @@ class Mission {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        title,
-        description,
-        category,
-        priority,
-        estimatedDuration,
-        completed,
-        completionDate,
-        xpReward,
-        academyId,
-      );
+    id,
+    title,
+    description,
+    category,
+    priority,
+    estimatedDuration,
+    completed,
+    completionDate,
+    xpReward,
+    academyId,
+  );
 
   @override
   String toString() {

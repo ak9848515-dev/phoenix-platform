@@ -22,4 +22,3 @@ class PhoenixApp extends StatelessWidget {
     );
   }
 }
-

@@ -62,20 +62,30 @@ class User {
       progress: progressData == null
           ? const <Progress>[]
           : (progressData as List)
-              .map((item) => Progress.fromMap(Map<String, dynamic>.from(item as Map)))
-              .toList(),
-      knowledgeDNA: KnowledgeDNA.fromMap(Map<String, dynamic>.from(map['knowledgeDNA'] as Map)),
+                .map(
+                  (item) =>
+                      Progress.fromMap(Map<String, dynamic>.from(item as Map)),
+                )
+                .toList(),
+      knowledgeDNA: KnowledgeDNA.fromMap(
+        Map<String, dynamic>.from(map['knowledgeDNA'] as Map),
+      ),
       achievements: achievementsData == null
           ? const <Achievement>[]
           : (achievementsData as List)
-              .map((item) => Achievement.fromMap(Map<String, dynamic>.from(item as Map)))
-              .toList(),
+                .map(
+                  (item) => Achievement.fromMap(
+                    Map<String, dynamic>.from(item as Map),
+                  ),
+                )
+                .toList(),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory User.fromJson(String source) =>
+      User.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -93,7 +103,14 @@ class User {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, email, Object.hashAll(progress), knowledgeDNA, Object.hashAll(achievements));
+  int get hashCode => Object.hash(
+    id,
+    name,
+    email,
+    Object.hashAll(progress),
+    knowledgeDNA,
+    Object.hashAll(achievements),
+  );
 
   @override
   String toString() {

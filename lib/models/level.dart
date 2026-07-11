@@ -4,11 +4,7 @@ import 'stage.dart';
 
 /// Immutable representation of a level within an academy.
 class Level {
-  const Level({
-    required this.id,
-    required this.title,
-    required this.stages,
-  });
+  const Level({required this.id, required this.title, required this.stages});
 
   final String id;
   final String title;
@@ -39,14 +35,18 @@ class Level {
       stages: stagesData == null
           ? const <Stage>[]
           : (stagesData as List)
-              .map((item) => Stage.fromMap(Map<String, dynamic>.from(item as Map)))
-              .toList(),
+                .map(
+                  (item) =>
+                      Stage.fromMap(Map<String, dynamic>.from(item as Map)),
+                )
+                .toList(),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Level.fromJson(String source) => Level.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Level.fromJson(String source) =>
+      Level.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -54,7 +54,10 @@ class Level {
       return true;
     }
 
-    return other is Level && other.id == id && other.title == title && other.stages.length == stages.length;
+    return other is Level &&
+        other.id == id &&
+        other.title == title &&
+        other.stages.length == stages.length;
   }
 
   @override

@@ -22,10 +22,7 @@ class PhoenixPrimaryButton extends StatelessWidget {
     final buttonChild = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (icon != null) ...[
-          Icon(icon),
-          const SizedBox(width: AppSpacing.sm),
-        ],
+        if (icon != null) ...[Icon(icon), const SizedBox(width: AppSpacing.sm)],
         Text(label),
       ],
     );

@@ -5,4 +5,6 @@ class AppRoutes {
   static const String dashboard = '/dashboard';
   static const String knowledgeDna = '/knowledge-dna';
   static const String academy = '/academy';
+  static const String progress = '/progress';
+  static const String profile = '/profile';
 }

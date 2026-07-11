@@ -16,7 +16,12 @@ class Mission {
   final String description;
   final List<Lesson> lessons;
 
-  Mission copyWith({String? id, String? title, String? description, List<Lesson>? lessons}) {
+  Mission copyWith({
+    String? id,
+    String? title,
+    String? description,
+    List<Lesson>? lessons,
+  }) {
     return Mission(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -44,14 +49,18 @@ class Mission {
       lessons: lessonsData == null
           ? const <Lesson>[]
           : (lessonsData as List)
-              .map((item) => Lesson.fromMap(Map<String, dynamic>.from(item as Map)))
-              .toList(),
+                .map(
+                  (item) =>
+                      Lesson.fromMap(Map<String, dynamic>.from(item as Map)),
+                )
+                .toList(),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Mission.fromJson(String source) => Mission.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Mission.fromJson(String source) =>
+      Mission.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -67,7 +76,8 @@ class Mission {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, description, Object.hashAll(lessons));
+  int get hashCode =>
+      Object.hash(id, title, description, Object.hashAll(lessons));
 
   @override
   String toString() {

@@ -34,14 +34,12 @@ class PhoenixCard extends StatelessWidget {
       elevation: elevation,
       color: color ?? theme.colorScheme.surfaceContainerHighest,
       clipBehavior: clipBehavior,
-      shape: shape ??
+      shape:
+          shape ??
           RoundedRectangleBorder(
             borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.lg),
           ),
-      child: Padding(
-        padding: padding,
-        child: child,
-      ),
+      child: Padding(padding: padding, child: child),
     );
   }
 }

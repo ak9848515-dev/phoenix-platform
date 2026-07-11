@@ -14,7 +14,12 @@ class Achievement {
   final String description;
   final String unlockedAt;
 
-  Achievement copyWith({String? id, String? title, String? description, String? unlockedAt}) {
+  Achievement copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? unlockedAt,
+  }) {
     return Achievement(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -43,7 +48,8 @@ class Achievement {
 
   String toJson() => json.encode(toMap());
 
-  factory Achievement.fromJson(String source) => Achievement.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Achievement.fromJson(String source) =>
+      Achievement.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {

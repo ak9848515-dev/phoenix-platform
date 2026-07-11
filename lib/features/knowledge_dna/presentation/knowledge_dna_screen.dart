@@ -1,171 +1,194 @@
 import 'package:flutter/material.dart';
 
+import '../../../routes/app_routes.dart';
 import '../../../services/sample_data_service.dart';
-import '../../../shared/widgets/phoenix_card.dart';
-import '../knowledge_dna_service.dart';
-import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
-import 'widgets/knowledge_dna_stat_card.dart';
+import '../knowledge_dna_service.dart';
+import '../widgets/knowledge_actions_card.dart';
+import '../widgets/knowledge_balance_card.dart';
+import '../widgets/knowledge_dna_header.dart';
+import '../widgets/knowledge_growth_card.dart';
+import '../widgets/knowledge_strengths_card.dart';
+import '../widgets/knowledge_summary_card.dart';
 
-/// Presentation-only screen for the Knowledge DNA experience.
-///
-/// It uses placeholder data and reusable widgets to showcase the visual
-/// structure of the feature without introducing navigation or logic.
 class KnowledgeDNAScreen extends StatelessWidget {
   const KnowledgeDNAScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final sampleData = const SampleDataService();
     final knowledgeService = KnowledgeDNAService(seedSource: sampleData);
     final analysis = knowledgeService.buildAnalysis();
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: Text('Knowledge DNA', style: theme.textTheme.titleLarge),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
+    final strongestCategory = analysis.skillStrengths.isNotEmpty
+        ? analysis.skillStrengths.first
+        : 'Building';
+    final weakestCategory = analysis.skillWeaknesses.isNotEmpty
+        ? analysis.skillWeaknesses.first
+        : 'Exploring';
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          KnowledgeDnaHeader(
+            userName: 'Ava',
+            dnaScore: analysis.knowledgeScore,
+            learningProfile: analysis.summary,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          KnowledgeSummaryCard(
+            overallScore: analysis.knowledgeScore,
+            strongestCategory: strongestCategory,
+            weakestCategory: weakestCategory,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          KnowledgeStrengthsCard(
+            strengths: analysis.skillStrengths,
+            confidenceScore: analysis.confidenceScore,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          KnowledgeGrowthCard(
+            weaknesses: analysis.skillWeaknesses,
+            learningVelocity: analysis.learningVelocity,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          KnowledgeBalanceCard(
+            knowledgeScore: analysis.knowledgeScore,
+            confidenceScore: analysis.confidenceScore,
+            retentionScore: analysis.retentionScore,
+            learningVelocity: analysis.learningVelocity,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _RecommendedFocusCard(
+            missions: analysis.recommendedMissions,
+            academies: analysis.recommendedAcademies,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          KnowledgeActionsCard(
+            onDashboard: () =>
+                Navigator.of(context).pushNamed(AppRoutes.dashboard),
+            onMission: () =>
+                Navigator.of(context).pushNamed(AppRoutes.missionCenter),
+            onLearn: () => Navigator.of(context).pushNamed(AppRoutes.academy),
+            onProgress: () =>
+                Navigator.of(context).pushNamed(AppRoutes.progress),
+          ),
+        ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Your learning profile',
-                style: theme.textTheme.headlineSmall,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              PhoenixCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Knowledge DNA', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      analysis.summary,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Confidence ${((analysis.confidenceScore) * 100).toInt()}% • Retention ${((analysis.retentionScore) * 100).toInt()}%',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ],
+    );
+  }
+}
+
+/// Displays recommended missions and academies from the engine.
+class _RecommendedFocusCard extends StatelessWidget {
+  const _RecommendedFocusCard({
+    required this.missions,
+    required this.academies,
+  });
+
+  final List<dynamic> missions;
+  final List<String> academies;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final hasMissions = missions.isNotEmpty;
+    final hasAcademies = academies.isNotEmpty;
+
+    if (!hasMissions && !hasAcademies) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      elevation: 0,
+      color: theme.colorScheme.surfaceContainerHighest,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.lightbulb_outlined,
+                  size: 20,
+                  color: theme.colorScheme.primary,
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
+                const SizedBox(width: AppSpacing.sm),
+                Text('Recommended Focus', style: theme.textTheme.titleMedium),
+              ],
+            ),
+            if (hasMissions) ...[
+              const SizedBox(height: AppSpacing.md),
               Text(
-                'A beautiful snapshot of your growth, strengths, and focus areas.',
-                style: theme.textTheme.bodyMedium?.copyWith(
+                'Missions',
+                style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              PhoenixCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Learning intelligence', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text('Knowledge ${((analysis.knowledgeScore) * 100).toInt()}%'),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text('Velocity ${((analysis.learningVelocity) * 100).toInt()}%'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: AppSpacing.md,
-                crossAxisSpacing: AppSpacing.md,
-                childAspectRatio: 1.1,
-                children: [
-                  KnowledgeDNAStatCard(
-                    title: 'Knowledge',
-                    value: '${(analysis.knowledgeScore * 100).toInt()}%',
-                    accentColor: AppColors.primary,
-                  ),
-                  KnowledgeDNAStatCard(
-                    title: 'Confidence',
-                    value: '${(analysis.confidenceScore * 100).toInt()}%',
-                    accentColor: AppColors.success,
-                  ),
-                  KnowledgeDNAStatCard(
-                    title: 'Retention',
-                    value: '${(analysis.retentionScore * 100).toInt()}%',
-                    accentColor: AppColors.warning,
-                  ),
-                  KnowledgeDNAStatCard(
-                    title: 'Velocity',
-                    value: '${(analysis.learningVelocity * 100).toInt()}%',
-                    accentColor: AppColors.secondary,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text('Highlights', style: theme.textTheme.titleMedium),
               const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                children: analysis.skillStrengths
-                    .map(
-                      (area) => Chip(
-                        label: Text(area),
-                        backgroundColor: AppColors.success.withValues(alpha: 0.14),
-                        side: BorderSide.none,
-                      ),
-                    )
-                    .toList(),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text('Growth Areas', style: theme.textTheme.titleMedium),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                children: analysis.skillWeaknesses
-                    .map(
-                      (area) => Chip(
-                        label: Text(area),
-                        backgroundColor: AppColors.warning.withValues(alpha: 0.14),
-                        side: BorderSide.none,
-                      ),
-                    )
-                    .toList(),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              PhoenixCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Recommended focus', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: AppSpacing.sm),
-                    ...analysis.recommendedMissions.map(
-                      (mission) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                        child: Text('- ${mission.title}', style: theme.textTheme.bodyMedium),
+              ...missions
+                  .take(3)
+                  .map(
+                    (mission) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.rocket_launch_outlined,
+                            size: 16,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              mission.title,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    ...analysis.recommendedAcademies.map(
-                      (academy) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                        child: Text('- $academy', style: theme.textTheme.bodyMedium),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
             ],
-          ),
+            if (hasAcademies) ...[
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Academies',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              ...academies
+                  .take(3)
+                  .map(
+                    (academy) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.school_outlined,
+                            size: 16,
+                            color: theme.colorScheme.tertiary,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              academy,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+            ],
+          ],
         ),
       ),
     );

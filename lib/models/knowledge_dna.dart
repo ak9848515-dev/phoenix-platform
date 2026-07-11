@@ -90,7 +90,8 @@ class KnowledgeDNA {
 
   String toJson() => json.encode(toMap());
 
-  factory KnowledgeDNA.fromJson(String source) => KnowledgeDNA.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory KnowledgeDNA.fromJson(String source) =>
+      KnowledgeDNA.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -114,18 +115,18 @@ class KnowledgeDNA {
 
   @override
   int get hashCode => Object.hash(
-        knowledge,
-        skill,
-        confidence,
-        retention,
-        consistency,
-        learningVelocity,
-        missionsCompleted,
-        projectsCompleted,
-        Object.hashAll(weakAreas),
-        Object.hashAll(strongAreas),
-        careerGoal,
-      );
+    knowledge,
+    skill,
+    confidence,
+    retention,
+    consistency,
+    learningVelocity,
+    missionsCompleted,
+    projectsCompleted,
+    Object.hashAll(weakAreas),
+    Object.hashAll(strongAreas),
+    careerGoal,
+  );
 
   @override
   String toString() {
