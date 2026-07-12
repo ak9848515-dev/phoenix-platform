@@ -8,4 +8,6 @@ class AppRoutes {
   static const String progress = '/progress';
   static const String profile = '/profile';
   static const String identity = '/identity';
+  static const String memory = '/memory';
+  static const String recommendation = '/recommendation';
 }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../features/academy/academy_screen.dart';
 import '../features/dashboard/dashboard_page.dart';
 import '../features/identity/presentation/identity_selection_screen.dart';
+import '../features/memory/presentation/memory_screen.dart';
+import '../features/recommendation/presentation/recommendation_screen.dart';
 import '../features/knowledge_dna/presentation/knowledge_dna_screen.dart';
 import '../features/mission_center/mission_center_screen.dart';
 import '../features/progress/progress_screen.dart';
@@ -57,6 +59,24 @@ class RouteGenerator {
             selectedIndex: 0,
             title: 'Progress',
             body: ProgressScreen(),
+          ),
+        );
+      case AppRoutes.recommendation:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Recommendations',
+            body: RecommendationScreen(),
+          ),
+        );
+      case AppRoutes.memory:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Memory',
+            body: MemoryScreen(),
           ),
         );
       case AppRoutes.identity:
