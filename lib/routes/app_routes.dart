@@ -7,4 +7,5 @@ class AppRoutes {
   static const String academy = '/academy';
   static const String progress = '/progress';
   static const String profile = '/profile';
+  static const String identity = '/identity';
 }
