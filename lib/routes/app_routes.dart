@@ -10,4 +10,7 @@ class AppRoutes {
   static const String identity = '/identity';
   static const String memory = '/memory';
   static const String recommendation = '/recommendation';
+  static const String journey = '/journey';
+  static const String dailyFocus = '/daily-focus';
+  static const String career = '/career';
 }

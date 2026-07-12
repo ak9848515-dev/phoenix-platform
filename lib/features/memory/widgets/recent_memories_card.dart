@@ -6,10 +6,7 @@ import '../models/memory_entry.dart';
 
 /// Displays a list of the most recent memory entries.
 class RecentMemoriesCard extends StatelessWidget {
-  const RecentMemoriesCard({
-    super.key,
-    required this.memories,
-  });
+  const RecentMemoriesCard({super.key, required this.memories});
 
   /// The recent memory entries to display.
   final List<MemoryEntry> memories;
@@ -48,10 +45,7 @@ class RecentMemoriesCard extends StatelessWidget {
 
 /// A single recent memory item row.
 class _RecentMemoryItem extends StatelessWidget {
-  const _RecentMemoryItem({
-    required this.memory,
-    required this.isLast,
-  });
+  const _RecentMemoryItem({required this.memory, required this.isLast});
 
   final MemoryEntry memory;
   final bool isLast;

@@ -10,9 +10,9 @@ void main() {
 
       expect(progress.dailyMissions, isNotEmpty);
       expect(progress.weeklyMissions, isNotEmpty);
-      expect(progress.completedCount, 3);
-      expect(progress.pendingCount, 2);
-      expect(progress.completionPercentage, 0.6);
+      expect(progress.completedCount, 2);
+      expect(progress.pendingCount, 4);
+      expect(progress.completionPercentage, closeTo(2 / 6, 0.001));
       expect(progress.streak, 2);
     });
   });

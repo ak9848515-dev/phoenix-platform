@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../features/identity/models/identity.dart';
+import '../features/journey/models/journey.dart';
+import '../features/journey/models/journey_stage.dart';
 import '../features/knowledge_dna/models/knowledge_dna.dart';
 import '../features/mission_engine/mission_engine.dart' as mission_engine;
 import '../models/academy.dart';
@@ -9,14 +12,224 @@ import '../models/mission.dart';
 import '../models/progress.dart';
 import '../models/stage.dart';
 
+/// Centralised sample data hub used by all Phoenix feature services.
+///
+/// By routing all sample data through this single source, the platform
+/// maintains coherence across Identity → Journey → Mission → Progress →
+/// Memory → Recommendation without introducing persistence or state management.
 class SampleDataService {
   const SampleDataService();
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Identity
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// The user's selected identity — the root of every Journey.
+  Identity get selectedIdentity => const Identity(
+    id: 'identity-flutter-developer',
+    title: 'Flutter Developer',
+    description:
+        'Craft beautiful, performant cross-platform applications '
+        'with Flutter and Dart.',
+    icon: Icons.phone_android_outlined,
+    category: 'Technology',
+    currentLevel: 1,
+    targetLevel: 7,
+    estimatedDuration: 400,
+    requiredSkills: <String>[
+      'Dart Language',
+      'Flutter Widgets',
+      'State Management',
+      'Platform Integrations',
+    ],
+    roadmap: <String>[
+      'Learn Dart fundamentals',
+      'Build a simple Flutter app',
+      'Master state management',
+      'Publish to App Store & Play Store',
+    ],
+    status: IdentityStatus.active,
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Journey
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// The Journey generated from the selected Identity.
+  ///
+  /// Every Journey is composed of Stages. Every Stage contains Missions.
+  /// Knowledge DNA measures progress through the Journey. Recommendation
+  /// selects the next best Journey step.
+  Journey get journey => const Journey(
+    id: 'journey-flutter-dev',
+    identityId: 'identity-flutter-developer',
+    title: 'Flutter Developer',
+    description:
+        'Master Flutter from fundamentals to production-ready apps. '
+        'This journey takes you through eight stages of progressive '
+        'skill building.',
+    estimatedDuration: 180,
+    completion: 0.18,
+    currentStage: 1,
+    stages: [
+      JourneyStage(
+        id: 'stage-programming-fundamentals',
+        title: 'Programming Fundamentals',
+        description:
+            'Learn core programming concepts: variables, control flow, '
+            'functions, and data structures.',
+        order: 0,
+        completion: 1.0,
+        estimatedDuration: 14,
+        requiredSkills: ['Logical thinking', 'Problem solving'],
+        missions: [
+          'Variables & Data Types',
+          'Control Flow',
+          'Functions & Scope',
+          'Data Structures',
+        ],
+        status: StageStatus.completed,
+      ),
+      JourneyStage(
+        id: 'stage-dart',
+        title: 'Dart',
+        description:
+            'Master the Dart language: syntax, sound null safety, '
+            'async programming, and core libraries.',
+        order: 1,
+        completion: 0.45,
+        estimatedDuration: 21,
+        requiredSkills: ['Programming Fundamentals'],
+        missions: [
+          'Dart Syntax & Types',
+          'Null Safety',
+          'Async & Futures',
+          'Collections & Generics',
+        ],
+        status: StageStatus.inProgress,
+      ),
+      JourneyStage(
+        id: 'stage-flutter-widgets',
+        title: 'Flutter Widgets',
+        description:
+            'Build UIs with Flutter widgets: layout, state, styling, '
+            'and custom painting.',
+        order: 2,
+        completion: 0.0,
+        estimatedDuration: 28,
+        requiredSkills: ['Dart', 'UI/UX basics'],
+        missions: [
+          'Stateless & Stateful Widgets',
+          'Layout Widgets',
+          'Styling & Theming',
+          'Custom Paint',
+        ],
+        status: StageStatus.available,
+      ),
+      JourneyStage(
+        id: 'stage-state-management',
+        title: 'State Management',
+        description:
+            'Manage app state effectively: Provider, Riverpod, Bloc, '
+            'and when to use each.',
+        order: 3,
+        completion: 0.0,
+        estimatedDuration: 21,
+        requiredSkills: ['Flutter Widgets', 'Dart'],
+        missions: ['State Fundamentals', 'Provider', 'Riverpod', 'Bloc/Cubit'],
+        status: StageStatus.locked,
+      ),
+      JourneyStage(
+        id: 'stage-api-integration',
+        title: 'API Integration',
+        description:
+            'Connect your apps to the world: REST, GraphQL, '
+            'local persistence, and offline support.',
+        order: 4,
+        completion: 0.0,
+        estimatedDuration: 28,
+        requiredSkills: ['Dart', 'State Management'],
+        missions: [
+          'HTTP & REST',
+          'GraphQL Basics',
+          'Local Storage',
+          'Offline Mode',
+        ],
+        status: StageStatus.locked,
+      ),
+      JourneyStage(
+        id: 'stage-architecture',
+        title: 'Architecture',
+        description:
+            'Design scalable Flutter apps: clean architecture, '
+            'testing strategies, and performance optimization.',
+        order: 5,
+        completion: 0.0,
+        estimatedDuration: 28,
+        requiredSkills: ['Flutter Widgets', 'State Management', 'API'],
+        missions: [
+          'Clean Architecture',
+          'Dependency Injection',
+          'Unit & Widget Testing',
+          'Performance Tuning',
+        ],
+        status: StageStatus.locked,
+      ),
+      JourneyStage(
+        id: 'stage-portfolio',
+        title: 'Portfolio',
+        description:
+            'Build your portfolio: capstone project, open source '
+            'contributions, and app store deployment.',
+        order: 6,
+        completion: 0.0,
+        estimatedDuration: 21,
+        requiredSkills: [
+          'Flutter Widgets',
+          'State Management',
+          'API',
+          'Architecture',
+        ],
+        missions: [
+          'Capstone Project',
+          'Open Source Contribution',
+          'App Store Deployment',
+        ],
+        status: StageStatus.locked,
+      ),
+      JourneyStage(
+        id: 'stage-job-ready',
+        title: 'Job Ready',
+        description:
+            'Prepare for the job market: resume building, technical '
+            'interviews, and networking.',
+        order: 7,
+        completion: 0.0,
+        estimatedDuration: 21,
+        requiredSkills: ['Portfolio', 'Architecture'],
+        missions: [
+          'Resume & Portfolio Review',
+          'Mock Interviews',
+          'Job Search Strategy',
+        ],
+        status: StageStatus.locked,
+      ),
+    ],
+  );
+
+  /// The current in-progress journey stage.
+  JourneyStage get currentJourneyStage => journey.stages[journey.currentStage];
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Missions (reflecting the current Journey stage)
+  // ─────────────────────────────────────────────────────────────────────────
 
   Mission get featuredMission => const Mission(
     id: 'mission-daily',
     title: "Today's Mission",
     description:
-        'Complete the onboarding sprint and unlock the next level of your learning path.',
+        'Complete the Dart stage missions to master the Dart language '
+        'and advance your Flutter Developer journey.',
     lessons: <Lesson>[],
   );
 
@@ -24,15 +237,21 @@ class SampleDataService {
     Progress(id: 'mission-progress', label: 'Current focus', value: 0.45),
   ];
 
+  /// Daily missions derived from the current Journey stage (Dart).
+  ///
+  /// This connects Mission → Journey by using the current stage's mission
+  /// titles as the source for daily tasks.
   List<mission_engine.Mission> get dailyMissions =>
       const <mission_engine.Mission>[
         mission_engine.Mission(
           id: 'daily-1',
-          title: 'Daily Reflect',
-          description: 'Capture one insight from your day.',
+          title: 'Dart Syntax & Types',
+          description:
+              'Master Dart variables, types, and type inference '
+              'to write clean, safe code.',
           category: 'daily',
           priority: 'high',
-          estimatedDuration: 15,
+          estimatedDuration: 30,
           completed: true,
           completionDate: null,
           xpReward: 120,
@@ -40,58 +259,84 @@ class SampleDataService {
         ),
         mission_engine.Mission(
           id: 'daily-2',
-          title: 'Weekly Sprint Plan',
-          description: 'Sketch the next three priorities for the week.',
+          title: 'Null Safety',
+          description:
+              'Understand Dart sound null safety: nullable types, '
+              'late variables, and null-aware operators.',
           category: 'daily',
-          priority: 'medium',
-          estimatedDuration: 20,
+          priority: 'high',
+          estimatedDuration: 25,
           completed: true,
           completionDate: null,
           xpReward: 90,
           academyId: 'academy-product',
         ),
+        mission_engine.Mission(
+          id: 'daily-3',
+          title: 'Async & Futures',
+          description:
+              'Learn async programming with Future, async/await, '
+              'and error handling in Dart.',
+          category: 'daily',
+          priority: 'high',
+          estimatedDuration: 35,
+          completed: false,
+          completionDate: null,
+          xpReward: 150,
+          academyId: 'academy-leadership',
+        ),
       ];
 
+  /// Weekly missions spanning other Journey stages and skill areas.
   List<mission_engine.Mission> get weeklyMissions =>
       const <mission_engine.Mission>[
         mission_engine.Mission(
           id: 'weekly-1',
-          title: 'Leadership Review',
-          description: 'Review one team signal and document an action.',
+          title: 'Collections & Generics',
+          description:
+              'Use Dart collections (List, Set, Map) and generics '
+              'to write reusable, type-safe code.',
           category: 'weekly',
-          priority: 'high',
+          priority: 'medium',
+          estimatedDuration: 40,
+          completed: false,
+          completionDate: null,
+          xpReward: 200,
+          academyId: 'academy-product',
+        ),
+        mission_engine.Mission(
+          id: 'weekly-2',
+          title: 'Statistics & Data Structures Review',
+          description:
+              'Revisit programming fundamentals: data structures '
+              'and algorithm patterns for the next stage.',
+          category: 'weekly',
+          priority: 'medium',
           estimatedDuration: 30,
           completed: false,
           completionDate: null,
           xpReward: 180,
-          academyId: 'academy-leadership',
-        ),
-        mission_engine.Mission(
-          id: 'weekly-2',
-          title: 'Design Systems Audit',
-          description: 'Check one reusable pattern and improve it.',
-          category: 'weekly',
-          priority: 'medium',
-          estimatedDuration: 45,
-          completed: true,
-          completionDate: null,
-          xpReward: 250,
           academyId: 'academy-design',
         ),
         mission_engine.Mission(
           id: 'weekly-3',
-          title: 'Opportunity Capture',
+          title: 'Stage Progress Review',
           description:
-              'Capture one new product opportunity from customer feedback.',
+              'Review your Dart stage progress and plan the next '
+              'learning sprint towards Flutter Widgets.',
           category: 'weekly',
           priority: 'low',
-          estimatedDuration: 25,
+          estimatedDuration: 15,
           completed: false,
           completionDate: null,
-          xpReward: 110,
+          xpReward: 80,
           academyId: 'academy-product',
         ),
       ];
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Progression (reflecting Journey completion)
+  // ─────────────────────────────────────────────────────────────────────────
 
   List<Progress> get knowledgeProgress => const <Progress>[
     Progress(id: 'knowledge-coverage', label: 'Knowledge DNA', value: 0.72),
@@ -150,6 +395,10 @@ class SampleDataService {
     Progress(id: 'section-academies', label: 'Academies', value: 0.0),
     Progress(id: 'section-knowledge-dna', label: 'Knowledge DNA', value: 0.72),
   ];
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Knowledge DNA
+  // ─────────────────────────────────────────────────────────────────────────
 
   KnowledgeDNA get knowledgeProfile => const KnowledgeDNA(
     knowledge: 'Design Systems',

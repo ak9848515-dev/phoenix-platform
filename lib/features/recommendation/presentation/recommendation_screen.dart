@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../services/sample_data_service.dart';
 import '../../../theme/spacing.dart';
 import '../models/recommendation.dart';
 import '../services/recommendation_service.dart';
@@ -23,7 +24,8 @@ class RecommendationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recommendationService = const RecommendationService();
+    final sampleData = const SampleDataService();
+    final recommendationService = RecommendationService(seedSource: sampleData);
     final todaysFocus = recommendationService.getTodaysFocus();
     final highPriority = recommendationService.getHighPriorityRecommendations();
     final missions = recommendationService.getByType(

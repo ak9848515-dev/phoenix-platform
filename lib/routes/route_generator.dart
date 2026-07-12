@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../features/academy/academy_screen.dart';
+import '../features/career/presentation/career_screen.dart';
+import '../features/daily_focus/presentation/daily_focus_screen.dart';
 import '../features/dashboard/dashboard_page.dart';
 import '../features/identity/presentation/identity_selection_screen.dart';
+import '../features/journey/presentation/journey_screen.dart';
 import '../features/memory/presentation/memory_screen.dart';
 import '../features/recommendation/presentation/recommendation_screen.dart';
 import '../features/knowledge_dna/presentation/knowledge_dna_screen.dart';
@@ -77,6 +80,33 @@ class RouteGenerator {
             selectedIndex: 0,
             title: 'Memory',
             body: MemoryScreen(),
+          ),
+        );
+      case AppRoutes.journey:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Journey',
+            body: JourneyScreen(),
+          ),
+        );
+      case AppRoutes.dailyFocus:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Daily Focus',
+            body: DailyFocusScreen(),
+          ),
+        );
+      case AppRoutes.career:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Career Readiness',
+            body: CareerScreen(),
           ),
         );
       case AppRoutes.identity:

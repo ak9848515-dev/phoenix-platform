@@ -7,10 +7,7 @@ import '../models/memory_entry.dart';
 
 /// Displays aggregate statistics about the user's memory entries.
 class MemoryStatisticsCard extends StatelessWidget {
-  const MemoryStatisticsCard({
-    super.key,
-    required this.entries,
-  });
+  const MemoryStatisticsCard({super.key, required this.entries});
 
   /// All memory entries to compute statistics from.
   final List<MemoryEntry> entries;
@@ -20,10 +17,7 @@ class MemoryStatisticsCard extends StatelessWidget {
     final theme = Theme.of(context);
     final totalMemories = entries.length;
     final pinnedCount = entries.where((e) => e.isPinned).length;
-    final categories = entries
-        .map((e) => e.category)
-        .toSet()
-        .length;
+    final categories = entries.map((e) => e.category).toSet().length;
     final avgImportance = entries.isEmpty
         ? 0.0
         : entries.fold(0.0, (sum, e) => sum + e.importance) / totalMemories;
@@ -136,9 +130,7 @@ class _StatItem extends StatelessWidget {
             color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Center(
-            child: Icon(icon, size: 20, color: color),
-          ),
+          child: Center(child: Icon(icon, size: 20, color: color)),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(

@@ -6,10 +6,7 @@ import '../models/memory_entry.dart';
 
 /// Displays a vertical timeline of memory entries.
 class MemoryTimelineCard extends StatelessWidget {
-  const MemoryTimelineCard({
-    super.key,
-    required this.entries,
-  });
+  const MemoryTimelineCard({super.key, required this.entries});
 
   /// The timeline entries to display, ordered newest first.
   final List<MemoryEntry> entries;
@@ -35,10 +32,8 @@ class MemoryTimelineCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           ...entries.map(
-            (entry) => _TimelineEntry(
-              entry: entry,
-              isLast: entries.last == entry,
-            ),
+            (entry) =>
+                _TimelineEntry(entry: entry, isLast: entries.last == entry),
           ),
         ],
       ),
@@ -48,10 +43,7 @@ class MemoryTimelineCard extends StatelessWidget {
 
 /// A single entry in the timeline with a connecting line.
 class _TimelineEntry extends StatelessWidget {
-  const _TimelineEntry({
-    required this.entry,
-    required this.isLast,
-  });
+  const _TimelineEntry({required this.entry, required this.isLast});
 
   final MemoryEntry entry;
   final bool isLast;
@@ -179,8 +171,7 @@ class _TimelineEntry extends StatelessWidget {
   }
 
   String _formatTimestamp(int milliseconds) {
-    final date =
-        DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
     return '${date.day}/${date.month}/${date.year}';
   }
 }

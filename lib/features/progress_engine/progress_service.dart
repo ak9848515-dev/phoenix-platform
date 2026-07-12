@@ -52,14 +52,21 @@ class ProgressService {
       missions.length,
     );
 
+    // Incorporate Journey completion into the progress summary,
+    // connecting Progress to Journey.
+    final journey = seedSource.journey;
+    final journeyPercent = (journey.completion * 100).round();
+    final combinedSummary =
+        '$level • ${completedMissions.length}/${missions.length} missions • '
+        'Journey $journeyPercent%';
+
     return ProgressSummary(
       totalXp: totalXp,
       level: level,
       completionPercentage: completionPercentage,
       streaks: streaks,
       achievements: achievements,
-      summary:
-          '$level • ${completedMissions.length}/${missions.length} missions complete',
+      summary: combinedSummary,
     );
   }
 }
