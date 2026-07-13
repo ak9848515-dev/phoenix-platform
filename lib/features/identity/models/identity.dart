@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 /// Represents a personal growth identity that a user can aspire to become.
@@ -80,6 +82,51 @@ class Identity {
       status: status ?? this.status,
     );
   }
+
+  /// Serializes this identity to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'description': description,
+      'iconCodePoint': icon.codePoint,
+      'category': category,
+      'currentLevel': currentLevel,
+      'targetLevel': targetLevel,
+      'estimatedDuration': estimatedDuration,
+      'requiredSkills': requiredSkills,
+      'roadmap': roadmap,
+      'status': status.name,
+    };
+  }
+
+  /// Creates an identity from a JSON-compatible map.
+  factory Identity.fromMap(Map<String, dynamic> map) {
+    return Identity(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      description: map['description'] as String,
+      // ignore: non_const_argument_for_const_parameter
+      icon: IconData(map['iconCodePoint'] as int),
+      category: map['category'] as String,
+      currentLevel: map['currentLevel'] as int,
+      targetLevel: map['targetLevel'] as int,
+      estimatedDuration: map['estimatedDuration'] as int,
+      requiredSkills: List<String>.from(map['requiredSkills'] as List),
+      roadmap: List<String>.from(map['roadmap'] as List),
+      status: IdentityStatus.values.firstWhere(
+        (s) => s.name == map['status'],
+        orElse: () => IdentityStatus.available,
+      ),
+    );
+  }
+
+  /// Serializes this identity to a JSON string.
+  String toJson() => json.encode(toMap());
+
+  /// Creates an identity from a JSON string.
+  factory Identity.fromJson(String source) =>
+      Identity.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {

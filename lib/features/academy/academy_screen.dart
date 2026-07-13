@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../routes/app_routes.dart';
-import '../../services/sample_data_service.dart';
+import '../../core/sample_repository.dart';
 import '../../theme/spacing.dart';
 import 'widgets/academy_header.dart';
 import 'widgets/continue_learning_card.dart';
@@ -15,9 +15,9 @@ class AcademyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
-    final academy = sampleData.featuredAcademy;
-    final academies = sampleData.academySummaries;
+    final repository = const SampleRepository();
+    final academy = repository.featuredAcademy;
+    final academies = repository.academySummaries;
 
     // Derive lesson data from the featured academy structure
     final allMissions = academy.levels

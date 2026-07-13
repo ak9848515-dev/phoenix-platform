@@ -1,4 +1,5 @@
-import '../../../services/sample_data_service.dart';
+import '../../../core/repository.dart';
+import '../../../core/sample_repository.dart';
 import '../models/recommendation.dart';
 
 /// Provides a curated set of sample recommendations for the Recommendation Screen.
@@ -11,10 +12,10 @@ import '../models/recommendation.dart';
 ///
 /// This is a presentation-only service. No AI, APIs, or persistence.
 class RecommendationService {
-  RecommendationService({SampleDataService? seedSource})
-    : seedSource = seedSource ?? const SampleDataService();
+  RecommendationService({Repository? repository})
+    : repository = repository ?? const SampleRepository();
 
-  final SampleDataService seedSource;
+  final Repository repository;
 
   /// Returns the full list of sample recommendations.
   ///
@@ -22,8 +23,8 @@ class RecommendationService {
   /// level, ensuring every recommendation has context from the two key
   /// upstream modules.
   List<Recommendation> getSampleRecommendations() {
-    final currentStage = seedSource.currentJourneyStage;
-    final journey = seedSource.journey;
+    final currentStage = repository.currentJourneyStage;
+    final journey = repository.journey;
 
     return <Recommendation>[
       Recommendation(
@@ -39,7 +40,7 @@ class RecommendationService {
             'You are in the ${currentStage.title} stage (Stage ${journey.currentStage + 1} of ${journey.stages.length}). '
             'You have completed Dart Syntax and Null Safety. '
             'Async & Futures is your next mission to stay on track.',
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: 'Async & Futures',
         relatedSkill: 'Dart Language',
         actionLabel: 'Continue Learning',
@@ -90,7 +91,7 @@ class RecommendationService {
         reason:
             'Hands-on practice accelerates skill acquisition by 3x compared '
             'to theory alone. Apply what you\'ve learned.',
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: null,
         relatedSkill: 'State Management',
         actionLabel: 'Start Building',

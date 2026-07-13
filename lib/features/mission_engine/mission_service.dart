@@ -1,18 +1,19 @@
-import '../../services/sample_data_service.dart';
+import '../../core/repository.dart';
+import '../../core/sample_repository.dart';
 import 'mission_engine.dart';
 import 'mission_progress.dart';
 import 'mission_statistics.dart';
 
 /// Central service for deriving mission progress and statistics from seeded data.
 class MissionService {
-  MissionService({SampleDataService? seedSource})
-    : seedSource = seedSource ?? const SampleDataService();
+  MissionService({Repository? repository})
+    : repository = repository ?? const SampleRepository();
 
-  final SampleDataService seedSource;
+  final Repository repository;
 
-  List<Mission> get dailyMissions => seedSource.dailyMissions;
+  List<Mission> get dailyMissions => repository.dailyMissions;
 
-  List<Mission> get weeklyMissions => seedSource.weeklyMissions;
+  List<Mission> get weeklyMissions => repository.weeklyMissions;
 
   Mission get featuredMission {
     final missions = <Mission>[...dailyMissions, ...weeklyMissions];

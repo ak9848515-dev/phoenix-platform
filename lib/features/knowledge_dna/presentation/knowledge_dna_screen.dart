@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../routes/app_routes.dart';
-import '../../../services/sample_data_service.dart';
+import '../../../core/sample_repository.dart';
 import '../../../theme/spacing.dart';
 import '../knowledge_dna_service.dart';
 import '../widgets/knowledge_actions_card.dart';
@@ -16,8 +16,8 @@ class KnowledgeDNAScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
-    final knowledgeService = KnowledgeDNAService(seedSource: sampleData);
+    final repository = const SampleRepository();
+    final knowledgeService = KnowledgeDNAService(repository: repository);
     final analysis = knowledgeService.buildAnalysis();
 
     final strongestCategory = analysis.skillStrengths.isNotEmpty

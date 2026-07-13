@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../routes/app_routes.dart';
-import '../../../services/sample_data_service.dart';
+import '../../../core/sample_repository.dart';
 import '../../../theme/spacing.dart';
 import '../services/journey_service.dart';
 import '../widgets/current_stage_card.dart';
@@ -29,8 +29,8 @@ class JourneyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
-    final journeyService = JourneyService(seedSource: sampleData);
+    final repository = const SampleRepository();
+    final journeyService = JourneyService(repository: repository);
     final journey = journeyService.getJourney();
 
     final currentStageIndex = journey.currentStage;

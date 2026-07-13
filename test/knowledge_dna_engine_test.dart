@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phoenix_platform/features/knowledge_dna/knowledge_dna_service.dart';
-import 'package:phoenix_platform/services/sample_data_service.dart';
+import 'package:phoenix_platform/core/sample_repository.dart';
 
 void main() {
   group('KnowledgeDNAService', () {
@@ -8,7 +8,7 @@ void main() {
       'builds knowledge intelligence output from mission and progress data',
       () {
         final service = KnowledgeDNAService(
-          seedSource: const SampleDataService(),
+          repository: const SampleRepository(),
         );
         final analysis = service.buildAnalysis();
 

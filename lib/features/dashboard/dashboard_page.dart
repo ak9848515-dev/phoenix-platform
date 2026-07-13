@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../routes/app_routes.dart';
-import '../../services/sample_data_service.dart';
+import '../../core/sample_repository.dart';
 import '../../theme/spacing.dart';
 import '../knowledge_dna/knowledge_dna_service.dart';
 import '../mission_engine/mission_service.dart';
@@ -18,16 +18,16 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
-    final missionService = MissionService(seedSource: sampleData);
+    final repository = const SampleRepository();
+    final missionService = MissionService(repository: repository);
     final missionProgress = missionService.buildProgress();
     final progressSummary = ProgressService(
-      seedSource: sampleData,
+      repository: repository,
     ).buildSummary();
     final knowledgeDNA = KnowledgeDNAService(
-      seedSource: sampleData,
+      repository: repository,
     ).buildAnalysis();
-    final knowledgeProfile = sampleData.knowledgeProfile;
+    final knowledgeProfile = repository.knowledgeProfile;
     final featuredMission = missionProgress.featuredMission;
 
     return SingleChildScrollView(

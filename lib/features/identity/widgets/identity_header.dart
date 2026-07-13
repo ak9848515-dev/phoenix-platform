@@ -14,11 +14,7 @@ class IdentityHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Icon(
-          Icons.face_outlined,
-          size: 48,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(Icons.face_outlined, size: 48, color: theme.colorScheme.primary),
         const SizedBox(height: AppSpacing.md),
         Text(
           'Who do you want to become?',

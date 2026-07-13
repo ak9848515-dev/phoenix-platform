@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Represents a single memory entry in the user's memory timeline.
 ///
 /// Each entry captures a meaningful event, decision, or milestone from
@@ -78,6 +80,50 @@ class MemoryEntry {
       isPinned: isPinned ?? this.isPinned,
     );
   }
+
+  /// Serializes this memory entry to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'description': description,
+      'category': category.name,
+      'timestamp': timestamp,
+      'relatedIdentity': relatedIdentity,
+      'relatedMission': relatedMission,
+      'importance': importance,
+      'tags': tags,
+      'source': source,
+      'isPinned': isPinned,
+    };
+  }
+
+  /// Creates a memory entry from a JSON-compatible map.
+  factory MemoryEntry.fromMap(Map<String, dynamic> map) {
+    return MemoryEntry(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      description: map['description'] as String,
+      category: MemoryCategory.values.firstWhere(
+        (c) => c.name == map['category'],
+        orElse: () => MemoryCategory.learning,
+      ),
+      timestamp: map['timestamp'] as int,
+      relatedIdentity: map['relatedIdentity'] as String?,
+      relatedMission: map['relatedMission'] as String?,
+      importance: (map['importance'] as num).toDouble(),
+      tags: List<String>.from(map['tags'] as List),
+      source: map['source'] as String,
+      isPinned: map['isPinned'] as bool? ?? false,
+    );
+  }
+
+  /// Serializes this memory entry to a JSON string.
+  String toJson() => json.encode(toMap());
+
+  /// Creates a memory entry from a JSON string.
+  factory MemoryEntry.fromJson(String source) =>
+      MemoryEntry.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {

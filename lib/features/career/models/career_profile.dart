@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Immutable representation of the user's career readiness profile.
 ///
 /// Measures how close the user is to becoming employable in their chosen
@@ -50,6 +52,47 @@ class CareerProfile {
 
   /// Interview readiness score from 0.0 to 1.0.
   final double interviewReadiness;
+
+  /// Serializes this career profile to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'identityId': identityId,
+      'careerScore': careerScore,
+      'jobReadiness': jobReadiness,
+      'strengths': strengths,
+      'skillGaps': skillGaps,
+      'nextGoal': nextGoal,
+      'estimatedWeeks': estimatedWeeks,
+      'portfolioProgress': portfolioProgress,
+      'resumeProgress': resumeProgress,
+      'interviewReadiness': interviewReadiness,
+    };
+  }
+
+  /// Creates a career profile from a JSON-compatible map.
+  factory CareerProfile.fromMap(Map<String, dynamic> map) {
+    return CareerProfile(
+      id: map['id'] as String,
+      identityId: map['identityId'] as String,
+      careerScore: (map['careerScore'] as num).toDouble(),
+      jobReadiness: map['jobReadiness'] as String,
+      strengths: List<String>.from(map['strengths'] as List),
+      skillGaps: List<String>.from(map['skillGaps'] as List),
+      nextGoal: map['nextGoal'] as String,
+      estimatedWeeks: map['estimatedWeeks'] as int,
+      portfolioProgress: (map['portfolioProgress'] as num).toDouble(),
+      resumeProgress: (map['resumeProgress'] as num).toDouble(),
+      interviewReadiness: (map['interviewReadiness'] as num).toDouble(),
+    );
+  }
+
+  /// Serializes this career profile to a JSON string.
+  String toJson() => json.encode(toMap());
+
+  /// Creates a career profile from a JSON string.
+  factory CareerProfile.fromJson(String source) =>
+      CareerProfile.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {

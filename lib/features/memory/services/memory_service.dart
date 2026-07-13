@@ -1,4 +1,5 @@
-import '../../../services/sample_data_service.dart';
+import '../../../core/repository.dart';
+import '../../../core/sample_repository.dart';
 import '../models/memory_entry.dart';
 
 /// Provides sample memory entries for the Memory Screen.
@@ -6,17 +7,17 @@ import '../models/memory_entry.dart';
 /// This is a presentation-only service. No persistence, AI, or business
 /// logic is included.
 class MemoryService {
-  MemoryService({SampleDataService? seedSource})
-    : seedSource = seedSource ?? const SampleDataService();
+  MemoryService({Repository? repository})
+    : repository = repository ?? const SampleRepository();
 
-  final SampleDataService seedSource;
+  final Repository repository;
 
   /// Returns a list of sample memory entries ordered by timestamp descending.
   ///
   /// Includes Journey milestone entries derived from the seed source's
   /// journey data, connecting Memory to Journey.
   List<MemoryEntry> getSampleMemories() {
-    final journey = seedSource.journey;
+    final journey = repository.journey;
 
     return <MemoryEntry>[
       MemoryEntry(
@@ -27,7 +28,7 @@ class MemoryService {
             'as a Flutter application.',
         category: MemoryCategory.project,
         timestamp: DateTime(2026, 7, 1, 9, 0).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: null,
         importance: 1.0,
         tags: <String>['phoenix', 'flutter', 'project-start'],
@@ -42,7 +43,7 @@ class MemoryService {
             '${journey.description.split('.').first}.',
         category: MemoryCategory.achievement,
         timestamp: DateTime(2026, 7, 1, 8, 0).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: null,
         importance: 1.0,
         tags: <String>['journey', 'identity', 'milestone'],
@@ -57,7 +58,7 @@ class MemoryService {
             'Learned variables, control flow, functions, and data structures.',
         category: MemoryCategory.achievement,
         timestamp: DateTime(2026, 7, 5, 16, 0).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: null,
         importance: 0.9,
         tags: <String>['journey', 'stage-complete', 'milestone'],
@@ -72,7 +73,7 @@ class MemoryService {
             'Software Engineering learning path.',
         category: MemoryCategory.learning,
         timestamp: DateTime(2026, 6, 28, 14, 30).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: 'daily-1',
         importance: 0.8,
         tags: <String>['oop', 'learning', 'module-complete'],
@@ -87,7 +88,7 @@ class MemoryService {
             'application to test the development workflow.',
         category: MemoryCategory.achievement,
         timestamp: DateTime(2026, 6, 20, 16, 0).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: null,
         importance: 0.9,
         tags: <String>['flutter', 'first-app', 'milestone'],
@@ -102,7 +103,7 @@ class MemoryService {
             'in the Flutter Developer journey. Ready for Async and Futures.',
         category: MemoryCategory.mission,
         timestamp: DateTime(2026, 7, 10, 10, 0).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: 'daily-1',
         importance: 0.7,
         tags: <String>['mission', 'dart', 'complete'],
@@ -132,7 +133,7 @@ class MemoryService {
             'for cross-platform mobile development.',
         category: MemoryCategory.decision,
         timestamp: DateTime(2026, 6, 5, 20, 0).millisecondsSinceEpoch,
-        relatedIdentity: seedSource.selectedIdentity.id,
+        relatedIdentity: repository.selectedIdentity.id,
         relatedMission: null,
         importance: 0.75,
         tags: <String>['flutter', 'decision', 'learning-path'],

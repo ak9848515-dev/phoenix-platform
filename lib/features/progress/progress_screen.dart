@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../routes/app_routes.dart';
-import '../../services/sample_data_service.dart';
+import '../../core/sample_repository.dart';
 import '../../theme/spacing.dart';
 import '../progress_engine/progress_service.dart';
 import 'widgets/achievement_summary_card.dart';
@@ -17,9 +17,9 @@ class ProgressScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
+    final repository = const SampleRepository();
     final progressSummary = ProgressService(
-      seedSource: sampleData,
+      repository: repository,
     ).buildSummary();
 
     final currentLevel = progressSummary.level;

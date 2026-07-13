@@ -1,4 +1,5 @@
-import '../../services/sample_data_service.dart';
+import '../../core/repository.dart';
+import '../../core/sample_repository.dart';
 import '../mission_engine/mission_engine.dart';
 import '../mission_engine/mission_service.dart';
 import 'achievement_engine.dart';
@@ -10,12 +11,12 @@ import 'xp_calculator.dart';
 
 /// Orchestrates progress metrics from mission completion data.
 class ProgressService {
-  ProgressService({SampleDataService? seedSource})
-    : seedSource = seedSource ?? const SampleDataService();
+  ProgressService({Repository? repository})
+    : repository = repository ?? const SampleRepository();
 
-  final SampleDataService seedSource;
+  final Repository repository;
 
-  MissionService get missionService => MissionService(seedSource: seedSource);
+  MissionService get missionService => MissionService(repository: repository);
 
   ProgressSummary buildSummary() {
     final missions = <Mission>[
@@ -54,7 +55,7 @@ class ProgressService {
 
     // Incorporate Journey completion into the progress summary,
     // connecting Progress to Journey.
-    final journey = seedSource.journey;
+    final journey = repository.journey;
     final journeyPercent = (journey.completion * 100).round();
     final combinedSummary =
         '$level • ${completedMissions.length}/${missions.length} missions • '

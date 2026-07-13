@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../routes/app_routes.dart';
-import '../../../services/sample_data_service.dart';
+import '../../../core/sample_repository.dart';
 import '../../../theme/spacing.dart';
 import '../../decision/services/decision_service.dart';
 import '../../mission_engine/mission_service.dart';
@@ -28,10 +28,10 @@ class DailyFocusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
-    final decisionService = DecisionService(seedSource: sampleData);
-    final missionService = MissionService(seedSource: sampleData);
-    final progressService = ProgressService(seedSource: sampleData);
+    final repository = const SampleRepository();
+    final decisionService = DecisionService(repository: repository);
+    final missionService = MissionService(repository: repository);
+    final progressService = ProgressService(repository: repository);
 
     // Derive today's focus from the Decision Engine, which aggregates
     // inputs from all Phoenix modules (Identity, Journey, Mission,
@@ -39,9 +39,9 @@ class DailyFocusScreen extends StatelessWidget {
     final decision = decisionService.getDecision();
 
     // Derive journey and progress context
-    final journey = sampleData.journey;
-    final currentStage = sampleData.currentJourneyStage;
-    final identity = sampleData.selectedIdentity;
+    final journey = repository.journey;
+    final currentStage = repository.currentJourneyStage;
+    final identity = repository.selectedIdentity;
     final missionProgress = missionService.buildProgress();
     final progressSummary = progressService.buildSummary();
 

@@ -1,4 +1,5 @@
-import '../../../services/sample_data_service.dart';
+import '../../../core/repository.dart';
+import '../../../core/sample_repository.dart';
 import '../../knowledge_dna/knowledge_dna_service.dart';
 import '../../memory/services/memory_service.dart';
 import '../../mission_engine/mission_engine.dart' as mission_engine;
@@ -11,9 +12,9 @@ import '../models/decision.dart';
 /// The Decision Engine selects the user's next highest-impact action.
 ///
 /// **Inputs**
-/// - Identity (via SampleDataService)
-/// - Journey (via SampleDataService)
-/// - Current Stage (via SampleDataService)
+/// - Identity (via Repository)
+/// - Journey (via Repository)
+/// - Current Stage (via Repository)
 /// - Mission Progress (via MissionService)
 /// - Knowledge DNA (via KnowledgeDNAService)
 /// - Progress (via ProgressService)
@@ -32,27 +33,27 @@ import '../models/decision.dart';
 /// - No networking
 /// - Recommendation is one of the inputs; DecisionService owns the final decision
 class DecisionService {
-  DecisionService({SampleDataService? seedSource})
-    : seedSource = seedSource ?? const SampleDataService();
+  DecisionService({Repository? repository})
+    : repository = repository ?? const SampleRepository();
 
-  final SampleDataService seedSource;
+  final Repository repository;
 
   // ─────────────────────────────────────────────────────────────────────
   // Internal service accessors (lazy, stateless)
   // ─────────────────────────────────────────────────────────────────────
 
-  MissionService get _missionService => MissionService(seedSource: seedSource);
+  MissionService get _missionService => MissionService(repository: repository);
 
   ProgressService get _progressService =>
-      ProgressService(seedSource: seedSource);
+      ProgressService(repository: repository);
 
   KnowledgeDNAService get _knowledgeDnaService =>
-      KnowledgeDNAService(seedSource: seedSource);
+      KnowledgeDNAService(repository: repository);
 
-  MemoryService get _memoryService => MemoryService(seedSource: seedSource);
+  MemoryService get _memoryService => MemoryService(repository: repository);
 
   RecommendationService get _recommendationService =>
-      RecommendationService(seedSource: seedSource);
+      RecommendationService(repository: repository);
 
   // ─────────────────────────────────────────────────────────────────────
   // Public API
@@ -131,8 +132,8 @@ class DecisionService {
   }
 
   Decision _buildFromJourney() {
-    final journey = seedSource.journey;
-    final currentStage = seedSource.currentJourneyStage;
+    final journey = repository.journey;
+    final currentStage = repository.currentJourneyStage;
 
     final confidence = (1.0 - journey.completion).clamp(0.3, 0.85);
 

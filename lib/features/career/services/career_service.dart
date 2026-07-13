@@ -1,4 +1,5 @@
-import '../../../services/sample_data_service.dart';
+import '../../../core/repository.dart';
+import '../../../core/sample_repository.dart';
 import '../../decision/services/decision_service.dart';
 import '../../journey/models/journey_stage.dart';
 import '../../knowledge_dna/knowledge_dna_service.dart';
@@ -14,10 +15,10 @@ import '../models/career_profile.dart';
 ///
 /// Presentation only. No AI, no persistence, no networking.
 class CareerService {
-  CareerService({SampleDataService? seedSource})
-    : seedSource = seedSource ?? const SampleDataService();
+  CareerService({Repository? repository})
+    : repository = repository ?? const SampleRepository();
 
-  final SampleDataService seedSource;
+  final Repository repository;
 
   // ─────────────────────────────────────────────────────────────────────
   // Internal service accessors
@@ -25,16 +26,16 @@ class CareerService {
   // Internal service accessors
   // ─────────────────────────────────────────────────────────────────────
 
-  MissionService get _missionService => MissionService(seedSource: seedSource);
+  MissionService get _missionService => MissionService(repository: repository);
 
   ProgressService get _progressService =>
-      ProgressService(seedSource: seedSource);
+      ProgressService(repository: repository);
 
   KnowledgeDNAService get _knowledgeDnaService =>
-      KnowledgeDNAService(seedSource: seedSource);
+      KnowledgeDNAService(repository: repository);
 
   DecisionService get _decisionService =>
-      DecisionService(seedSource: seedSource);
+      DecisionService(repository: repository);
 
   // ─────────────────────────────────────────────────────────────────────
   // Public API
@@ -42,9 +43,9 @@ class CareerService {
 
   /// Builds the career readiness profile from all integrated modules.
   CareerProfile buildProfile() {
-    final identity = seedSource.selectedIdentity;
-    final journey = seedSource.journey;
-    final currentStage = seedSource.currentJourneyStage;
+    final identity = repository.selectedIdentity;
+    final journey = repository.journey;
+    final currentStage = repository.currentJourneyStage;
     final missionProgress = _missionService.buildProgress();
     final progressSummary = _progressService.buildSummary();
     final knowledgeAnalysis = _knowledgeDnaService.buildAnalysis();
@@ -163,7 +164,7 @@ class CareerService {
   /// Returns a scored list of skill gaps with priority for UI display.
   List<GapItem> getGapDetails() {
     final profile = buildProfile();
-    final currentStage = seedSource.currentJourneyStage;
+    final currentStage = repository.currentJourneyStage;
 
     return profile.skillGaps.asMap().entries.map((entry) {
       final index = entry.key;

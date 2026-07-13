@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phoenix_platform/features/mission_engine/mission_service.dart';
-import 'package:phoenix_platform/services/sample_data_service.dart';
+import 'package:phoenix_platform/core/sample_repository.dart';
 
 void main() {
   group('MissionService', () {
     test('builds progress from seeded missions', () {
-      final service = MissionService(seedSource: const SampleDataService());
+      final service = MissionService(repository: const SampleRepository());
       final progress = service.buildProgress();
 
       expect(progress.dailyMissions, isNotEmpty);

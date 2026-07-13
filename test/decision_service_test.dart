@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phoenix_platform/features/decision/models/decision.dart';
 import 'package:phoenix_platform/features/decision/services/decision_service.dart';
-import 'package:phoenix_platform/services/sample_data_service.dart';
+import 'package:phoenix_platform/core/sample_repository.dart';
 
 void main() {
   group('DecisionService', () {
     test('returns a non-null decision', () {
-      final service = DecisionService(seedSource: const SampleDataService());
+      final service = DecisionService(repository: const SampleRepository());
 
       final decision = service.getDecision();
 
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('returns candidates from all source modules', () {
-      final service = DecisionService(seedSource: const SampleDataService());
+      final service = DecisionService(repository: const SampleRepository());
 
       final candidates = service.getCandidates();
 
@@ -60,7 +60,7 @@ void main() {
     });
 
     test('candidates are sorted by confidence descending', () {
-      final service = DecisionService(seedSource: const SampleDataService());
+      final service = DecisionService(repository: const SampleRepository());
 
       final candidates = service.getCandidates();
 
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('the top candidate comes from recommendation module', () {
-      final service = DecisionService(seedSource: const SampleDataService());
+      final service = DecisionService(repository: const SampleRepository());
 
       final decision = service.getDecision();
 
@@ -89,7 +89,7 @@ void main() {
     });
 
     test('every decision has a valid source module', () {
-      final service = DecisionService(seedSource: const SampleDataService());
+      final service = DecisionService(repository: const SampleRepository());
 
       final candidates = service.getCandidates();
       final validModules = <String>[
@@ -111,7 +111,7 @@ void main() {
     });
 
     test('journey candidate references current stage', () {
-      final service = DecisionService(seedSource: const SampleDataService());
+      final service = DecisionService(repository: const SampleRepository());
 
       final candidates = service.getCandidates();
       final journeyDecision = candidates.firstWhere(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../routes/app_routes.dart';
-import '../../../services/sample_data_service.dart';
+import '../../../core/sample_repository.dart';
 import '../../../theme/spacing.dart';
 import '../services/career_service.dart';
 import '../widgets/career_actions_card.dart';
@@ -23,8 +23,8 @@ class CareerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sampleData = const SampleDataService();
-    final careerService = CareerService(seedSource: sampleData);
+    final repository = const SampleRepository();
+    final careerService = CareerService(repository: repository);
 
     final profile = careerService.buildProfile();
     final strengths = careerService.getStrengthDetails();
@@ -36,8 +36,8 @@ class CareerScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CareerHeader(
-            identityTitle: profile.identityId == sampleData.selectedIdentity.id
-                ? sampleData.selectedIdentity.title
+            identityTitle: profile.identityId == repository.selectedIdentity.id
+                ? repository.selectedIdentity.title
                 : 'Career Path',
             careerScore: profile.careerScore,
             jobReadiness: profile.jobReadiness,
