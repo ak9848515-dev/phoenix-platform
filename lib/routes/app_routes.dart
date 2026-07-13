@@ -13,4 +13,9 @@ class AppRoutes {
   static const String journey = '/journey';
   static const String dailyFocus = '/daily-focus';
   static const String career = '/career';
+  static const String portfolio = '/portfolio';
+  static const String resume = '/resume';
+  static const String interview = '/interview';
+  static const String opportunity = '/opportunity';
+  static const String marketplace = '/marketplace';
 }

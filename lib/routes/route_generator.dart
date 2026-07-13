@@ -10,7 +10,12 @@ import '../features/memory/presentation/memory_screen.dart';
 import '../features/recommendation/presentation/recommendation_screen.dart';
 import '../features/knowledge_dna/presentation/knowledge_dna_screen.dart';
 import '../features/mission_center/mission_center_screen.dart';
+import '../features/portfolio/presentation/portfolio_screen.dart';
 import '../features/progress/progress_screen.dart';
+import '../features/interview/presentation/interview_screen.dart';
+import '../features/opportunity/presentation/opportunity_screen.dart';
+import '../features/marketplace/presentation/marketplace_screen.dart';
+import '../features/resume/presentation/resume_screen.dart';
 import '../shared/widgets/phoenix_shell.dart';
 import 'app_routes.dart';
 
@@ -107,6 +112,51 @@ class RouteGenerator {
             selectedIndex: 0,
             title: 'Career Readiness',
             body: CareerScreen(),
+          ),
+        );
+      case AppRoutes.portfolio:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Portfolio',
+            body: PortfolioScreen(),
+          ),
+        );
+      case AppRoutes.resume:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Resume',
+            body: ResumeScreen(),
+          ),
+        );
+      case AppRoutes.interview:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Interview Prep',
+            body: InterviewScreen(),
+          ),
+        );
+      case AppRoutes.opportunity:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Opportunities',
+            body: OpportunityScreen(),
+          ),
+        );
+      case AppRoutes.marketplace:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 0,
+            title: 'Plugin Marketplace',
+            body: MarketplaceScreen(),
           ),
         );
       case AppRoutes.identity:

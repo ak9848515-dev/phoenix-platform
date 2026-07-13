@@ -18,7 +18,15 @@ class PluginLoader {
   /// They are returned with [PluginLifecycleState.installed] and
   /// [PluginMetadata.source] set to 'built-in'.
   List<Plugin> loadBuiltInPlugins() {
-    return [_softwareEngineerPlugin()];
+    return [
+      _softwareEngineerPlugin(),
+      _flutterDeveloperPlugin(),
+      _sapConsultantPlugin(),
+      _contentCreatorPlugin(),
+      _businessOwnerPlugin(),
+      _entrepreneurPlugin(),
+      _studentPlugin(),
+    ];
   }
 
   /// Loads a specific built-in plugin by [id].
@@ -34,10 +42,6 @@ class PluginLoader {
   }
 
   /// Creates the built-in Software Engineer plugin.
-  ///
-  /// This is the first career plugin shipped with Phoenix. It provides
-  /// identity, journey, missions, knowledge DNA, academy, career metrics,
-  /// and AI prompt templates for the Software Engineering path.
   Plugin _softwareEngineerPlugin() {
     return Plugin(
       manifest: const PluginManifest(
@@ -50,6 +54,186 @@ class PluginLoader {
             'and professional development.',
         author: 'Phoenix',
         category: 'Technology',
+        minPhoenixVersion: '1.0.0',
+        pluginApiVersion: '1.0.0',
+        requiredCapabilities: [
+          'identity',
+          'journey',
+          'missions',
+          'knowledge_dna',
+          'academy',
+          'career',
+          'ai_prompts',
+        ],
+      ),
+      metadata: const PluginMetadata(source: 'built-in'),
+      state: PluginLifecycleState.installed,
+    );
+  }
+
+  /// Creates the built-in Flutter Developer plugin.
+  Plugin _flutterDeveloperPlugin() {
+    return Plugin(
+      manifest: const PluginManifest(
+        id: 'flutter_developer',
+        name: 'Flutter Developer',
+        version: '1.0.0',
+        description:
+            'Complete Flutter development career path covering Dart, '
+            'widgets, state management, animations, platform channels, '
+            'and app store deployment.',
+        author: 'Phoenix',
+        category: 'Technology',
+        minPhoenixVersion: '1.0.0',
+        pluginApiVersion: '1.0.0',
+        requiredCapabilities: [
+          'identity',
+          'journey',
+          'missions',
+          'knowledge_dna',
+          'academy',
+          'career',
+          'ai_prompts',
+        ],
+      ),
+      metadata: const PluginMetadata(source: 'built-in'),
+      state: PluginLifecycleState.installed,
+    );
+  }
+
+  /// Creates the built-in SAP Consultant plugin.
+  Plugin _sapConsultantPlugin() {
+    return Plugin(
+      manifest: const PluginManifest(
+        id: 'sap_consultant',
+        name: 'SAP Consultant',
+        version: '1.0.0',
+        description:
+            'Complete SAP consulting career path covering SAP modules, '
+            'implementation methodologies, configuration, ABAP, '
+            'and project management.',
+        author: 'Phoenix',
+        category: 'Business',
+        minPhoenixVersion: '1.0.0',
+        pluginApiVersion: '1.0.0',
+        requiredCapabilities: [
+          'identity',
+          'journey',
+          'missions',
+          'knowledge_dna',
+          'academy',
+          'career',
+          'ai_prompts',
+        ],
+      ),
+      metadata: const PluginMetadata(source: 'built-in'),
+      state: PluginLifecycleState.installed,
+    );
+  }
+
+  /// Creates the built-in Content Creator plugin.
+  Plugin _contentCreatorPlugin() {
+    return Plugin(
+      manifest: const PluginManifest(
+        id: 'content_creator',
+        name: 'Content Creator',
+        version: '1.0.0',
+        description:
+            'Complete content creation career path covering video '
+            'production, audience growth, monetization, branding, '
+            'and platform strategy.',
+        author: 'Phoenix',
+        category: 'Creative',
+        minPhoenixVersion: '1.0.0',
+        pluginApiVersion: '1.0.0',
+        requiredCapabilities: [
+          'identity',
+          'journey',
+          'missions',
+          'knowledge_dna',
+          'academy',
+          'career',
+          'ai_prompts',
+        ],
+      ),
+      metadata: const PluginMetadata(source: 'built-in'),
+      state: PluginLifecycleState.installed,
+    );
+  }
+
+  /// Creates the built-in Business Owner plugin.
+  Plugin _businessOwnerPlugin() {
+    return Plugin(
+      manifest: const PluginManifest(
+        id: 'business_owner',
+        name: 'Business Owner',
+        version: '1.0.0',
+        description:
+            'Complete business ownership path covering business planning, '
+            'operations, finance, marketing, team management, '
+            'and growth strategy.',
+        author: 'Phoenix',
+        category: 'Business',
+        minPhoenixVersion: '1.0.0',
+        pluginApiVersion: '1.0.0',
+        requiredCapabilities: [
+          'identity',
+          'journey',
+          'missions',
+          'knowledge_dna',
+          'academy',
+          'career',
+          'ai_prompts',
+        ],
+      ),
+      metadata: const PluginMetadata(source: 'built-in'),
+      state: PluginLifecycleState.installed,
+    );
+  }
+
+  /// Creates the built-in Entrepreneur plugin.
+  Plugin _entrepreneurPlugin() {
+    return Plugin(
+      manifest: const PluginManifest(
+        id: 'entrepreneur',
+        name: 'Entrepreneur',
+        version: '1.0.0',
+        description:
+            'Complete entrepreneurship path covering startup ideation, '
+            'product development, fundraising, scaling, '
+            'and leadership.',
+        author: 'Phoenix',
+        category: 'Business',
+        minPhoenixVersion: '1.0.0',
+        pluginApiVersion: '1.0.0',
+        requiredCapabilities: [
+          'identity',
+          'journey',
+          'missions',
+          'knowledge_dna',
+          'academy',
+          'career',
+          'ai_prompts',
+        ],
+      ),
+      metadata: const PluginMetadata(source: 'built-in'),
+      state: PluginLifecycleState.installed,
+    );
+  }
+
+  /// Creates the built-in Student plugin.
+  Plugin _studentPlugin() {
+    return Plugin(
+      manifest: const PluginManifest(
+        id: 'student',
+        name: 'Student',
+        version: '1.0.0',
+        description:
+            'Complete student growth path covering study techniques, '
+            'time management, exam preparation, skill building, '
+            'and career exploration.',
+        author: 'Phoenix',
+        category: 'Education',
         minPhoenixVersion: '1.0.0',
         pluginApiVersion: '1.0.0',
         requiredCapabilities: [
