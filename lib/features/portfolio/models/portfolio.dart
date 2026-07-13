@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'portfolio_achievement.dart';
 import 'portfolio_project.dart';
 import 'portfolio_skill.dart';
@@ -65,6 +67,70 @@ class Portfolio {
 
   /// Number of distinct technologies.
   int get technologyCount => technologies.length;
+
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'identityId': identityId,
+      'portfolioScore': portfolioScore,
+      'featuredProjects': featuredProjects.map((p) => p.toMap()).toList(),
+      'skills': skills.map((s) => s.toMap()).toList(),
+      'technologies': technologies,
+      'achievements': achievements.map((a) => a.toMap()).toList(),
+      'careerReadiness': careerReadiness,
+      'strengthAreas': strengthAreas,
+      'improvementAreas': improvementAreas,
+      'lastUpdated': lastUpdated?.toIso8601String(),
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory Portfolio.fromMap(Map<String, dynamic> map) {
+    return Portfolio(
+      id: map['id'] as String,
+      identityId: map['identityId'] as String,
+      portfolioScore: (map['portfolioScore'] as num?)?.toDouble() ?? 0.0,
+      featuredProjects: map['featuredProjects'] != null
+          ? (map['featuredProjects'] as List)
+              .map((p) => PortfolioProject.fromMap(
+                  Map<String, dynamic>.from(p as Map)))
+              .toList()
+          : const [],
+      skills: map['skills'] != null
+          ? (map['skills'] as List)
+              .map((s) => PortfolioSkill.fromMap(
+                  Map<String, dynamic>.from(s as Map)))
+              .toList()
+          : const [],
+      technologies: map['technologies'] != null
+          ? List<String>.from(map['technologies'] as List)
+          : const [],
+      achievements: map['achievements'] != null
+          ? (map['achievements'] as List)
+              .map((a) => PortfolioAchievement.fromMap(
+                  Map<String, dynamic>.from(a as Map)))
+              .toList()
+          : const [],
+      careerReadiness: map['careerReadiness'] as String? ?? '',
+      strengthAreas: map['strengthAreas'] != null
+          ? List<String>.from(map['strengthAreas'] as List)
+          : const [],
+      improvementAreas: map['improvementAreas'] != null
+          ? List<String>.from(map['improvementAreas'] as List)
+          : const [],
+      lastUpdated: map['lastUpdated'] != null
+          ? DateTime.parse(map['lastUpdated'] as String)
+          : null,
+    );
+  }
+
+  /// Serializes to a JSON string.
+  String toJson() => json.encode(toMap());
+
+  /// Creates from a JSON string.
+  factory Portfolio.fromJson(String source) =>
+      Portfolio.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// Creates a copy with the given fields replaced.
   Portfolio copyWith({

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'resume_project.dart';
 import 'resume_skill.dart';
 
@@ -126,6 +128,75 @@ class Resume {
 
   /// Number of skills.
   int get skillCount => skills.length;
+
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'identityId': identityId,
+      'resumeType': resumeType.name,
+      'professionalSummary': professionalSummary,
+      'projects': projects.map((p) => p.toMap()).toList(),
+      'skills': skills.map((s) => s.toMap()).toList(),
+      'achievements': achievements,
+      'careerHighlights': careerHighlights,
+      'technologyStack': technologyStack,
+      'careerReadiness': careerReadiness,
+      'resumeScore': resumeScore,
+      'generatedAt': generatedAt?.toIso8601String(),
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory Resume.fromMap(Map<String, dynamic> map) {
+    return Resume(
+      id: map['id'] as String,
+      identityId: map['identityId'] as String,
+      resumeType: _resumeTypeFromName(map['resumeType'] as String? ?? ''),
+      professionalSummary: map['professionalSummary'] as String? ?? '',
+      projects: map['projects'] != null
+          ? (map['projects'] as List)
+              .map((p) => ResumeProject.fromMap(
+                  Map<String, dynamic>.from(p as Map)))
+              .toList()
+          : const [],
+      skills: map['skills'] != null
+          ? (map['skills'] as List)
+              .map((s) => ResumeSkill.fromMap(
+                  Map<String, dynamic>.from(s as Map)))
+              .toList()
+          : const [],
+      achievements: map['achievements'] != null
+          ? List<String>.from(map['achievements'] as List)
+          : const [],
+      careerHighlights: map['careerHighlights'] != null
+          ? List<String>.from(map['careerHighlights'] as List)
+          : const [],
+      technologyStack: map['technologyStack'] != null
+          ? List<String>.from(map['technologyStack'] as List)
+          : const [],
+      careerReadiness: map['careerReadiness'] as String? ?? '',
+      resumeScore: (map['resumeScore'] as num?)?.toDouble() ?? 0.0,
+      generatedAt: map['generatedAt'] != null
+          ? DateTime.parse(map['generatedAt'] as String)
+          : null,
+    );
+  }
+
+  /// Serializes to a JSON string.
+  String toJson() => json.encode(toMap());
+
+  /// Creates from a JSON string.
+  factory Resume.fromJson(String source) =>
+      Resume.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  /// Resolves ResumeType from its name string.
+  static ResumeType _resumeTypeFromName(String name) {
+    return ResumeType.values.firstWhere(
+      (t) => t.name == name,
+      orElse: () => ResumeType.generic,
+    );
+  }
 
   /// Creates a copy with the given fields replaced.
   Resume copyWith({

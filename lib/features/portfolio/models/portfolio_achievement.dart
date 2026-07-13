@@ -57,6 +57,35 @@ class PortfolioAchievement {
     );
   }
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'description': description,
+      'iconCodePoint': icon?.codePoint,
+      'date': date?.toIso8601String(),
+      'type': type,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory PortfolioAchievement.fromMap(Map<String, dynamic> map) {
+    return PortfolioAchievement(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      description: map['description'] as String?,
+      icon: map['iconCodePoint'] != null
+          // ignore: non_const_argument_for_const_parameter
+          ? IconData(map['iconCodePoint'] as int)
+          : null,
+      date: map['date'] != null
+          ? DateTime.parse(map['date'] as String)
+          : null,
+      type: map['type'] as String? ?? 'achievement',
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

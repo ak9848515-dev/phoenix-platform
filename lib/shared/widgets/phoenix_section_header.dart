@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/spacing.dart';
+import '../../core/design/theme/phoenix_colors.dart';
+import '../../core/design/theme/phoenix_spacing.dart';
+import '../../core/design/theme/phoenix_typography.dart';
 
+/// A section header for the Phoenix Platform.
+///
+/// Uses the Phoenix Design System tokens for consistent styling.
 class PhoenixSectionHeader extends StatelessWidget {
   const PhoenixSectionHeader({
     super.key,
@@ -18,8 +23,6 @@ class PhoenixSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Row(
@@ -29,13 +32,13 @@ class PhoenixSectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: theme.textTheme.titleMedium),
+                Text(title, style: PhoenixTypography.h3),
                 if (subtitle != null) ...[
-                  const SizedBox(height: AppSpacing.xs),
+                  const SizedBox(height: PhoenixSpacing.xs),
                   Text(
                     subtitle!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    style: PhoenixTypography.bodySmall.copyWith(
+                      color: PhoenixColors.textSecondary,
                     ),
                   ),
                 ],
@@ -43,7 +46,7 @@ class PhoenixSectionHeader extends StatelessWidget {
             ),
           ),
           if (actions != null) ...[
-            const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: PhoenixSpacing.sm),
             actions!,
           ],
         ],

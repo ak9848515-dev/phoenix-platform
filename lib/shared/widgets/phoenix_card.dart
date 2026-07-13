@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/radius.dart';
-import '../../theme/spacing.dart';
+import '../../core/design/theme/phoenix_colors.dart';
+import '../../core/design/theme/phoenix_radius.dart';
+import '../../core/design/theme/phoenix_spacing.dart';
 
+/// A premium card surface for the Phoenix Platform.
+///
+/// Uses the Phoenix Design System tokens for consistent styling.
 class PhoenixCard extends StatelessWidget {
   const PhoenixCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(AppSpacing.lg),
+    this.padding = const EdgeInsets.all(PhoenixSpacing.xl),
     this.margin,
     this.color,
     this.borderRadius,
@@ -27,17 +31,22 @@ class PhoenixCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final cardColor = color ?? PhoenixColors.surface;
+    final cardRadius = borderRadius ?? PhoenixRadius.xlRadius;
 
     return Card(
       margin: margin,
       elevation: elevation,
-      color: color ?? theme.colorScheme.surfaceContainerHighest,
+      color: cardColor,
+      shadowColor: PhoenixColors.shadow,
       clipBehavior: clipBehavior,
+      surfaceTintColor: Colors.transparent,
       shape:
           shape ??
           RoundedRectangleBorder(
-            borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.lg),
+            borderRadius: cardRadius is BorderRadius
+                ? cardRadius
+                : BorderRadius.circular(PhoenixRadius.xl),
           ),
       child: Padding(padding: padding, child: child),
     );

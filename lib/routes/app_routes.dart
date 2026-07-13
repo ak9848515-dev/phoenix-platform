@@ -18,4 +18,5 @@ class AppRoutes {
   static const String interview = '/interview';
   static const String opportunity = '/opportunity';
   static const String marketplace = '/marketplace';
+  static const String ai = '/ai';
 }

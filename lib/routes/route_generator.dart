@@ -16,6 +16,8 @@ import '../features/interview/presentation/interview_screen.dart';
 import '../features/opportunity/presentation/opportunity_screen.dart';
 import '../features/marketplace/presentation/marketplace_screen.dart';
 import '../features/resume/presentation/resume_screen.dart';
+import '../features/ai/presentation/ai_screen.dart';
+import '../features/profile/presentation/profile_screen.dart';
 import '../shared/widgets/phoenix_shell.dart';
 import 'app_routes.dart';
 
@@ -168,13 +170,22 @@ class RouteGenerator {
             body: IdentitySelectionScreen(),
           ),
         );
+      case AppRoutes.ai:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 3,
+            title: 'AI Mentor',
+            body: AIScreen(),
+          ),
+        );
       case AppRoutes.profile:
         return MaterialPageRoute<dynamic>(
           settings: settings,
           builder: (_) => const PhoenixShell(
             selectedIndex: 3,
             title: 'Profile',
-            body: _PlaceholderPage(label: 'Profile'),
+            body: ProfileScreen(),
           ),
         );
       default:
@@ -187,20 +198,5 @@ class RouteGenerator {
           ),
         );
     }
-  }
-}
-
-/// Temporary placeholder for routes that don't have a screen yet.
-class _PlaceholderPage extends StatelessWidget {
-  const _PlaceholderPage({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Text('$label — Coming Soon', style: theme.textTheme.titleMedium),
-    );
   }
 }

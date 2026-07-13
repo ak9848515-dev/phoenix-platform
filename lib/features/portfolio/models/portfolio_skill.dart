@@ -43,6 +43,28 @@ class PortfolioSkill {
     );
   }
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'proficiency': proficiency,
+      'category': category,
+      'isStrength': isStrength,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory PortfolioSkill.fromMap(Map<String, dynamic> map) {
+    return PortfolioSkill(
+      id: map['id'] as String,
+      name: map['name'] as String,
+      proficiency: (map['proficiency'] as num).toDouble(),
+      category: map['category'] as String? ?? 'General',
+      isStrength: map['isStrength'] as bool? ?? false,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

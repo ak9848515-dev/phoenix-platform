@@ -110,7 +110,7 @@ class PortfolioService {
       ...missionProgress.weeklyMissions,
     ];
     for (final mission in allMissions) {
-      if (mission.completed) {
+      if (mission.isCompleted) {
         projects.add(
           PortfolioProject(
             id: 'project-mission-${mission.id}',

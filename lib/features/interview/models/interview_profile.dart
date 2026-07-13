@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'interview_question.dart';
 
 /// Immutable representation of the user's interview preparation profile.
@@ -54,6 +56,60 @@ class InterviewProfile {
 
   /// Number of mock questions available.
   int get questionCount => mockQuestions.length;
+
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'identityId': identityId,
+      'interviewReadiness': interviewReadiness,
+      'technicalScore': technicalScore,
+      'behavioralScore': behavioralScore,
+      'communicationScore': communicationScore,
+      'strengths': strengths,
+      'improvementAreas': improvementAreas,
+      'recommendedTopics': recommendedTopics,
+      'mockQuestions': mockQuestions.map((q) => q.toMap()).toList(),
+      'estimatedPreparationDays': estimatedPreparationDays,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory InterviewProfile.fromMap(Map<String, dynamic> map) {
+    return InterviewProfile(
+      id: map['id'] as String,
+      identityId: map['identityId'] as String,
+      interviewReadiness:
+          (map['interviewReadiness'] as num?)?.toDouble() ?? 0.0,
+      technicalScore: (map['technicalScore'] as num?)?.toDouble() ?? 0.0,
+      behavioralScore: (map['behavioralScore'] as num?)?.toDouble() ?? 0.0,
+      communicationScore:
+          (map['communicationScore'] as num?)?.toDouble() ?? 0.0,
+      strengths: map['strengths'] != null
+          ? List<String>.from(map['strengths'] as List)
+          : const [],
+      improvementAreas: map['improvementAreas'] != null
+          ? List<String>.from(map['improvementAreas'] as List)
+          : const [],
+      recommendedTopics: map['recommendedTopics'] != null
+          ? List<String>.from(map['recommendedTopics'] as List)
+          : const [],
+      mockQuestions: map['mockQuestions'] != null
+          ? (map['mockQuestions'] as List)
+              .map((q) => InterviewQuestion.fromMap(
+                  Map<String, dynamic>.from(q as Map)))
+              .toList()
+          : const [],
+      estimatedPreparationDays: map['estimatedPreparationDays'] as int? ?? 0,
+    );
+  }
+
+  /// Serializes to a JSON string.
+  String toJson() => json.encode(toMap());
+
+  /// Creates from a JSON string.
+  factory InterviewProfile.fromJson(String source) =>
+      InterviewProfile.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// Creates a copy with the given fields replaced.
   InterviewProfile copyWith({

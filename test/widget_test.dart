@@ -15,7 +15,20 @@ void main() {
   ) async {
     await tester.pumpWidget(const PhoenixApp());
 
+    // Allow animations (FadeAnimation, SlideAnimation) to settle
+    // so they don't leave pending timers.
+    await tester.pumpAndSettle();
+
     expect(find.text('Dashboard'), findsAtLeastNWidgets(1));
-    expect(find.text('Good morning'), findsOneWidget);
+
+    // The greeting is time-based; check for any recognized variant.
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      expect(find.text('Good morning'), findsOneWidget);
+    } else if (hour < 17) {
+      expect(find.text('Good afternoon'), findsOneWidget);
+    } else {
+      expect(find.text('Good evening'), findsOneWidget);
+    }
   });
 }

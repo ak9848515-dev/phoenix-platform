@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme/spacing.dart';
+import '../../../core/design/theme/phoenix_colors.dart';
+import '../../../core/design/theme/phoenix_radius.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
+import '../../../core/design/theme/phoenix_typography.dart';
 
 /// A reusable secondary action button used across all experience screens.
 ///
 /// Displays an icon and label inside a rounded, tinted container.
-/// Used in at least 3+ features (Mission, Academy, Progress, Knowledge DNA, Dashboard).
+/// Uses the Phoenix Design System tokens for consistent styling.
 class ExperienceSecondaryButton extends StatelessWidget {
   const ExperienceSecondaryButton({
     super.key,
@@ -20,28 +23,26 @@ class ExperienceSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Material(
-      color: theme.colorScheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(12),
+      color: PhoenixColors.surfaceVariant,
+      borderRadius: BorderRadius.circular(PhoenixRadius.md),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(PhoenixRadius.md),
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.md,
+            horizontal: PhoenixSpacing.md,
+            vertical: PhoenixSpacing.md,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
-              const SizedBox(width: AppSpacing.sm),
+              Icon(icon, size: 20, color: PhoenixColors.textSecondary),
+              const SizedBox(width: PhoenixSpacing.sm),
               Text(
                 label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                style: PhoenixTypography.label.copyWith(
+                  color: PhoenixColors.textSecondary,
                 ),
               ),
             ],

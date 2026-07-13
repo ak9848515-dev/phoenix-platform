@@ -58,6 +58,38 @@ class PortfolioProject {
     );
   }
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'description': description,
+      'type': type,
+      'completedDate': completedDate?.toIso8601String(),
+      'skills': skills,
+      'technologies': technologies,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory PortfolioProject.fromMap(Map<String, dynamic> map) {
+    return PortfolioProject(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      description: map['description'] as String,
+      type: map['type'] as String? ?? 'mission',
+      completedDate: map['completedDate'] != null
+          ? DateTime.parse(map['completedDate'] as String)
+          : null,
+      skills: map['skills'] != null
+          ? List<String>.from(map['skills'] as List)
+          : const [],
+      technologies: map['technologies'] != null
+          ? List<String>.from(map['technologies'] as List)
+          : const [],
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

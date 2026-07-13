@@ -180,7 +180,7 @@ class DecisionService {
 
     mission_engine.Mission? nextMission;
     try {
-      nextMission = allMissions.firstWhere((m) => !m.completed);
+      nextMission = allMissions.firstWhere((m) => !m.isCompleted);
     } catch (_) {
       return [];
     }

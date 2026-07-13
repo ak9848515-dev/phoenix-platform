@@ -34,6 +34,39 @@ class InterviewQuestion {
   /// Tips for answering this question.
   final List<String> tips;
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'question': question,
+      'questionType': questionType.name,
+      'difficulty': difficulty,
+      'topics': topics,
+      'suggestedAnswer': suggestedAnswer,
+      'tips': tips,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory InterviewQuestion.fromMap(Map<String, dynamic> map) {
+    return InterviewQuestion(
+      id: map['id'] as String,
+      question: map['question'] as String,
+      questionType: QuestionType.values.firstWhere(
+        (t) => t.name == map['questionType'],
+        orElse: () => QuestionType.technical,
+      ),
+      difficulty: (map['difficulty'] as num?)?.toDouble() ?? 0.5,
+      topics: map['topics'] != null
+          ? List<String>.from(map['topics'] as List)
+          : const [],
+      suggestedAnswer: map['suggestedAnswer'] as String?,
+      tips: map['tips'] != null
+          ? List<String>.from(map['tips'] as List)
+          : const [],
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

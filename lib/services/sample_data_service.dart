@@ -5,6 +5,10 @@ import '../features/journey/models/journey.dart';
 import '../features/journey/models/journey_stage.dart';
 import '../features/knowledge_dna/models/knowledge_dna.dart';
 import '../features/mission_engine/mission_engine.dart' as mission_engine;
+import '../features/mission_engine/models/mission_category.dart';
+import '../features/mission_engine/models/mission_difficulty.dart';
+import '../features/mission_engine/models/mission_priority.dart';
+import '../features/mission_engine/models/mission_status.dart';
 import '../models/academy.dart';
 import '../models/lesson.dart';
 import '../models/level.dart';
@@ -249,13 +253,13 @@ class SampleDataService {
           description:
               'Master Dart variables, types, and type inference '
               'to write clean, safe code.',
-          category: 'daily',
-          priority: 'high',
+          category: MissionCategory.daily,
+          priority: MissionPriority.high,
+          difficulty: MissionDifficulty.beginner,
           estimatedDuration: 30,
-          completed: true,
-          completionDate: null,
-          xpReward: 120,
-          academyId: 'academy-leadership',
+          rewardXP: 120,
+          status: MissionStatus.completed,
+          completedDate: null,
         ),
         mission_engine.Mission(
           id: 'daily-2',
@@ -263,13 +267,13 @@ class SampleDataService {
           description:
               'Understand Dart sound null safety: nullable types, '
               'late variables, and null-aware operators.',
-          category: 'daily',
-          priority: 'high',
+          category: MissionCategory.daily,
+          priority: MissionPriority.high,
+          difficulty: MissionDifficulty.beginner,
           estimatedDuration: 25,
-          completed: true,
-          completionDate: null,
-          xpReward: 90,
-          academyId: 'academy-product',
+          rewardXP: 90,
+          status: MissionStatus.completed,
+          completedDate: null,
         ),
         mission_engine.Mission(
           id: 'daily-3',
@@ -277,13 +281,13 @@ class SampleDataService {
           description:
               'Learn async programming with Future, async/await, '
               'and error handling in Dart.',
-          category: 'daily',
-          priority: 'high',
+          category: MissionCategory.daily,
+          priority: MissionPriority.high,
+          difficulty: MissionDifficulty.easy,
           estimatedDuration: 35,
-          completed: false,
-          completionDate: null,
-          xpReward: 150,
-          academyId: 'academy-leadership',
+          rewardXP: 150,
+          status: MissionStatus.pending,
+          completedDate: null,
         ),
       ];
 
@@ -296,13 +300,13 @@ class SampleDataService {
           description:
               'Use Dart collections (List, Set, Map) and generics '
               'to write reusable, type-safe code.',
-          category: 'weekly',
-          priority: 'medium',
+          category: MissionCategory.weekly,
+          priority: MissionPriority.medium,
+          difficulty: MissionDifficulty.easy,
           estimatedDuration: 40,
-          completed: false,
-          completionDate: null,
-          xpReward: 200,
-          academyId: 'academy-product',
+          rewardXP: 200,
+          status: MissionStatus.pending,
+          completedDate: null,
         ),
         mission_engine.Mission(
           id: 'weekly-2',
@@ -310,13 +314,13 @@ class SampleDataService {
           description:
               'Revisit programming fundamentals: data structures '
               'and algorithm patterns for the next stage.',
-          category: 'weekly',
-          priority: 'medium',
+          category: MissionCategory.weekly,
+          priority: MissionPriority.medium,
+          difficulty: MissionDifficulty.medium,
           estimatedDuration: 30,
-          completed: false,
-          completionDate: null,
-          xpReward: 180,
-          academyId: 'academy-design',
+          rewardXP: 180,
+          status: MissionStatus.pending,
+          completedDate: null,
         ),
         mission_engine.Mission(
           id: 'weekly-3',
@@ -324,13 +328,13 @@ class SampleDataService {
           description:
               'Review your Dart stage progress and plan the next '
               'learning sprint towards Flutter Widgets.',
-          category: 'weekly',
-          priority: 'low',
+          category: MissionCategory.weekly,
+          priority: MissionPriority.low,
+          difficulty: MissionDifficulty.beginner,
           estimatedDuration: 15,
-          completed: false,
-          completionDate: null,
-          xpReward: 80,
-          academyId: 'academy-product',
+          rewardXP: 80,
+          status: MissionStatus.pending,
+          completedDate: null,
         ),
       ];
 

@@ -62,6 +62,51 @@ class Opportunity {
   /// Short description of the opportunity.
   final String description;
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'type': type.name,
+      'matchScore': matchScore,
+      'requiredSkills': requiredSkills,
+      'matchedSkills': matchedSkills,
+      'missingSkills': missingSkills,
+      'estimatedReadiness': estimatedReadiness,
+      'recommendedActions': recommendedActions,
+      'estimatedTimeline': estimatedTimeline,
+      'description': description,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory Opportunity.fromMap(Map<String, dynamic> map) {
+    return Opportunity(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      type: OpportunityType.values.firstWhere(
+        (t) => t.name == map['type'],
+        orElse: () => OpportunityType.fullTimeJob,
+      ),
+      matchScore: (map['matchScore'] as num?)?.toDouble() ?? 0.0,
+      requiredSkills: map['requiredSkills'] != null
+          ? List<String>.from(map['requiredSkills'] as List)
+          : const [],
+      matchedSkills: map['matchedSkills'] != null
+          ? List<String>.from(map['matchedSkills'] as List)
+          : const [],
+      missingSkills: map['missingSkills'] != null
+          ? List<String>.from(map['missingSkills'] as List)
+          : const [],
+      estimatedReadiness: map['estimatedReadiness'] as String? ?? '',
+      recommendedActions: map['recommendedActions'] != null
+          ? List<String>.from(map['recommendedActions'] as List)
+          : const [],
+      estimatedTimeline: map['estimatedTimeline'] as String? ?? '',
+      description: map['description'] as String? ?? '',
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

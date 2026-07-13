@@ -32,7 +32,7 @@ class KnowledgeDNAAnalyzer {
     ];
 
     final recommendedMissions = availableMissions
-        .where((mission) => !mission.completed)
+        .where((mission) => !mission.isCompleted)
         .take(2)
         .toList();
     final recommendedAcademies = availableAcademies.take(2).toList();

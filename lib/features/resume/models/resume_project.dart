@@ -42,6 +42,32 @@ class ResumeProject {
     );
   }
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'title': title,
+      'description': description,
+      'type': type,
+      'skills': skills,
+      'highlights': highlights,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory ResumeProject.fromMap(Map<String, dynamic> map) {
+    return ResumeProject(
+      title: map['title'] as String,
+      description: map['description'] as String,
+      type: map['type'] as String? ?? 'mission',
+      skills: map['skills'] != null
+          ? List<String>.from(map['skills'] as List)
+          : const [],
+      highlights: map['highlights'] != null
+          ? List<String>.from(map['highlights'] as List)
+          : const [],
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

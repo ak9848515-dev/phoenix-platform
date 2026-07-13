@@ -1,7 +1,7 @@
 import '../../core/repository.dart';
 import '../../core/sample_repository.dart';
 import '../mission_engine/mission_engine.dart';
-import '../mission_engine/mission_service.dart';
+import '../user_state/services/user_state_service.dart';
 import 'achievement_engine.dart';
 import 'level_calculator.dart';
 import 'progress_engine.dart';
@@ -11,41 +11,61 @@ import 'xp_calculator.dart';
 
 /// Orchestrates progress metrics from mission completion data.
 class ProgressService {
-  ProgressService({Repository? repository})
+  ProgressService({Repository? repository, this._userStateService})
     : repository = repository ?? const SampleRepository();
 
   final Repository repository;
+  final UserStateService? _userStateService;
 
-  MissionService get missionService => MissionService(repository: repository);
+  /// In-memory accumulator for XP earned through mission completions.
+  /// Used when the Progress Engine completes a mission — this allows
+  /// the Mission Engine to track rewards without a full persistence
+  /// pipeline. Accumulated XP is added on top of the base sample XP.
+  int _accumulatedXp = 0;
+
+  /// Records XP earned from a mission completion.
+  ///
+  /// This is the ONLY entry point for modifying XP from outside
+  /// the Progress Engine. Never update XP directly from widgets.
+  /// Also updates UserStateService when available.
+  void addXp(int amount) {
+    _accumulatedXp += amount;
+    _userStateService?.addXp(amount);
+    _userStateService?.touch();
+  }
+
+  /// Returns the total accumulated XP including mission rewards.
+  int get totalAccumulatedXp => _accumulatedXp;
 
   ProgressSummary buildSummary() {
     final missions = <Mission>[
-      ...missionService.dailyMissions,
-      ...missionService.weeklyMissions,
+      ...repository.dailyMissions,
+      ...repository.weeklyMissions,
     ];
     final completedMissions = missions
-        .where((mission) => mission.completed)
+        .where((mission) => mission.isCompleted)
         .toList();
-    final totalXp = XPCalculator().calculate(
-      completedMissions.map((mission) => mission.xpReward).toList(),
+    final baseXp = XPCalculator().calculate(
+      completedMissions.map((mission) => mission.rewardXP).toList(),
     );
+    final totalXp = baseXp + _accumulatedXp;
     final level = LevelCalculator().calculate(totalXp);
     final completionPercentage = missions.isEmpty
         ? 0.0
         : completedMissions.length / missions.length;
     final streaks = Streaks(
       daily: StreakCalculator().calculateDaily(
-        missionService.dailyMissions
-            .map((mission) => mission.completed)
+        repository.dailyMissions
+            .map((mission) => mission.isCompleted)
             .toList(),
       ),
       weekly: StreakCalculator().calculateWeekly(
-        missionService.weeklyMissions
-            .map((mission) => mission.completed)
+        repository.weeklyMissions
+            .map((mission) => mission.isCompleted)
             .toList(),
       ),
       monthly: StreakCalculator().calculateMonthly(
-        missions.map((mission) => mission.completed).toList(),
+        missions.map((mission) => mission.isCompleted).toList(),
       ),
     );
     final achievements = AchievementEngine().calculate(

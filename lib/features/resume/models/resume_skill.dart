@@ -37,6 +37,26 @@ class ResumeSkill {
     );
   }
 
+  /// Serializes to a JSON-compatible map.
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'name': name,
+      'proficiency': proficiency,
+      'isStrength': isStrength,
+      'category': category,
+    };
+  }
+
+  /// Creates from a JSON-compatible map.
+  factory ResumeSkill.fromMap(Map<String, dynamic> map) {
+    return ResumeSkill(
+      name: map['name'] as String,
+      proficiency: (map['proficiency'] as num).toDouble(),
+      isStrength: map['isStrength'] as bool? ?? false,
+      category: map['category'] as String? ?? 'General',
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

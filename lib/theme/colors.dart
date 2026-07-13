@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../core/design/theme/phoenix_colors.dart';
+
 /// Defines the application's semantic color palette and shared color tokens.
 ///
-/// These constants are intentionally reusable so that the UI can stay
-/// consistent across light and dark themes without introducing hard-coded
-/// color values in individual widgets.
+/// These constants delegate to the [PhoenixColors] design system tokens
+/// so the entire app stays consistent.
 class AppColors {
   AppColors._();
 
-  static const Color primary = Color(0xFF2563EB);
-  static const Color secondary = Color(0xFFF97316);
-  static const Color success = Color(0xFF22C55E);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color error = Color(0xFFEF4444);
+  static const Color primary = PhoenixColors.primary;
+  static const Color secondary = PhoenixColors.primary;
+  static const Color success = PhoenixColors.success;
+  static const Color warning = PhoenixColors.warning;
+  static const Color error = PhoenixColors.error;
 
-  static const Color darkBackground = Color(0xFF0F172A);
-  static const Color surface = Color(0xFF1E293B);
-  static const Color lightSurface = Color(0xFFF8FAFC);
-  static const Color onDarkBackground = Color(0xFFF8FAFC);
-  static const Color onLightSurface = Color(0xFF0F172A);
-  static const Color border = Color(0xFFCBD5E1);
-  static const Color darkBorder = Color(0xFF334155);
+  static const Color darkBackground = PhoenixColors.darkBackground;
+  static const Color surface = PhoenixColors.darkSurface;
+  static const Color lightSurface = PhoenixColors.background;
+  static const Color onDarkBackground = PhoenixColors.darkTextPrimary;
+  static const Color onLightSurface = PhoenixColors.textPrimary;
+  static const Color border = PhoenixColors.border;
+  static const Color darkBorder = PhoenixColors.darkBorder;
 }

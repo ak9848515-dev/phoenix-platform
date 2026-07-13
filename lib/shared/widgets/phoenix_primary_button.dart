@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/radius.dart';
-import '../../theme/spacing.dart';
+import '../../core/design/theme/phoenix_colors.dart';
+import '../../core/design/theme/phoenix_radius.dart';
+import '../../core/design/theme/phoenix_spacing.dart';
+import '../../core/design/theme/phoenix_typography.dart';
 
+/// A premium primary action button for the Phoenix Platform.
+///
+/// Uses the Phoenix Design System tokens for consistent styling.
 class PhoenixPrimaryButton extends StatelessWidget {
   const PhoenixPrimaryButton({
     super.key,
@@ -22,7 +27,10 @@ class PhoenixPrimaryButton extends StatelessWidget {
     final buttonChild = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (icon != null) ...[Icon(icon), const SizedBox(width: AppSpacing.sm)],
+        if (icon != null) ...[
+          Icon(icon, size: 18),
+          const SizedBox(width: PhoenixSpacing.sm),
+        ],
         Text(label),
       ],
     );
@@ -37,12 +45,20 @@ class PhoenixPrimaryButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
+        backgroundColor: PhoenixColors.primary,
+        foregroundColor: PhoenixColors.onPrimary,
+        disabledBackgroundColor: PhoenixColors.textDisabled,
+        disabledForegroundColor: PhoenixColors.onPrimary,
+        elevation: 0,
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
+          horizontal: PhoenixSpacing.xl,
+          vertical: PhoenixSpacing.md,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: PhoenixRadius.mdRadius,
+        ),
+        textStyle: PhoenixTypography.label.copyWith(
+          color: PhoenixColors.onPrimary,
         ),
       ),
       child: content,

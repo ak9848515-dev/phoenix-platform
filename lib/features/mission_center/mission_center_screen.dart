@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../routes/app_routes.dart';
-import '../../core/sample_repository.dart';
+import '../../routes/app_routes.dart';import '../../core/sample_repository.dart';
 import '../../theme/spacing.dart';
 import '../mission_engine/mission_service.dart';
 import 'widgets/mission_actions_card.dart';
@@ -28,7 +27,7 @@ class MissionCenterScreen extends StatelessWidget {
         .map(
           (m) => MissionTaskItem(
             title: m.title,
-            completed: m.completed,
+            completed: m.isCompleted,
             subtitle: m.description,
           ),
         )
@@ -45,7 +44,7 @@ class MissionCenterScreen extends StatelessWidget {
             statusLabel: missionProgress.pendingCount > 0
                 ? 'In Progress'
                 : 'Complete',
-            priority: featuredMission.priority,
+            priority: featuredMission.priority.displayName,
           ),
           const SizedBox(height: AppSpacing.lg),
           MissionProgressCard(

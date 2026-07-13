@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/radius.dart';
+import '../../core/design/theme/phoenix_colors.dart';
 
+/// A progress indicator for the Phoenix Platform.
+///
+/// Uses the Phoenix Design System tokens for consistent styling.
 class PhoenixProgressIndicator extends StatelessWidget {
   const PhoenixProgressIndicator({
     super.key,
@@ -21,13 +24,13 @@ class PhoenixProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.xl),
+      borderRadius: borderRadius ?? BorderRadius.circular(100),
       child: LinearProgressIndicator(
         value: value,
         minHeight: minHeight,
-        backgroundColor: backgroundColor,
+        backgroundColor: backgroundColor ?? PhoenixColors.surfaceVariant,
         valueColor: AlwaysStoppedAnimation<Color>(
-          valueColor ?? Theme.of(context).colorScheme.primary,
+          valueColor ?? PhoenixColors.primary,
         ),
       ),
     );
