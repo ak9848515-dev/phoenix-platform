@@ -105,10 +105,14 @@ class _PhoenixShellState extends State<PhoenixShell> {
     // Build AppBar actions with Search + VoiceButton appended
     final appBarActions = <Widget>[
       if (widget.actions != null) ...widget.actions!,
-      IconButton(
+      Semantics(
+        label: 'Search Knowledge',
+        button: true,
+        child: IconButton(
         icon: const Icon(Icons.search_rounded),
         tooltip: 'Search',
         onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
+      ),
       ),
       if (voiceService != null)
         VoiceButton(
@@ -151,10 +155,14 @@ class _PhoenixShellState extends State<PhoenixShell> {
     // Build AppBar actions with Search + VoiceButton appended
     final appBarActions = <Widget>[
       if (widget.actions != null) ...widget.actions!,
-      IconButton(
+      Semantics(
+        label: 'Search Knowledge',
+        button: true,
+        child: IconButton(
         icon: const Icon(Icons.search_rounded),
         tooltip: 'Search',
         onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
+      ),
       ),
       if (voiceService != null)
         VoiceButton(

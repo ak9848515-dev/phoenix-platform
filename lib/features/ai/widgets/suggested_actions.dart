@@ -165,7 +165,11 @@ class _ActionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Semantics(
+      label: label,
+      button: true,
+      enabled: true,
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -197,6 +201,7 @@ class _ActionChip extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../theme/phoenix_colors.dart';
-import '../theme/phoenix_spacing.dart';
-import '../theme/phoenix_typography.dart';
+import '../../core/design/theme/phoenix_colors.dart';
+import '../../core/design/theme/phoenix_spacing.dart';
+import '../../core/design/theme/phoenix_typography.dart';
 
 /// A premium progress bar for the Phoenix Design System.
 ///

@@ -178,7 +178,11 @@ class PhoenixHomeScreen extends StatelessWidget {
 
   Widget _buildQuickSearch(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
+    return Semantics(
+      label: 'Search Knowledge',
+      hint: 'Double-tap to search missions, habits, and knowledge',
+      button: true,
+      child: InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
       child: Container(
@@ -192,7 +196,7 @@ class PhoenixHomeScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.search_rounded, color: theme.colorScheme.onSurfaceVariant, size: 20),
+            Semantics(excludeSemantics: true, child: Icon(Icons.search_rounded, color: theme.colorScheme.onSurfaceVariant, size: 20)),
             const SizedBox(width: AppSpacing.sm),
             Text(
               'Search missions, habits, knowledge...',
@@ -201,9 +205,10 @@ class PhoenixHomeScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Icon(Icons.shortcut_rounded, color: theme.colorScheme.onSurfaceVariant, size: 18),
+            Semantics(excludeSemantics: true, child: Icon(Icons.shortcut_rounded, color: theme.colorScheme.onSurfaceVariant, size: 18)),
           ],
         ),
+      ),
       ),
     );
   }
@@ -379,6 +384,7 @@ class PhoenixHomeScreen extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.arrow_forward_rounded),
+              tooltip: 'View AI Recommendation',
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRoutes.recommendation),
             ),
@@ -484,6 +490,7 @@ class PhoenixHomeScreen extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.arrow_forward_rounded),
+              tooltip: 'View pending decisions',
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRoutes.recommendation),
             ),

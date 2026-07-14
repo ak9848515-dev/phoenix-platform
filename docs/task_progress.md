@@ -1,73 +1,46 @@
-# PHX-060 — Phoenix OS 2.0 Sprint Progress
+# PHX-061 — Architecture Stabilization Sprint Progress
 
-## Architecture Analysis Complete
+## Baseline
+- **Tests**: 595 passing
+- **Analyzer**: 0 issues
+- **Architecture**: Clean repository/service/engine pattern
 
-- **Baseline Tests**: 588 passing → **595 passing**
-- **Baseline Analyzer**: 11 issues → **0 issues**
-- **Architecture**: Clean repository/service/engine pattern — all engines complete
+## Completed Work
 
-## Implementation Plan
+### PR-001 — Widget Consolidation
+- [x] Enhanced canonical PhoenixPrimaryButton with isLoading/isDisabled support + nullable onPressed
+- [x] Migrated 3 import references from core/design/widgets to shared/widgets
+- [x] Deleted core/design/widgets/phoenix_primary_button.dart (duplicate)
+- [x] Created PhoenixProgressBar in shared/widgets/ (canonical location)
+- [x] Migrated 9 import references for PhoenixProgressBar
+- [x] Deleted core/design/widgets/phoenix_progress_bar.dart (duplicate)
+- [x] Deleted core/design/widgets/phoenix_empty_state.dart (0 import references)
 
-### Phase 1: Code Quality ✅
-- [x] Fix 5 unused_field warnings in `knowledge_service.dart`
-- [x] Fix 6 analyzer infos (braces, deprecated, build context, initializing formals)
-- [x] Run `flutter analyze` to confirm 0 issues
+### PR-002 — Duplicate Model Cleanup
+- [x] Deleted lib/models/knowledge_dna.dart (dead duplicate)
+- [x] Deleted lib/models/user.dart (dead legacy model, 0 imports)
+- [x] Renamed legacy Mission to CurriculumMission in lib/models/mission.dart
+- [x] Updated all 6 consuming files
 
-### Phase 2: Global Search ✅
-- [x] Create `GlobalSearchService` aggregating from all 11 engines
-- [x] Add global search route and route constants
-- [x] Create `GlobalSearchScreen` with grouped results
-- [x] Add search delegate/trigger from shell
-- [x] Tests for global search (7 tests)
+### PR-003 — Dead Code Cleanup
+- [x] Audited all 377 Dart files
+- [x] Deleted 12 confirmed dead files
+- [x] Restored 2 files with hidden references
+- [x] Final state: 0 analyzer issues, 595 tests passing
 
-### Phase 3: Unified Home Experience ✅
-- [x] Create `PhoenixHomeScreen` with all 9+ sections
-- [x] Today's Mission section
-- [x] AI Recommendation section
-- [x] Habit Summary section
-- [x] Learning Progress section
-- [x] Recent Timeline Activity section
-- [x] Knowledge Insights section
-- [x] Decision Reminder section
-- [x] Voice Shortcut (via shell)
-- [x] Quick Search section
+### PR-004 — Documentation Synchronization
+- [x] PROJECT_STATUS.md updated
+- [x] task_progress.md updated
+- [x] ARCHITECTURE_CERTIFICATION.md written
+- [x] TECHNICAL_DEBT.md written
+- [x] RELEASE_CHECKLIST.md written
+- [x] RELEASE_NOTES.md written
 
-### Phase 4: Cross-Engine Synchronization ✅
-- [x] Verify mission completion → timeline sync (TimelineService reads mission completions from UserState)
-- [x] Verify habit completion → timeline sync (HabitService calls timelineService.invalidateCache())
-- [x] Verify all engines use UserStateService for persistence
-- [x] Verify no duplicated state (all engines read/write through UserStateService)
+## Outstanding Items
+- Remaining core/design/widgets/ files still referenced (phoenix_card, phoenix_badge, phoenix_stat_tile)
+- Accessibility audit not started
+- Error handling review not started
+- ~~Release verification (APK/AAB builds)~~ ✅ APK + AAB built successfully
 
-### Phase 5: Navigation Audit ✅
-- [x] Verify every route works (all 30+ routes registered in route_generator)
-- [x] Remove dead routes (none found)
-- [x] Verify deep-link readiness (all routes use named routes with onGenerateRoute)
-
-### Phase 6: Accessibility Audit
-- [ ] Add semantics to key widgets
-- [ ] Review focus traversal
-- [ ] Review screen reader labels
-
-### Phase 7: Error Handling Review
-- [ ] Review empty states
-- [ ] Review loading states
-- [ ] Review offline behaviour
-
-### Phase 8: Testing ✅
-- [x] Run existing 588 tests to verify no regressions
-- [x] Global search tests (7 new)
-- [x] Target: 600+ tests → **595 passing**
-
-### Phase 9: Documentation
-- [ ] Update architecture overview
-- [ ] Update module dependency diagram
-- [ ] Update service dependency diagram
-- [ ] Update public APIs
-- [ ] Update project status
-- [ ] Update release notes
-
-### Phase 10: Release Verification
-- [x] `flutter analyze` — 0 issues ✅
-- [x] `flutter test` — 595 passing ✅
-- [ ] `flutter build apk --release`
-- [ ] `flutter build appbundle --release`
+## Next Sprint
+Pending PHX-062 planning

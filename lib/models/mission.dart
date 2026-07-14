@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'lesson.dart';
 
-/// Immutable representation of a mission composed of lessons.
-class Mission {
-  const Mission({
+/// Legacy curriculum mission DTO used by the repository layer.
+///
+/// Represents a group of lessons within a stage of the old Academy hierarchy.
+/// Distinguished from [mission_engine.Mission] by name for clarity.
+class CurriculumMission {
+  const CurriculumMission({
     required this.id,
     required this.title,
     required this.description,
@@ -16,13 +19,13 @@ class Mission {
   final String description;
   final List<Lesson> lessons;
 
-  Mission copyWith({
+  CurriculumMission copyWith({
     String? id,
     String? title,
     String? description,
     List<Lesson>? lessons,
   }) {
-    return Mission(
+    return CurriculumMission(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
@@ -39,10 +42,10 @@ class Mission {
     };
   }
 
-  factory Mission.fromMap(Map<String, dynamic> map) {
+  factory CurriculumMission.fromMap(Map<String, dynamic> map) {
     final lessonsData = map['lessons'];
 
-    return Mission(
+    return CurriculumMission(
       id: map['id'] as String,
       title: map['title'] as String,
       description: map['description'] as String,
@@ -59,8 +62,8 @@ class Mission {
 
   String toJson() => json.encode(toMap());
 
-  factory Mission.fromJson(String source) =>
-      Mission.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CurriculumMission.fromJson(String source) =>
+      CurriculumMission.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
@@ -68,7 +71,7 @@ class Mission {
       return true;
     }
 
-    return other is Mission &&
+    return other is CurriculumMission &&
         other.id == id &&
         other.title == title &&
         other.description == description &&

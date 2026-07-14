@@ -46,7 +46,7 @@ class LocalRepository implements Repository {
   // ── Missions ─────────────────────────────────────────────────────────
 
   @override
-  Mission get featuredMission => _fallback.featuredMission;
+  CurriculumMission get featuredMission => _fallback.featuredMission;
 
   @override
   List<Progress> get missionProgress => _fallback.missionProgress;

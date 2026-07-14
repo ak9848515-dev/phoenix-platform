@@ -8,9 +8,9 @@ class Stage {
 
   final String id;
   final String title;
-  final List<Mission> missions;
+  final List<CurriculumMission> missions;
 
-  Stage copyWith({String? id, String? title, List<Mission>? missions}) {
+  Stage copyWith({String? id, String? title, List<CurriculumMission>? missions}) {
     return Stage(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -33,11 +33,11 @@ class Stage {
       id: map['id'] as String,
       title: map['title'] as String,
       missions: missionsData == null
-          ? const <Mission>[]
+          ? const <CurriculumMission>[]
           : (missionsData as List)
                 .map(
                   (item) =>
-                      Mission.fromMap(Map<String, dynamic>.from(item as Map)),
+                      CurriculumMission.fromMap(Map<String, dynamic>.from(item as Map)),
                 )
                 .toList(),
     );

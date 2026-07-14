@@ -181,13 +181,6 @@ class AppBootstrap {
     );
     _memoryGraphService = memoryGraphService;
 
-    // Seed the graph with platform entities (non-fatal if fails)
-    try {
-      await memoryGraphService.seedFromPlatform();
-    } catch (_) {
-      debugPrint('Memory Graph seeding failed (non-fatal)');
-    }
-
     // Build the Knowledge Service
     final knowledgeService = KnowledgeService(
       userStateService: userStateService,
@@ -195,12 +188,15 @@ class AppBootstrap {
     );
     _knowledgeService = knowledgeService;
 
-    // Seed the knowledge graph from platform entities (non-fatal if fails)
-    try {
-      await knowledgeService.seedFromPlatform();
-    } catch (_) {
-      debugPrint('Knowledge seeding failed (non-fatal)');
-    }
+    // Seed graphs in parallel (non-fatal if either fails)
+    await Future.wait([
+      memoryGraphService.seedFromPlatform().catchError((_) {
+        debugPrint('Memory Graph seeding failed (non-fatal)');
+      }),
+      knowledgeService.seedFromPlatform().catchError((_) {
+        debugPrint('Knowledge seeding failed (non-fatal)');
+      }),
+    ]);
   }
 
   /// Creates the root [PhoenixApp] widget with all required configuration.

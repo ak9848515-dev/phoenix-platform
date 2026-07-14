@@ -7,7 +7,7 @@ import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/design/theme/phoenix_typography.dart';
 import '../../../core/design/widgets/phoenix_badge.dart';
 import '../../../core/design/widgets/phoenix_card.dart';
-import '../../../core/design/widgets/phoenix_primary_button.dart';
+import '../../../shared/widgets/phoenix_primary_button.dart';
 import '../../recommendation/models/recommendation.dart';
 
 /// Displays the highest-priority recommendation with reason, expected

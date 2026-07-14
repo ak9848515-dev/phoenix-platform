@@ -21,7 +21,12 @@ class TimelineCard extends StatelessWidget {
     final theme = Theme.of(context);
     final color = _colorForCategory(event.category);
 
-    return InkWell(
+    return Semantics(
+      label: '${event.title}, ${event.category.label}',
+      hint: onTap != null ? 'Double-tap to view details' : null,
+      button: onTap != null,
+      enabled: onTap != null,
+      child: InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -115,6 +120,7 @@ class TimelineCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 

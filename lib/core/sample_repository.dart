@@ -32,7 +32,7 @@ class SampleRepository implements Repository {
   JourneyStage get currentJourneyStage => _data.currentJourneyStage;
 
   @override
-  Mission get featuredMission => _data.featuredMission;
+  CurriculumMission get featuredMission => _data.featuredMission;
 
   @override
   List<Progress> get missionProgress => _data.missionProgress;

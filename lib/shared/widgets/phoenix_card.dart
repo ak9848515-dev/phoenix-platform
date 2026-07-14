@@ -80,7 +80,10 @@ class PhoenixCard extends StatelessWidget {
                 ? cardRadius
                 : BorderRadius.circular(PhoenixRadius.xl),
           ),
-      child: InkWell(
+      child: Semantics(
+        button: onTap != null,
+        enabled: onTap != null,
+        child: InkWell(
         onTap: onTap,
         borderRadius: cardRadius is BorderRadius
             ? cardRadius
@@ -98,6 +101,7 @@ class PhoenixCard extends StatelessWidget {
             child,
           ],
         ),
+      ),
       ),
       ),
     );

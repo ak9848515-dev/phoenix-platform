@@ -36,7 +36,12 @@ class EntityCard extends StatelessWidget {
           width: isSelected ? 2 : 1,
         ),
       ),
-      child: InkWell(
+      child: Semantics(
+        label: '${entity.title}, ${entity.type.label}',
+        hint: onTap != null ? 'Double-tap to view details' : null,
+        button: onTap != null,
+        enabled: onTap != null,
+        child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -117,6 +122,7 @@ class EntityCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

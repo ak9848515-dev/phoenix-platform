@@ -6,7 +6,7 @@ import '../../../core/design/theme/phoenix_icons.dart';
 import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/design/theme/phoenix_typography.dart';
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../../core/design/widgets/phoenix_progress_bar.dart';
+import '../../../shared/widgets/phoenix_progress_bar.dart';
 import '../../../core/design/widgets/phoenix_stat_tile.dart';
 
 /// Displays a comprehensive guidance summary built from all existing

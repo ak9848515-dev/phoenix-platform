@@ -4,7 +4,7 @@ import '../../../core/design/theme/phoenix_colors.dart';
 import '../../../core/design/theme/phoenix_radius.dart';
 import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/design/theme/phoenix_typography.dart';
-import '../../../core/design/widgets/phoenix_primary_button.dart';
+import '../../../shared/widgets/phoenix_primary_button.dart';
 
 /// A premium permission dialog requesting microphone access.
 ///

@@ -31,8 +31,8 @@ abstract class Repository {
 
   // ── Missions ────────────────────────────────────────────────────────
 
-  /// The featured/today's mission.
-  Mission get featuredMission;
+  /// The featured/today's curriculum mission.
+  CurriculumMission get featuredMission;
 
   /// Mission progress indicators.
   List<Progress> get missionProgress;

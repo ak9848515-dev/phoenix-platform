@@ -6,7 +6,7 @@ import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/design/theme/phoenix_typography.dart';
 import '../../../core/design/widgets/phoenix_badge.dart';
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../../core/design/widgets/phoenix_progress_bar.dart';
+import '../../../shared/widgets/phoenix_progress_bar.dart';
 
 /// Displays the user's current featured mission with progress.
 ///
@@ -53,7 +53,12 @@ class TodayMissionCard extends StatelessWidget {
     return SlideAnimation(
       offsetBegin: const Offset(0, 0.06),
       duration: const Duration(milliseconds: 500),
-      child: GestureDetector(
+      child: Semantics(
+        label: 'Today\'s Mission: $missionTitle',
+        hint: 'Double-tap to view mission details',
+        button: onTap != null,
+        enabled: onTap != null,
+        child: GestureDetector(
         onTap: onTap,
         child: PhoenixCard(
         header: "Today's Mission",
@@ -89,6 +94,7 @@ class TodayMissionCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
       ),
     );

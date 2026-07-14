@@ -23,7 +23,11 @@ class ExperienceSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Semantics(
+      label: label,
+      button: true,
+      enabled: true,
+      child: Material(
       color: PhoenixColors.surfaceVariant,
       borderRadius: BorderRadius.circular(PhoenixRadius.md),
       child: InkWell(
@@ -48,6 +52,7 @@ class ExperienceSecondaryButton extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

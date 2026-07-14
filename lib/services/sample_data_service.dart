@@ -228,7 +228,7 @@ class SampleDataService {
   // Missions (reflecting the current Journey stage)
   // ─────────────────────────────────────────────────────────────────────────
 
-  Mission get featuredMission => const Mission(
+  CurriculumMission get featuredMission => const CurriculumMission(
     id: 'mission-daily',
     title: "Today's Mission",
     description:
@@ -380,8 +380,8 @@ class SampleDataService {
           Stage(
             id: 'stage-1',
             title: 'Mindset',
-            missions: <Mission>[
-              Mission(
+            missions: <CurriculumMission>[
+              CurriculumMission(
                 id: 'mission-1',
                 title: 'Daily Reflect',
                 description: 'Capture one insight from your day.',

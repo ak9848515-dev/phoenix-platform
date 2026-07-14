@@ -6,7 +6,7 @@ import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/design/theme/phoenix_typography.dart';
 import '../../../core/design/widgets/phoenix_badge.dart';
 import '../../../core/design/widgets/phoenix_card.dart';
-import '../../../core/design/widgets/phoenix_progress_bar.dart';
+import '../../../shared/widgets/phoenix_progress_bar.dart';
 
 /// Displays the user's Knowledge DNA summary with top skills,
 /// skill categories, learning progress, and strongest competencies.
