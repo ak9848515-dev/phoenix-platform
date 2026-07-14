@@ -1,5 +1,7 @@
-import 'package:flutter/foundation.dart';
-
+import 'package:flutter/foundation.dart';import '../../academy/models/learning_progress.dart';
+import '../../habit/models/habit.dart';
+import '../../habit/models/habit_entry.dart';
+import '../../decision/models/decision_analysis.dart';
 import '../../identity/models/identity.dart';
 import '../../journey/models/journey.dart';
 import '../../journey/models/journey_stage.dart';
@@ -67,8 +69,18 @@ class UserStateService {
   CareerProfile? get careerProfile => currentState.careerProfile;
   InterviewProfile? get interviewProfile => currentState.interviewProfile;
   List<Opportunity> get opportunities => currentState.opportunities;
+  List<LearningProgress> get learningProgress =>
+      currentState.learningProgress;
+  List<DecisionAnalysis> get decisionHistory =>
+      currentState.decisionHistory;
+  List<Habit> get habits => currentState.habits;
+  List<HabitEntry> get habitEntries => currentState.habitEntries;
   UserSettings get settings => currentState.settings;
   List<Achievement> get achievements => currentState.achievements;
+  Map<String, dynamic>? get memoryGraphData =>
+      currentState.memoryGraphData;
+  Map<String, dynamic>? get knowledgeSnapshot =>
+      currentState.knowledgeSnapshot;
   String? get aiContext => currentState.aiContext;
   int get totalXp => currentState.totalXp;
   int get level => currentState.level;
@@ -121,6 +133,10 @@ class UserStateService {
   /// Updates just the opportunities.
   Future<void> setOpportunities(List<Opportunity> opportunities) =>
       _engine.update((s) => s.copyWith(opportunities: opportunities));
+
+  /// Updates just the learning progress.
+  Future<void> setLearningProgress(List<LearningProgress> progress) =>
+      _engine.update((s) => s.copyWith(learningProgress: progress));
 
   /// Updates just the settings.
   Future<void> setSettings(UserSettings settings) =>

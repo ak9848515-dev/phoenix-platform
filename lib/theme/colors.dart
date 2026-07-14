@@ -20,6 +20,7 @@ class AppColors {
   static const Color lightSurface = PhoenixColors.background;
   static const Color onDarkBackground = PhoenixColors.darkTextPrimary;
   static const Color onLightSurface = PhoenixColors.textPrimary;
+  static const Color info = PhoenixColors.info;
   static const Color border = PhoenixColors.border;
   static const Color darkBorder = PhoenixColors.darkBorder;
 }

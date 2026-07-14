@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../../academy/models/learning_progress.dart';
+import '../../decision/models/decision_analysis.dart';
 import '../../identity/models/identity.dart';
 import '../../journey/models/journey.dart';
 import '../../journey/models/journey_stage.dart';
@@ -10,6 +12,8 @@ import '../../resume/models/resume.dart';
 import '../../career/models/career_profile.dart';
 import '../../interview/models/interview_profile.dart';
 import '../../opportunity/models/opportunity.dart';
+import '../../habit/models/habit.dart';
+import '../../habit/models/habit_entry.dart';
 import '../../../models/user_settings.dart';
 import '../../../models/achievement.dart';
 
@@ -40,6 +44,12 @@ class UserState {
     this.opportunities = const [],
     this.settings = const UserSettings(),
     this.achievements = const [],
+    this.learningProgress = const [],
+    this.habits = const [],
+    this.habitEntries = const [],
+    this.decisionHistory = const [],
+    this.memoryGraphData,
+    this.knowledgeSnapshot,
     this.aiContext,
     this.lastActivityAt,
     this.currentFocus,
@@ -106,6 +116,34 @@ class UserState {
   /// Earned achievements.
   final List<Achievement> achievements;
 
+  // ── Academy Learning Progress ─────────────────────────────────────
+
+  /// Learning progress across all Academy paths.
+  final List<LearningProgress> learningProgress;
+
+  // ── Habit Intelligence Data ────────────────────────────────────────
+
+  /// All tracked habits.
+  final List<Habit> habits;
+
+  /// Daily habit entries.
+  final List<HabitEntry> habitEntries;
+
+  // ── Decision Intelligence History ─────────────────────────────────
+
+  /// Past decision analyses with outcomes.
+  final List<DecisionAnalysis> decisionHistory;
+
+  // ── Memory Graph Data ─────────────────────────────────────────────
+
+  /// Serialized memory graph data (entities + relations).
+  final Map<String, dynamic>? memoryGraphData;
+
+  // ── Personal Knowledge Graph Data ─────────────────────────────────
+
+  /// Serialized knowledge snapshot (nodes + edges + context).
+  final Map<String, dynamic>? knowledgeSnapshot;
+
   // ── AI Context ────────────────────────────────────────────────────
 
   /// AI context string for the Phoenix AI experience.
@@ -150,6 +188,12 @@ class UserState {
     List<Opportunity>? opportunities,
     UserSettings? settings,
     List<Achievement>? achievements,
+    List<LearningProgress>? learningProgress,
+    List<Habit>? habits,
+    List<HabitEntry>? habitEntries,
+    List<DecisionAnalysis>? decisionHistory,
+    Map<String, dynamic>? memoryGraphData,
+    Map<String, dynamic>? knowledgeSnapshot,
     String? aiContext,
     DateTime? lastActivityAt,
     String? currentFocus,
@@ -182,6 +226,12 @@ class UserState {
       opportunities: opportunities ?? this.opportunities,
       settings: settings ?? this.settings,
       achievements: achievements ?? this.achievements,
+      learningProgress: learningProgress ?? this.learningProgress,
+      habits: habits ?? this.habits,
+      habitEntries: habitEntries ?? this.habitEntries,
+      decisionHistory: decisionHistory ?? this.decisionHistory,
+      memoryGraphData: memoryGraphData ?? this.memoryGraphData,
+      knowledgeSnapshot: knowledgeSnapshot ?? this.knowledgeSnapshot,
       aiContext: clearAiContext ? null : (aiContext ?? this.aiContext),
       lastActivityAt: lastActivityAt ?? this.lastActivityAt,
       currentFocus: currentFocus ?? this.currentFocus,
@@ -208,6 +258,12 @@ class UserState {
       'opportunities': opportunities.map((o) => o.toMap()).toList(),
       'settings': settings.toMap(),
       'achievements': achievements.map((a) => a.toMap()).toList(),
+      'learningProgress': learningProgress.map((lp) => lp.toMap()).toList(),
+      'habits': habits.map((h) => h.toMap()).toList(),
+      'habitEntries': habitEntries.map((e) => e.toMap()).toList(),
+      'decisionHistory': decisionHistory.map((da) => da.toMap()).toList(),
+      'memoryGraphData': memoryGraphData,
+      'knowledgeSnapshot': knowledgeSnapshot,
       'aiContext': aiContext,
       'lastActivityAt': lastActivityAt?.toIso8601String(),
       'currentFocus': currentFocus,
@@ -257,6 +313,16 @@ class UserState {
               Map<String, dynamic>.from(map['settings'] as Map))
           : const UserSettings(),
       achievements: _parseAchievements(map['achievements']),
+      learningProgress: _parseLearningProgress(map['learningProgress']),
+      habits: _parseHabits(map['habits']),
+      habitEntries: _parseHabitEntries(map['habitEntries']),
+      decisionHistory: _parseDecisionHistory(map['decisionHistory']),
+      memoryGraphData: map['memoryGraphData'] != null
+          ? Map<String, dynamic>.from(map['memoryGraphData'] as Map)
+          : null,
+      knowledgeSnapshot: map['knowledgeSnapshot'] != null
+          ? Map<String, dynamic>.from(map['knowledgeSnapshot'] as Map)
+          : null,
       aiContext: map['aiContext'] as String?,
       lastActivityAt: map['lastActivityAt'] != null
           ? DateTime.parse(map['lastActivityAt'] as String)
@@ -281,6 +347,38 @@ class UserState {
     return (data as List)
         .map((m) => mission_engine.Mission.fromMap(
             Map<String, dynamic>.from(m as Map)))
+        .toList();
+  }
+
+  static List<LearningProgress> _parseLearningProgress(dynamic data) {
+    if (data == null) return const [];
+    return (data as List)
+        .map((lp) => LearningProgress.fromMap(
+            Map<String, dynamic>.from(lp as Map)))
+        .toList();
+  }
+
+  static List<DecisionAnalysis> _parseDecisionHistory(dynamic data) {
+    if (data == null) return const [];
+    return (data as List)
+        .map((da) => DecisionAnalysis.fromMap(
+            Map<String, dynamic>.from(da as Map)))
+        .toList();
+  }
+
+  static List<Habit> _parseHabits(dynamic data) {
+    if (data == null) return const [];
+    return (data as List)
+        .map((h) => Habit.fromMap(
+            Map<String, dynamic>.from(h as Map)))
+        .toList();
+  }
+
+  static List<HabitEntry> _parseHabitEntries(dynamic data) {
+    if (data == null) return const [];
+    return (data as List)
+        .map((e) => HabitEntry.fromMap(
+            Map<String, dynamic>.from(e as Map)))
         .toList();
   }
 

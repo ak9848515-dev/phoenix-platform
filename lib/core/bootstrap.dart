@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../config/app_config.dart';
+import '../core/sample_repository.dart';
+import '../features/academy/services/academy_service.dart';
+import '../features/ai/services/ai_mentor_service.dart';
+import '../features/decision/services/decision_intelligence_service.dart';
+import '../features/habit/services/habit_service.dart';
+import '../features/memory_graph/services/memory_graph_service.dart';
+import '../features/personal_knowledge/services/knowledge_service.dart';
+import '../features/timeline/services/timeline_service.dart';
 import '../features/user_state/engine/user_state_engine.dart';
 import '../features/user_state/repository/user_state_repository.dart';
 import '../features/user_state/services/user_state_service.dart';
+import '../features/voice/providers/mock_speech_provider.dart';
+import '../features/voice/services/voice_service.dart';
 import '../routes/app_router.dart';
 import '../theme/theme.dart';
 import 'storage_service.dart';
@@ -64,11 +74,64 @@ class AppBootstrap {
   /// [init] completes.
   static UserStateService? get maybeUserStateService => _userStateService;
 
+  /// The application-wide [VoiceService] instance.
+  ///
+  /// Initialized once during [init] and accessible throughout the app.
+  /// All screens use this service through [VoiceButton] in the Phoenix Shell.
+  static VoiceService? _voiceService;
+
+  /// Returns the [VoiceService] instance or `null` if not initialized.
+  ///
+  /// Safe for use in screens and widgets that may render before
+  /// [init] completes.
+  static VoiceService? get maybeVoiceService => _voiceService;
+
+  /// The application-wide [AcademyService] instance.
+  ///
+  /// Initialized once during [init] and accessible throughout the app.
+  /// All academy screens use this service.
+  static AcademyService? _academyService;
+
+  /// Returns the [AcademyService] instance or `null` if not initialized.
+  static AcademyService? get maybeAcademyService => _academyService;
+
+  /// The application-wide [DecisionIntelligenceService] instance.
+  static DecisionIntelligenceService? _decisionService;
+
+  /// Returns the [DecisionIntelligenceService] instance or `null`.
+  static DecisionIntelligenceService? get maybeDecisionService =>
+      _decisionService;
+
+  /// The application-wide [TimelineService] instance.
+  static TimelineService? _timelineService;
+
+  /// Returns the [TimelineService] instance or `null` if not initialized.
+  static TimelineService? get maybeTimelineService => _timelineService;
+
+  /// The application-wide [HabitService] instance.
+  static HabitService? _habitService;
+
+  /// Returns the [HabitService] instance or `null` if not initialized.
+  static HabitService? get maybeHabitService => _habitService;
+
+  /// The application-wide [MemoryGraphService] instance.
+  static MemoryGraphService? _memoryGraphService;
+
+  /// Returns the [MemoryGraphService] instance or `null` if not initialized.
+  static MemoryGraphService? get maybeMemoryGraphService => _memoryGraphService;
+
+  /// The application-wide [KnowledgeService] instance.
+  static KnowledgeService? _knowledgeService;
+
+  /// Returns the [KnowledgeService] instance or `null` if not initialized.
+  static KnowledgeService? get maybeKnowledgeService => _knowledgeService;
+
   /// Initializes all app-wide services.
   ///
   /// Must be called once before [createApp]. Currently initializes:
   ///   - [SharedPreferencesStorageService]
   ///   - [UserStateService]
+  ///   - [VoiceService]
   static Future<void> init() async {
     final storage = SharedPreferencesStorageService();
     await storage.init();
@@ -79,6 +142,65 @@ class AppBootstrap {
     final userStateService = UserStateService(engine: userStateEngine);
     await userStateService.init();
     _userStateService = userStateService;
+
+    final voiceProvider = MockSpeechProvider();
+    final voiceService = VoiceService(provider: voiceProvider);
+    await voiceService.initialize();
+    _voiceService = voiceService;
+
+    final repository = const SampleRepository();
+    final aiMentorService = AIMentorService(repository: repository);
+    final academyService = AcademyService(
+      userStateService: userStateService,
+      aiMentorService: aiMentorService,
+    );
+    _academyService = academyService;
+
+    final decisionService = DecisionIntelligenceService(
+      userStateService: userStateService,
+      aiMentorService: aiMentorService,
+    );
+    _decisionService = decisionService;
+
+    final timelineService = TimelineService(
+      userStateService: userStateService,
+      aiMentorService: aiMentorService,
+    );
+    _timelineService = timelineService;
+
+    final habitService = HabitService(
+      userStateService: userStateService,
+      aiMentorService: aiMentorService,
+      timelineService: timelineService,
+    );
+    _habitService = habitService;
+
+    final memoryGraphService = MemoryGraphService(
+      userStateService: userStateService,
+      aiMentorService: aiMentorService,
+    );
+    _memoryGraphService = memoryGraphService;
+
+    // Seed the graph with platform entities (non-fatal if fails)
+    try {
+      await memoryGraphService.seedFromPlatform();
+    } catch (_) {
+      debugPrint('Memory Graph seeding failed (non-fatal)');
+    }
+
+    // Build the Knowledge Service
+    final knowledgeService = KnowledgeService(
+      userStateService: userStateService,
+      aiMentorService: aiMentorService,
+    );
+    _knowledgeService = knowledgeService;
+
+    // Seed the knowledge graph from platform entities (non-fatal if fails)
+    try {
+      await knowledgeService.seedFromPlatform();
+    } catch (_) {
+      debugPrint('Knowledge seeding failed (non-fatal)');
+    }
   }
 
   /// Creates the root [PhoenixApp] widget with all required configuration.

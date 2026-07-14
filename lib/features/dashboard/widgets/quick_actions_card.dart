@@ -6,7 +6,7 @@ import '../../../core/design/theme/phoenix_icons.dart';
 import '../../../core/design/theme/phoenix_radius.dart';
 import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/design/theme/phoenix_typography.dart';
-import '../../../core/design/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_card.dart';
 
 /// A grid of quick-action buttons for navigating to core Phoenix features.
 ///

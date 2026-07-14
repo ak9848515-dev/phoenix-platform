@@ -88,6 +88,9 @@ class PhoenixColors {
 
   // ── Additional Accents ──────────────────────────────────────────
 
+  /// Info / learning accent — calm blue.
+  static const Color info = Color(0xFF2563EB);
+
   /// Violet accent for career readiness visuals.
   static const Color career = Color(0xFF7C3AED);
 

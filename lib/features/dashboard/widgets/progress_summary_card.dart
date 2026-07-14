@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/design/animations/fade_animation.dart';
 import '../../../core/design/theme/phoenix_colors.dart';
 import '../../../core/design/theme/phoenix_icons.dart';
-import '../../../core/design/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_card.dart';
 import '../../../core/design/widgets/phoenix_stat_tile.dart';
 
 /// Displays a summary of the user's key progress metrics: XP, Level,

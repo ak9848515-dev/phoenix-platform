@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../features/voice/models/voice_command.dart';
+import '../../features/voice/services/voice_command_router.dart';
+import '../../features/voice/services/voice_service.dart';
+import '../../features/voice/widgets/listening_overlay.dart';
+import '../../features/voice/widgets/voice_button.dart';
+import '../../core/bootstrap.dart';
+import '../../routes/app_routes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/colors.dart';
 
@@ -14,7 +21,7 @@ import '../../theme/colors.dart';
 ///
 /// The shell does **not** contain any business logic. It is purely a layout
 /// and navigation wrapper.
-class PhoenixShell extends StatelessWidget {
+class PhoenixShell extends StatefulWidget {
   const PhoenixShell({
     super.key,
     required this.body,
@@ -34,6 +41,13 @@ class PhoenixShell extends StatelessWidget {
 
   /// Optional list of widgets displayed as actions in the AppBar.
   final List<Widget>? actions;
+
+  @override
+  State<PhoenixShell> createState() => _PhoenixShellState();
+}
+
+class _PhoenixShellState extends State<PhoenixShell> {
+  final VoiceCommandRouter _voiceRouter = VoiceCommandRouter();
 
   static const List<_NavigationDestination> _destinations = [
     _NavigationDestination(
@@ -86,19 +100,38 @@ class PhoenixShell extends StatelessWidget {
 
   Widget _buildWithBottomNav(BuildContext context) {
     final theme = Theme.of(context);
+    final voiceService = AppBootstrap.maybeVoiceService;
+
+    // Build AppBar actions with Search + VoiceButton appended
+    final appBarActions = <Widget>[
+      if (widget.actions != null) ...widget.actions!,
+      IconButton(
+        icon: const Icon(Icons.search_rounded),
+        tooltip: 'Search',
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
+      ),
+      if (voiceService != null)
+        VoiceButton(
+          voiceService: voiceService,
+          size: 40,
+          onCommand: (command) => _handleVoiceCommand(context, command),
+        ),
+    ];
 
     return Scaffold(
       appBar: AppBar(
-        title: title != null
-            ? Text(title!, style: theme.textTheme.titleLarge)
+        title: widget.title != null
+            ? Text(widget.title!, style: theme.textTheme.titleLarge)
             : null,
-        actions: actions,
+        actions: appBarActions,
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),
-      body: SafeArea(child: body),
+      body: SafeArea(
+        child: _buildBodyWithVoiceOverlay(context, voiceService),
+      ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
+        selectedIndex: widget.selectedIndex,
         onDestinationSelected: (index) => _onDestinationTap(context, index),
         destinations: _destinations.map((d) {
           return NavigationDestination(
@@ -113,13 +146,30 @@ class PhoenixShell extends StatelessWidget {
 
   Widget _buildWithNavigationRail(BuildContext context) {
     final theme = Theme.of(context);
+    final voiceService = AppBootstrap.maybeVoiceService;
+
+    // Build AppBar actions with Search + VoiceButton appended
+    final appBarActions = <Widget>[
+      if (widget.actions != null) ...widget.actions!,
+      IconButton(
+        icon: const Icon(Icons.search_rounded),
+        tooltip: 'Search',
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
+      ),
+      if (voiceService != null)
+        VoiceButton(
+          voiceService: voiceService,
+          size: 40,
+          onCommand: (command) => _handleVoiceCommand(context, command),
+        ),
+    ];
 
     return Scaffold(
       appBar: AppBar(
-        title: title != null
-            ? Text(title!, style: theme.textTheme.titleLarge)
+        title: widget.title != null
+            ? Text(widget.title!, style: theme.textTheme.titleLarge)
             : null,
-        actions: actions,
+        actions: appBarActions,
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),
@@ -127,7 +177,7 @@ class PhoenixShell extends StatelessWidget {
         child: Row(
           children: [
             NavigationRail(
-              selectedIndex: selectedIndex,
+              selectedIndex: widget.selectedIndex,
               onDestinationSelected: (index) =>
                   _onDestinationTap(context, index),
               labelType: NavigationRailLabelType.all,
@@ -148,11 +198,44 @@ class PhoenixShell extends StatelessWidget {
               }).toList(),
             ),
             const VerticalDivider(width: 1),
-            Expanded(child: body),
+            Expanded(
+              child: _buildBodyWithVoiceOverlay(context, voiceService),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  /// Wraps the body in a Stack with the voice overlay positioned
+  /// at the bottom when voice is available.
+  Widget _buildBodyWithVoiceOverlay(
+    BuildContext context,
+    VoiceService? voiceService,
+  ) {
+    if (voiceService == null) return widget.body;
+
+    return Stack(
+      children: [
+        widget.body,
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: ListeningOverlay(voiceService: voiceService),
+        ),
+      ],
+    );
+  }
+
+  /// Handles a recognised voice command by routing it to the
+  /// appropriate navigation destination.
+  ///
+  /// Uses the pre-parsed [VoiceCommand] directly to avoid a redundant
+  /// re-parse cycle. The command's [VoiceCommand.route] is pushed
+  /// onto the navigator stack via [VoiceCommandRouter.execute].
+  void _handleVoiceCommand(BuildContext context, VoiceCommand command) {
+    _voiceRouter.execute(command, Navigator.of(context));
   }
 }
 
