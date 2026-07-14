@@ -37,8 +37,13 @@ class AcademyService extends ChangeNotifier {
     required this._aiMentorService,
     LearningEngine? learningEngine,
     LearningPathRegistry? pathRegistry,
+    /// Pre-loaded learning paths from persisted storage. When provided,
+    /// these are used instead of the default hardcoded registry.
+    List<LearningPath>? initialPaths,
   })  : _learningEngine = learningEngine ?? const LearningEngine(),
-        _pathRegistry = pathRegistry ?? const LearningPathRegistry();
+        _pathRegistry = initialPaths != null
+            ? LearningPathRegistry.fromPaths(initialPaths)
+            : (pathRegistry ?? LearningPathRegistry());
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;

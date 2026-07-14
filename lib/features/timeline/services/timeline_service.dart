@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
+import '../../../core/storage_service.dart';
 import '../../ai/services/ai_mentor_service.dart';
 import '../../user_state/services/user_state_service.dart';
 import '../engine/life_timeline_engine.dart';
@@ -28,21 +31,103 @@ class TimelineService extends ChangeNotifier {
     required this._userStateService,
     required this._aiMentorService,
     LifeTimelineEngine? engine,
-  }) : _engine = engine ?? const LifeTimelineEngine();
+    /// Optional [StorageService] for persistent caching of computed
+    /// timeline events and milestones. When provided, computed data
+    /// is written to storage on cache invalidation and loaded on init.
+    StorageService? storageService,
+  })  : _engine = engine ?? const LifeTimelineEngine(),
+        _storage = storageService;
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;
   final LifeTimelineEngine _engine;
+  final StorageService? _storage;
 
   // Cached events — rebuilt on demand.
   List<TimelineEvent>? _cachedEvents;
   List<Milestone>? _cachedMilestones;
 
+  /// Whether persisted data has been loaded into cache.
+  bool _initialized = false;
+
+  /// Loads persisted timeline data from storage into cache.
+  ///
+  /// Called once during bootstrap. Prevents recomputing events
+  /// from source data on every app restart. Only loads non-empty
+  /// data — empty storage means "not yet computed" so events will
+  /// be computed lazily on first access via [allEvents].
+  Future<void> initFromStorage() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    final storage = _storage;
+    if (storage == null) return;
+
+    final eventsRaw = storage.readTimelineEvents();
+    if (eventsRaw != null) {
+      try {
+        final list = json.decode(eventsRaw) as List<dynamic>;
+        // Only load non-empty data. Empty arrays from seed should
+        // not prevent lazy computation on first access.
+        if (list.isNotEmpty) {
+          _cachedEvents = list
+              .map((item) => TimelineEvent.fromMap(
+                  Map<String, dynamic>.from(item as Map)))
+              .toList();
+        }
+      } catch (e) {
+        debugPrint('TimelineService: failed to parse persisted events: $e');
+      }
+    }
+
+    final milestonesRaw = storage.readMilestones();
+    if (milestonesRaw != null) {
+      try {
+        final list = json.decode(milestonesRaw) as List<dynamic>;
+        // Only load non-empty data.
+        if (list.isNotEmpty) {
+          _cachedMilestones = list
+              .map((item) =>
+                  Milestone.fromMap(Map<String, dynamic>.from(item as Map)))
+              .toList();
+        }
+      } catch (e) {
+        debugPrint('TimelineService: failed to parse persisted milestones: $e');
+      }
+    }
+  }
+
+  /// Persists current cached events and milestones to storage.
+  Future<void> _persistToStorage() async {
+    final storage = _storage;
+    if (storage == null) return;
+    try {
+      if (_cachedEvents != null) {
+        await storage.saveTimelineEvents(
+          json.encode(_cachedEvents!.map((e) => e.toMap()).toList()),
+        );
+      }
+      if (_cachedMilestones != null) {
+        await storage.saveMilestones(
+          json.encode(_cachedMilestones!.map((m) => m.toMap()).toList()),
+        );
+      }
+    } catch (e) {
+      debugPrint('TimelineService: failed to persist timeline data: $e');
+    }
+  }
+
   // ── Event Access ─────────────────────────────────────────────────
 
   /// All aggregated events, newest first.
   List<TimelineEvent> get allEvents {
-    _cachedEvents ??= _engine.aggregate(_collectEvents());
+    if (_cachedEvents == null && _storage != null) {
+      // First access — compute and persist
+      _cachedEvents = _engine.aggregate(_collectEvents());
+      _persistToStorage();
+    } else {
+      _cachedEvents ??= _engine.aggregate(_collectEvents());
+    }
     return _cachedEvents!;
   }
 
@@ -106,8 +191,15 @@ class TimelineService extends ChangeNotifier {
 
   /// All detected milestones, newest first.
   List<Milestone> get milestones {
-    _cachedMilestones ??=
-        _engine.sortMilestones(_engine.detectMilestones(allEvents));
+    if (_cachedMilestones == null && _storage != null) {
+      // First access — compute and persist
+      _cachedMilestones = _engine.sortMilestones(
+          _engine.detectMilestones(allEvents));
+      _persistToStorage();
+    } else {
+      _cachedMilestones ??= _engine.sortMilestones(
+          _engine.detectMilestones(allEvents));
+    }
     return _cachedMilestones!;
   }
 
@@ -159,6 +251,21 @@ class TimelineService extends ChangeNotifier {
     _cachedEvents = null;
     _cachedMilestones = null;
     notifyListeners();
+  }
+
+  /// Persists the current cached data to storage.
+  ///
+  /// Call this after the cache has been populated (e.g. after
+  /// events have been accessed) to persist the computed data.
+  Future<void> persistCache() async {
+    // Ensure cache is populated first
+    if (_cachedEvents == null) {
+      allEvents;
+    }
+    if (_cachedMilestones == null) {
+      milestones;
+    }
+    await _persistToStorage();
   }
 
   // ── Event Collection ─────────────────────────────────────────────

@@ -8,13 +8,19 @@ import '../models/quiz_question.dart';
 /// Registry of all available learning paths in the Academy.
 ///
 /// This is the single source of truth for learning path content.
-/// For v1, paths are hardcoded. Future versions may load from
-/// a repository or remote source.
+/// Defaults to hardcoded paths. Use [LearningPathRegistry.fromPaths]
+/// to load from persisted data.
 class LearningPathRegistry {
-  const LearningPathRegistry();
+  /// Creates a registry with the default hardcoded learning paths.
+  LearningPathRegistry() : _paths = _defaultPaths();
 
-  /// All registered learning paths.
-  List<LearningPath> get allPaths => [
+  /// Creates a registry with the given [paths] (e.g. loaded from storage).
+  LearningPathRegistry.fromPaths(this._paths);
+
+  final List<LearningPath> _paths;
+
+  /// Returns the default hardcoded learning paths.
+  static List<LearningPath> _defaultPaths() => [
         _flutterPath(),
         _dartPath(),
         _aiPath(),
@@ -23,10 +29,13 @@ class LearningPathRegistry {
         _sapPath(),
       ];
 
+  /// All registered learning paths.
+  List<LearningPath> get allPaths => _paths;
+
   /// Returns a path by ID, or null if not found.
   LearningPath? findById(String id) {
     try {
-      return allPaths.firstWhere((p) => p.id == id);
+      return _paths.firstWhere((p) => p.id == id);
     } catch (_) {
       return null;
     }
@@ -34,14 +43,14 @@ class LearningPathRegistry {
 
   /// Returns paths matching career tags.
   List<LearningPath> findByTags(List<String> tags) {
-    return allPaths
+    return _paths
         .where((p) => p.careerTags.any((t) => tags.contains(t)))
         .toList();
   }
 
   // ── Flutter Development Path ─────────────────────────────────────
 
-  LearningPath _flutterPath() {
+  static LearningPath _flutterPath() {
     return LearningPath(
       id: 'flutter',
       title: 'Flutter Development',
@@ -230,7 +239,7 @@ class LearningPathRegistry {
 
   // ── Dart Programming Path ────────────────────────────────────────
 
-  LearningPath _dartPath() {
+  static LearningPath _dartPath() {
     return LearningPath(
       id: 'dart',
       title: 'Dart Programming',
@@ -358,7 +367,7 @@ class LearningPathRegistry {
 
   // ── AI & Machine Learning Path ───────────────────────────────────
 
-  LearningPath _aiPath() {
+  static LearningPath _aiPath() {
     return LearningPath(
       id: 'ai',
       title: 'AI & Machine Learning',
@@ -428,7 +437,7 @@ class LearningPathRegistry {
 
   // ── Data Structures Path ─────────────────────────────────────────
 
-  LearningPath _dataStructuresPath() {
+  static LearningPath _dataStructuresPath() {
     return LearningPath(
       id: 'data-structures',
       title: 'Data Structures',
@@ -492,7 +501,7 @@ class LearningPathRegistry {
 
   // ── System Design Path ───────────────────────────────────────────
 
-  LearningPath _systemDesignPath() {
+  static LearningPath _systemDesignPath() {
     return LearningPath(
       id: 'system-design',
       title: 'System Design',
@@ -563,7 +572,7 @@ class LearningPathRegistry {
 
   // ── SAP Path ─────────────────────────────────────────────────────
 
-  LearningPath _sapPath() {
+  static LearningPath _sapPath() {
     return LearningPath(
       id: 'sap',
       title: 'SAP Consulting',

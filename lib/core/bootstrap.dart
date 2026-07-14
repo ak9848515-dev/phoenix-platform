@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../config/app_config.dart';
-import '../core/sample_repository.dart';
+import '../features/academy/engine/learning_path_registry.dart';
 import '../features/academy/services/academy_service.dart';
 import '../features/ai/services/ai_mentor_service.dart';
 import '../features/decision/services/decision_intelligence_service.dart';
@@ -15,7 +17,9 @@ import '../features/user_state/services/user_state_service.dart';
 import '../features/voice/providers/mock_speech_provider.dart';
 import '../features/voice/services/voice_service.dart';
 import '../routes/app_router.dart';
+import '../services/sample_data_service.dart';
 import '../theme/theme.dart';
+import 'local_repository.dart';
 import 'storage_service.dart';
 
 /// Application bootstrap and startup orchestration.
@@ -148,44 +152,77 @@ class AppBootstrap {
     await voiceService.initialize();
     _voiceService = voiceService;
 
-    final repository = const SampleRepository();
+    // Seed academy data on first launch if not yet persisted
+    await _seedAcademyData(storage);
+
+    // Build the repository (LocalRepository with storage-backed academy data)
+    final repository = LocalRepository(storageService: storage);
     final aiMentorService = AIMentorService(repository: repository);
+
+    // Load persisted learning paths
+    final persistedPaths = repository.learningPaths;
     final academyService = AcademyService(
       userStateService: userStateService,
       aiMentorService: aiMentorService,
+      initialPaths: persistedPaths.isNotEmpty ? persistedPaths : null,
     );
     _academyService = academyService;
 
     final decisionService = DecisionIntelligenceService(
       userStateService: userStateService,
       aiMentorService: aiMentorService,
+      storageService: storage,
     );
+    await decisionService.initFromStorage();
+    // Seed decision data on first launch if not yet persisted
+    await _seedDecisionData(storage);
     _decisionService = decisionService;
+
+    // Seed timeline data on first launch if not yet persisted
+    await _seedTimelineData(storage);
 
     final timelineService = TimelineService(
       userStateService: userStateService,
       aiMentorService: aiMentorService,
+      storageService: storage,
     );
+    await timelineService.initFromStorage();
     _timelineService = timelineService;
 
     final habitService = HabitService(
       userStateService: userStateService,
       aiMentorService: aiMentorService,
       timelineService: timelineService,
+      storageService: storage,
     );
+    // Load persisted habit data into UserState on first launch
+    await habitService.initFromStorage();
+    // If UserState has habits but storage doesn't (upgrade from v1),
+    // persist them to storage
+    await _seedHabitData(storage, userStateService);
     _habitService = habitService;
+
+    // Seed memory graph data on first launch if not yet persisted
+    await _seedMemoryGraphData(storage);
 
     final memoryGraphService = MemoryGraphService(
       userStateService: userStateService,
       aiMentorService: aiMentorService,
+      storageService: storage,
     );
+    // Load persisted graph data into UserState on first launch
+    await memoryGraphService.initFromStorage();
     _memoryGraphService = memoryGraphService;
 
     // Build the Knowledge Service
     final knowledgeService = KnowledgeService(
       userStateService: userStateService,
       aiMentorService: aiMentorService,
+      storageService: storage,
     );
+    await knowledgeService.initFromStorage();
+    // Seed knowledge data on first launch if not yet persisted
+    await _seedKnowledgeData(storage);
     _knowledgeService = knowledgeService;
 
     // Seed graphs in parallel (non-fatal if either fails)
@@ -197,6 +234,126 @@ class AppBootstrap {
         debugPrint('Knowledge seeding failed (non-fatal)');
       }),
     ]);
+  }
+
+  /// Seeds knowledge snapshot data into storage on first launch.
+  ///
+  /// If storage is empty but UserState already has a knowledge snapshot
+  /// (upgrade from v1 where UserState was the sole persistence layer),
+  /// writes current snapshot to the new storage key. If both are empty
+  /// or the snapshot is empty, writes an empty map so LocalRepository
+  /// knows the domain is seeded.
+  static Future<void> _seedKnowledgeData(StorageService storage) async {
+    final hasData = storage.readKnowledgeSnapshot() != null;
+    if (!hasData) {
+      await storage.saveKnowledgeSnapshot(json.encode(const <String, dynamic>{}));
+    }
+  }
+
+  /// Seeds memory graph data into storage on first launch.
+  ///
+  /// Persists an empty graph map so that LocalRepository knows the data
+  /// domain is seeded. On upgrade from v1 where UserState was the sole
+  /// persistence layer, [MemoryGraphService.initFromStorage] handles
+  /// writing existing UserState data to storage.
+  static Future<void> _seedMemoryGraphData(StorageService storage) async {
+    final hasData = storage.readMemoryGraph() != null;
+    if (!hasData) {
+      await storage.saveMemoryGraph(json.encode(const <String, dynamic>{}));
+    }
+  }
+
+  /// Seeds decision history data into storage on first launch.
+  ///
+  /// If storage is empty but UserState already has decision history
+  /// (upgrade from v1 where UserState was the sole persistence layer),
+  /// writes current analyses to the new storage key. If both are
+  /// empty, writes empty array so LocalRepository knows the domain
+  /// is seeded.
+  static Future<void> _seedDecisionData(StorageService storage) async {
+    final hasData = storage.readDecisionHistory() != null;
+    if (!hasData) {
+      await storage.saveDecisionHistory(json.encode([]));
+    }
+  }
+
+  /// Seeds timeline data into storage on first launch.
+  ///
+  /// On first launch, persists empty arrays so that LocalRepository
+  /// knows the data domain is seeded. On subsequent launches,
+  /// existing persisted data is preserved. Timeline events are
+  /// computed dynamically from UserState data — the persisted cache
+  /// is populated on first event access after init.
+  static Future<void> _seedTimelineData(StorageService storage) async {
+    final hasEvents = storage.readTimelineEvents() != null;
+    final hasMilestones = storage.readMilestones() != null;
+
+    if (!hasEvents) {
+      await storage.saveTimelineEvents(json.encode([]));
+    }
+    if (!hasMilestones) {
+      await storage.saveMilestones(json.encode([]));
+    }
+  }
+
+  /// Seeds habit data into storage on first launch.
+  ///
+  /// If storage is empty but UserState already has habits (upgrade from
+  /// v1 where UserState was the sole persistence layer), writes current
+  /// habits and entries to the new storage keys so that LocalRepository
+  /// can serve them on subsequent launches. If both are empty, writes
+  /// empty arrays so LocalRepository knows the data domain is seeded.
+  static Future<void> _seedHabitData(
+    StorageService storage,
+    UserStateService userStateService,
+  ) async {
+    final hasHabits = storage.readHabits() != null;
+    final hasEntries = storage.readHabitEntries() != null;
+
+    if (!hasHabits) {
+      final state = userStateService.currentState;
+      await storage.saveHabits(
+        json.encode(state.habits.map((h) => h.toMap()).toList()),
+      );
+    }
+    if (!hasEntries) {
+      final state = userStateService.currentState;
+      await storage.saveHabitEntries(
+        json.encode(state.habitEntries.map((e) => e.toMap()).toList()),
+      );
+    }
+  }
+
+  /// Seeds academy data into storage on first launch.
+  ///
+  /// Reads learning path content from [LearningPathRegistry] and legacy
+  /// academy summaries from [SampleDataService], then persists them so
+  /// [LocalRepository] can serve them on subsequent launches.
+  static Future<void> _seedAcademyData(StorageService storage) async {
+    final hasPaths = storage.readLearningPaths() != null;
+    final hasSummaries = storage.readAcademySummaries() != null;
+    final hasFeatured = storage.readFeaturedAcademy() != null;
+
+    if (!hasPaths) {
+      final registry = LearningPathRegistry();
+      final pathsJson = json.encode(
+        registry.allPaths.map((p) => p.toMap()).toList(),
+      );
+      await storage.saveLearningPaths(pathsJson);
+    }
+
+    if (!hasSummaries) {
+      final sampleData = SampleDataService();
+      final summariesJson = json.encode(
+        sampleData.academySummaries.map((a) => a.toMap()).toList(),
+      );
+      await storage.saveAcademySummaries(summariesJson);
+    }
+
+    if (!hasFeatured) {
+      final sampleData = SampleDataService();
+      await storage.saveFeaturedAcademy(sampleData.featuredAcademy.toJson());
+    }
   }
 
   /// Creates the root [PhoenixApp] widget with all required configuration.

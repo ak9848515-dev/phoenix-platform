@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
+import '../../../core/storage_service.dart';
 import '../../ai/services/ai_mentor_service.dart';
 import '../../user_state/services/user_state_service.dart';
 import '../engine/personal_knowledge_engine.dart';
@@ -31,11 +34,74 @@ class KnowledgeService extends ChangeNotifier {
     required this._userStateService,
     required this._aiMentorService,
     PersonalKnowledgeEngine? engine,
-  }) : _engine = engine ?? const PersonalKnowledgeEngine();
+    /// Optional [StorageService] for explicit persistence of knowledge
+    /// snapshot data. When provided, snapshot writes are mirrored to storage.
+    StorageService? storageService,
+  })  : _engine = engine ?? const PersonalKnowledgeEngine(),
+        _storage = storageService;
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;
   final PersonalKnowledgeEngine _engine;
+  final StorageService? _storage;
+
+  /// Whether persisted data has been loaded into UserState.
+  bool _initialized = false;
+
+  /// Loads persisted knowledge snapshot from storage into UserState.
+  ///
+  /// Called once during bootstrap. Merges stored snapshot into the
+  /// current user state so that existing persisted data is available
+  /// before any service reads occur. Also handles upgrade from v1
+  /// where UserState was the sole persistence layer.
+  Future<void> initFromStorage() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    final storage = _storage;
+    if (storage == null) return;
+
+    final raw = storage.readKnowledgeSnapshot();
+    if (raw != null) {
+      try {
+        final map = json.decode(raw) as Map<String, dynamic>;
+        // Only seed if user has no knowledge snapshot yet
+        if (_userStateService.currentState.knowledgeSnapshot == null &&
+            map.isNotEmpty) {
+          await _userStateService.update(
+              (s) => s.copyWith(knowledgeSnapshot: map));
+        }
+      } catch (e) {
+        debugPrint(
+            'KnowledgeService: failed to parse persisted snapshot: $e');
+      }
+    }
+
+    // If UserState has data but storage is empty, persist to storage
+    // (handles upgrade from v1 where snapshot was only in UserState)
+    final currentState = _userStateService.currentState;
+    if (raw == null &&
+        currentState.knowledgeSnapshot != null &&
+        currentState.knowledgeSnapshot!.isNotEmpty) {
+      await _persistToStorage();
+    }
+  }
+
+  /// Persists current knowledge snapshot to storage.
+  Future<void> _persistToStorage() async {
+    final storage = _storage;
+    if (storage == null) return;
+    try {
+      final state = _userStateService.currentState;
+      if (state.knowledgeSnapshot != null) {
+        await storage.saveKnowledgeSnapshot(
+          json.encode(state.knowledgeSnapshot),
+        );
+      }
+    } catch (e) {
+      debugPrint('KnowledgeService: failed to persist snapshot: $e');
+    }
+  }
 
   // ── Snapshot Access ───────────────────────────────────────────────
 
@@ -53,6 +119,7 @@ class KnowledgeService extends ChangeNotifier {
     await _userStateService.update(
       (state) => state.copyWith(knowledgeSnapshot: s.toMap()),
     );
+    await _persistToStorage();
     notifyListeners();
   }
 

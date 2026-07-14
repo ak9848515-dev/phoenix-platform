@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
+import '../../../core/storage_service.dart';
 import '../../ai/services/ai_mentor_service.dart';
 import '../../timeline/services/timeline_service.dart';
 import '../../user_state/services/user_state_service.dart';
@@ -34,12 +37,95 @@ class HabitService extends ChangeNotifier {
     required this._aiMentorService,
     this._timelineService,
     HabitEngine? engine,
-  }) : _engine = engine ?? const HabitEngine();
+    /// Optional [StorageService] for explicit persistence of habit data.
+    /// When provided, habit and entry writes are mirrored to storage.
+    StorageService? storageService,
+  })  : _engine = engine ?? const HabitEngine(),
+        _storage = storageService;
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;
   final TimelineService? _timelineService;
   final HabitEngine _engine;
+  final StorageService? _storage;
+
+  /// Whether persisted data has been loaded into user state.
+  bool _initialized = false;
+
+  /// Loads persisted habit data from storage into UserState.
+  ///
+  /// Called once during bootstrap. Merges stored habits and entries
+  /// into the current user state so that existing persisted data is
+  /// available before any service reads occur.
+  Future<void> initFromStorage() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    final storage = _storage;
+    if (storage == null) return;
+
+    // Sync habits: storage → UserState if UserState is empty
+    final habitsRaw = storage.readHabits();
+    if (habitsRaw != null) {
+      try {
+        final list = json.decode(habitsRaw) as List<dynamic>;
+        if (list.isNotEmpty) {
+          final loaded = list
+              .map((item) =>
+                  Habit.fromMap(Map<String, dynamic>.from(item as Map)))
+              .toList();
+          // Only seed if user has no habits yet (first launch after persistence)
+          if (_userStateService.currentState.habits.isEmpty) {
+            await _userStateService.update((s) => s.copyWith(habits: loaded));
+          }
+        }
+      } catch (e) {
+        debugPrint('HabitService: failed to parse persisted habits: $e');
+      }
+    }
+
+    // Sync habit entries: storage → UserState if UserState is empty
+    final entriesRaw = storage.readHabitEntries();
+    if (entriesRaw != null) {
+      try {
+        final list = json.decode(entriesRaw) as List<dynamic>;
+        if (list.isNotEmpty) {
+          final loaded = list
+              .map((item) => HabitEntry.fromMap(
+                  Map<String, dynamic>.from(item as Map)))
+              .toList();
+          if (_userStateService.currentState.habitEntries.isEmpty) {
+            await _userStateService.update(
+                (s) => s.copyWith(habitEntries: loaded));
+          }
+        }
+      } catch (e) {
+        debugPrint('HabitService: failed to parse persisted habit entries: $e');
+      }
+    }
+
+    // If UserState has data but storage is empty, persist current data to storage
+    // (handles upgrade from v1 where habits were only in UserState)
+    final currentState = _userStateService.currentState;
+    if (habitsRaw == null && currentState.habits.isNotEmpty) {
+      await _persistToStorage();
+    }
+  }
+
+  /// Persists current habits and entries to storage (if available).
+  Future<void> _persistToStorage() async {
+    final storage = _storage;
+    if (storage == null) return;
+    try {
+      final state = _userStateService.currentState;
+      await storage.saveHabits(
+          json.encode(state.habits.map((h) => h.toMap()).toList()));
+      await storage.saveHabitEntries(
+          json.encode(state.habitEntries.map((e) => e.toMap()).toList()));
+    } catch (e) {
+      debugPrint('HabitService: failed to persist habit data: $e');
+    }
+  }
 
   // ── Habit CRUD ────────────────────────────────────────────────────
 
@@ -86,6 +172,7 @@ class HabitService extends ChangeNotifier {
     current.add(habit);
     await _userStateService.update((s) =>
         s.copyWith(habits: current, lastActivityAt: DateTime.now()));
+    await _persistToStorage();
     notifyListeners();
   }
 
@@ -97,6 +184,7 @@ class HabitService extends ChangeNotifier {
       current[index] = updated;
       await _userStateService.update((s) =>
           s.copyWith(habits: current, lastActivityAt: DateTime.now()));
+      await _persistToStorage();
       notifyListeners();
     }
   }
@@ -108,6 +196,7 @@ class HabitService extends ChangeNotifier {
     final allE = allEntries.where((e) => e.habitId != habitId).toList();
     await _userStateService.update((s) =>
         s.copyWith(habits: allH, habitEntries: allE, lastActivityAt: DateTime.now()));
+    await _persistToStorage();
     notifyListeners();
   }
 
@@ -136,6 +225,7 @@ class HabitService extends ChangeNotifier {
     current.add(entry);
     await _userStateService.update((s) =>
         s.copyWith(habitEntries: current, lastActivityAt: now, totalXp: s.totalXp + 5));
+    await _persistToStorage();
     notifyListeners();
 
     // Invalidate timeline cache so habit events are reflected
@@ -166,6 +256,7 @@ class HabitService extends ChangeNotifier {
     current.add(entry);
     await _userStateService.update((s) =>
         s.copyWith(habitEntries: current, lastActivityAt: now));
+    await _persistToStorage();
     notifyListeners();
 
     return entry;
@@ -179,6 +270,7 @@ class HabitService extends ChangeNotifier {
         e.habitId == habitId && e.dateKey == todayStr);
     await _userStateService.update((s) =>
         s.copyWith(habitEntries: current, lastActivityAt: DateTime.now()));
+    await _persistToStorage();
     notifyListeners();
   }
 

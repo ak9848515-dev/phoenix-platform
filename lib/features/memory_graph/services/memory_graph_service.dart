@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 import '../../ai/services/ai_mentor_service.dart';
 import '../../user_state/services/user_state_service.dart';
+import '../../../core/storage_service.dart';
 import '../engine/memory_graph_engine.dart';
 import '../models/entity_type.dart';
 import '../models/memory_cluster.dart';
@@ -31,11 +34,15 @@ class MemoryGraphService extends ChangeNotifier {
     required this._userStateService,
     required this._aiMentorService,
     MemoryGraphEngine? engine,
-  }) : _engine = engine ?? const MemoryGraphEngine();
+    StorageService? storageService,
+  }) : _engine = engine ?? const MemoryGraphEngine(),
+       _storage = storageService;
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;
   final MemoryGraphEngine _engine;
+  final StorageService? _storage;
+  bool _initialized = false;
 
   // ── Graph Access ─────────────────────────────────────────────────
 
@@ -48,11 +55,12 @@ class MemoryGraphService extends ChangeNotifier {
     return MemoryGraph.fromMap(data);
   }
 
-  /// Persists the graph.
+  /// Persists the graph to both UserState and StorageService.
   Future<void> _saveGraph(MemoryGraph g) async {
     await _userStateService.update(
       (s) => s.copyWith(memoryGraphData: g.toMap()),
     );
+    await _persistToStorage(g);
     notifyListeners();
   }
 
@@ -189,6 +197,56 @@ class MemoryGraphService extends ChangeNotifier {
       'Give me a brief explanation of why this connection matters.',
     );
     return response.content;
+  }
+
+  // ── Persistence ───────────────────────────────────────────────────
+
+  /// Initializes the service by loading persisted graph data from storage.
+  ///
+  /// If UserState is empty but storage has data (e.g. after a cold start),
+  /// loads the graph from storage into UserState. If storage is also empty
+  /// (first launch), UserState remains empty and [seedFromPlatform] will
+  /// populate it.
+  ///
+  /// Handles upgrade from v1 where UserState was the sole persistence layer:
+  /// if UserState has data but storage is empty, writes to storage so
+  /// subsequent launches can read from storage.
+  Future<void> initFromStorage() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    final storage = _storage;
+    if (storage == null) return;
+
+    final currentState = _userStateService.currentState;
+    final raw = storage.readMemoryGraph();
+
+    if (raw != null && currentState.memoryGraphData == null) {
+      // Storage has data, UserState is empty — load from storage
+      try {
+        final decoded = Map<String, dynamic>.from(
+            json.decode(raw) as Map<String, dynamic>);
+        await _userStateService.update(
+          (s) => s.copyWith(memoryGraphData: decoded),
+        );
+      } catch (e) {
+        debugPrint('MemoryGraphService: failed to load from storage: $e');
+      }
+    } else if (raw == null && currentState.memoryGraphData != null) {
+      // UserState has data but storage is empty — upgrade from v1
+      await _persistToStorage(graph);
+    }
+  }
+
+  /// Persists the current graph to storage.
+  Future<void> _persistToStorage(MemoryGraph g) async {
+    final storage = _storage;
+    if (storage == null) return;
+    try {
+      await storage.saveMemoryGraph(json.encode(g.toMap()));
+    } catch (e) {
+      debugPrint('MemoryGraphService: failed to persist graph: $e');
+    }
   }
 
   // ── Platform Integration ─────────────────────────────────────────

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
+import '../../../core/storage_service.dart';
 import '../../ai/services/ai_mentor_service.dart';
 import '../../user_state/services/user_state_service.dart';
 import '../engine/decision_engine.dart';
@@ -33,11 +36,75 @@ class DecisionIntelligenceService extends ChangeNotifier {
     required this._userStateService,
     required this._aiMentorService,
     DecisionEngine? engine,
-  }) : _engine = engine ?? const DecisionEngine();
+    /// Optional [StorageService] for explicit persistence of decision
+    /// history. When provided, analysis saves are mirrored to storage.
+    StorageService? storageService,
+  })  : _engine = engine ?? const DecisionEngine(),
+        _storage = storageService;
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;
   final DecisionEngine _engine;
+  final StorageService? _storage;
+
+  /// Whether persisted data has been loaded into UserState.
+  bool _initialized = false;
+
+  /// Loads persisted decision history from storage into UserState.
+  ///
+  /// Called once during bootstrap. Merges stored analyses into the
+  /// current user state so that existing persisted data is available
+  /// before any service reads occur. Also handles upgrade from v1
+  /// where UserState was the sole persistence layer.
+  Future<void> initFromStorage() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    final storage = _storage;
+    if (storage == null) return;
+
+    final raw = storage.readDecisionHistory();
+    if (raw != null) {
+      try {
+        final list = json.decode(raw) as List<dynamic>;
+        if (list.isNotEmpty) {
+          final loaded = list
+              .map((item) => DecisionAnalysis.fromMap(
+                  Map<String, dynamic>.from(item as Map)))
+              .toList();
+          // Only seed if user has no decision history yet
+          if (_userStateService.currentState.decisionHistory.isEmpty) {
+            await _userStateService.update(
+                (s) => s.copyWith(decisionHistory: loaded));
+          }
+        }
+      } catch (e) {
+        debugPrint(
+            'DecisionService: failed to parse persisted decisions: $e');
+      }
+    }
+
+    // If UserState has data but storage is empty, persist to storage
+    // (handles upgrade from v1 where decisions were only in UserState)
+    final currentState = _userStateService.currentState;
+    if (raw == null && currentState.decisionHistory.isNotEmpty) {
+      await _persistToStorage();
+    }
+  }
+
+  /// Persists current decision history to storage.
+  Future<void> _persistToStorage() async {
+    final storage = _storage;
+    if (storage == null) return;
+    try {
+      final state = _userStateService.currentState;
+      await storage.saveDecisionHistory(
+        json.encode(state.decisionHistory.map((a) => a.toMap()).toList()),
+      );
+    } catch (e) {
+      debugPrint('DecisionService: failed to persist decisions: $e');
+    }
+  }
 
   // ── Analysis ──────────────────────────────────────────────────────
 
@@ -89,6 +156,7 @@ class DecisionIntelligenceService extends ChangeNotifier {
     await _userStateService.update(
       (s) => s.copyWith(decisionHistory: updated),
     );
+    await _persistToStorage();
     notifyListeners();
   }
 

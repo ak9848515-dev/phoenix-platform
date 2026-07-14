@@ -1,4 +1,12 @@
+import 'dart:convert';
+
+import '../features/academy/models/learning_path.dart';
+import '../features/decision/models/decision_analysis.dart';
+import '../features/habit/models/habit.dart';
+import '../features/habit/models/habit_entry.dart';
 import '../features/identity/models/identity.dart';
+import '../features/timeline/models/milestone.dart';
+import '../features/timeline/models/timeline_event.dart';
 import '../features/journey/models/journey.dart';
 import '../features/journey/models/journey_stage.dart';
 import '../features/knowledge_dna/models/knowledge_dna.dart';
@@ -63,10 +71,154 @@ class LocalRepository implements Repository {
   List<Progress> get knowledgeProgress => _fallback.knowledgeProgress;
 
   @override
-  List<Academy> get academySummaries => _fallback.academySummaries;
+  List<Academy> get academySummaries {
+    final raw = _storage.readAcademySummaries();
+    if (raw == null) return _fallback.academySummaries;
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) =>
+              Academy.fromMap(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return _fallback.academySummaries;
+    }
+  }
 
   @override
-  Academy get featuredAcademy => _fallback.featuredAcademy;
+  Academy get featuredAcademy {
+    final raw = _storage.readFeaturedAcademy();
+    if (raw == null) return _fallback.featuredAcademy;
+    try {
+      return Academy.fromJson(raw);
+    } catch (_) {
+      return _fallback.featuredAcademy;
+    }
+  }
+
+  // ── Habits ───────────────────────────────────────────────────────────
+
+  /// Loads habits from storage, or returns an empty list.
+  List<Habit> get habits {
+    final raw = _storage.readHabits();
+    if (raw == null) return const [];
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) =>
+              Habit.fromMap(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Loads habit entries from storage, or returns an empty list.
+  List<HabitEntry> get habitEntries {
+    final raw = _storage.readHabitEntries();
+    if (raw == null) return const [];
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) =>
+              HabitEntry.fromMap(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  // ── Timeline ─────────────────────────────────────────────────────────
+
+  /// Loads timeline events from storage, or returns an empty list.
+  List<TimelineEvent> get timelineEvents {
+    final raw = _storage.readTimelineEvents();
+    if (raw == null) return const [];
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) => TimelineEvent.fromMap(
+              Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Loads milestones from storage, or returns an empty list.
+  List<Milestone> get milestones {
+    final raw = _storage.readMilestones();
+    if (raw == null) return const [];
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) =>
+              Milestone.fromMap(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  // ── Decision History ────────────────────────────────────────────────
+
+  /// Loads decision history from storage, or returns an empty list.
+  List<DecisionAnalysis> get decisionHistory {
+    final raw = _storage.readDecisionHistory();
+    if (raw == null) return const [];
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) => DecisionAnalysis.fromMap(
+              Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  // ── Knowledge Snapshot ──────────────────────────────────────────────
+
+  /// Loads the knowledge snapshot from storage, or returns null.
+  Map<String, dynamic>? get knowledgeSnapshot {
+    final raw = _storage.readKnowledgeSnapshot();
+    if (raw == null) return null;
+    try {
+      return Map<String, dynamic>.from(
+          json.decode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ── Memory Graph ────────────────────────────────────────────────
+
+  /// Loads the memory graph data from storage, or returns null.
+  Map<String, dynamic>? get memoryGraph {
+    final raw = _storage.readMemoryGraph();
+    if (raw == null) return null;
+    try {
+      return Map<String, dynamic>.from(
+          json.decode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Loads learning paths from storage, or returns default paths.
+  List<LearningPath> get learningPaths {
+    final raw = _storage.readLearningPaths();
+    if (raw == null) return const [];
+    try {
+      final list = json.decode(raw) as List<dynamic>;
+      return list
+          .map((item) =>
+              LearningPath.fromMap(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
 
   @override
   List<Progress> get dashboardSections => _fallback.dashboardSections;
