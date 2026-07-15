@@ -24,11 +24,22 @@ class ConsistencyChart extends StatelessWidget {
       return SizedBox(
         height: height,
         child: Center(
-          child: Text(
-            'No data yet',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.bar_chart_rounded,
+                size: 24,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Start tracking to see your trend',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
         ),
       );

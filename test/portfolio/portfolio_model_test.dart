@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phoenix_platform/features/portfolio/models/portfolio.dart';
 import 'package:phoenix_platform/features/portfolio/models/portfolio_achievement.dart';
@@ -102,7 +101,7 @@ void main() {
       id: 'ach-1',
       title: 'First Mission',
       description: 'Completed first mission',
-      icon: Icons.stars,
+      iconName: 'stars_outlined',
       date: DateTime(2026, 1, 1),
       type: 'achievement',
     );
@@ -135,7 +134,7 @@ void main() {
         id: 'ach-1',
         title: 'First Mission',
         description: 'Completed first mission',
-        icon: Icons.stars,
+        iconName: 'stars_outlined',
         date: DateTime(2026, 1, 1),
         type: 'achievement',
       );

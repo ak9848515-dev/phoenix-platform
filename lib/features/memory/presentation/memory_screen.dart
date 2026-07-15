@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/sample_repository.dart';
+import '../../../routes/app_routes.dart';
 import '../../../shared/widgets/phoenix_primary_button.dart';
 import '../../../theme/spacing.dart';
 import '../services/memory_service.dart';
@@ -51,11 +52,6 @@ class MemoryScreen extends StatelessWidget {
   }
 
   void _onAddMemory(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Adding memories will be available soon.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    Navigator.of(context).pushNamed(AppRoutes.timeline);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/memory_entity.dart';
@@ -48,7 +49,11 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
     if (svc == null) {
       return Scaffold(
         appBar: AppBar(title: Text(entity.title)),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const PhoenixLoadingWidget(
+          icon: Icons.circle_rounded,
+          title: 'Loading entity details...',
+          subtitle: 'Preparing relationships and context.',
+        ),
       );
     }
 

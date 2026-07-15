@@ -16,6 +16,9 @@ class ProgressSummaryCard extends StatelessWidget {
     required this.totalXp,
     required this.currentLevel,
     required this.currentStreak,
+    this.onXpTap,
+    this.onLevelTap,
+    this.onStreakTap,
   });
 
   /// Total XP earned.
@@ -27,6 +30,15 @@ class ProgressSummaryCard extends StatelessWidget {
   /// Current daily streak count.
   final int currentStreak;
 
+  /// Called when the XP stat is tapped.
+  final VoidCallback? onXpTap;
+
+  /// Called when the Level stat is tapped.
+  final VoidCallback? onLevelTap;
+
+  /// Called when the Streak stat is tapped.
+  final VoidCallback? onStreakTap;
+
   @override
   Widget build(BuildContext context) {
     return FadeAnimation(
@@ -37,25 +49,34 @@ class ProgressSummaryCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            PhoenixStatTile(
-              icon: PhoenixIcons.xp,
-              label: 'Total XP',
-              value: _formatXp(totalXp),
-              color: PhoenixColors.primary,
+            _TappableStatTile(
+              onTap: onXpTap,
+              child: PhoenixStatTile(
+                icon: PhoenixIcons.xp,
+                label: 'Total XP',
+                value: _formatXp(totalXp),
+                color: PhoenixColors.primary,
+              ),
             ),
             _verticalDivider(),
-            PhoenixStatTile(
-              icon: PhoenixIcons.level,
-              label: 'Level',
-              value: '$currentLevel',
-              color: PhoenixColors.primary,
+            _TappableStatTile(
+              onTap: onLevelTap,
+              child: PhoenixStatTile(
+                icon: PhoenixIcons.level,
+                label: 'Level',
+                value: '$currentLevel',
+                color: PhoenixColors.primary,
+              ),
             ),
             _verticalDivider(),
-            PhoenixStatTile(
-              icon: PhoenixIcons.streak,
-              label: 'Streak',
-              value: '$currentStreak days',
-              color: PhoenixColors.warning,
+            _TappableStatTile(
+              onTap: onStreakTap,
+              child: PhoenixStatTile(
+                icon: PhoenixIcons.streak,
+                label: 'Streak',
+                value: '$currentStreak days',
+                color: PhoenixColors.warning,
+              ),
             ),
           ],
         ),
@@ -76,5 +97,33 @@ class ProgressSummaryCard extends StatelessWidget {
       return '${(xp / 1000).toStringAsFixed(1)}k';
     }
     return xp.toString();
+  }
+}
+
+/// Wraps a stat tile in a tappable [InkWell] if [onTap] is provided.
+class _TappableStatTile extends StatelessWidget {
+  const _TappableStatTile({
+    required this.child,
+    this.onTap,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'View progress details',
+      button: onTap != null,
+      enabled: onTap != null,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: child,
+        ),
+      ),
+    );
   }
 }

@@ -9,7 +9,10 @@ class AppConfig {
   static const String appTitle = 'Phoenix Platform';
 
   /// The initial route shown on app launch.
-  static const String initialRoute = '/dashboard';
+  ///
+  /// Splash screen checks authentication state and routes to
+  /// login or dashboard accordingly.
+  static const String initialRoute = '/splash';
 
   /// Whether Material 3 is enabled.
   static const bool useMaterial3 = true;

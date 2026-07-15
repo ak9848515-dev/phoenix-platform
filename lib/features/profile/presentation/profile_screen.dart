@@ -105,6 +105,21 @@ class ProfileScreen extends StatelessWidget {
             completedMissions: missionProgress.completedCount,
             totalMissions: totalMissions,
             overallProgress: progressSummary.completionPercentage,
+            onXpTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'xp'},
+            ),
+            onLevelTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'level'},
+            ),
+            onStreakTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'streak'},
+            ),
+            onMissionsTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.missionCenter,
+            ),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 
@@ -131,6 +146,14 @@ class ProfileScreen extends StatelessWidget {
                     : 'No projects yet',
             onViewPortfolio: () =>
                 Navigator.of(context).pushNamed(AppRoutes.portfolio),
+            onProjectsTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.portfolio),
+            onAchievementsTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'achievements'},
+            ),
+            onTechnologiesTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.knowledge),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 
@@ -161,13 +184,28 @@ class ProfileScreen extends StatelessWidget {
             careerRecommendation: topRecommendation?.title,
             onViewCareer: () =>
                 Navigator.of(context).pushNamed(AppRoutes.career),
+            onCareerTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.career),
+            onInterviewTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.career),
+            onTimelineTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'streak'},
+            ),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 
-          // ── 7. Preferences ─────────────────────────────────────────
-          // Preferences — no settings screens exist yet.
-          // Pass null for all handlers so rows render as non-interactive.
-          const PreferencesCard(),
+          // ── 7. Preferences ────────────────────────────────────────
+          PreferencesCard(
+            onTheme: () =>
+                Navigator.of(context).pushNamed(AppRoutes.settingsTheme),
+            onNotifications: () =>
+                Navigator.of(context).pushNamed(AppRoutes.settingsNotifications),
+            onSync: () =>
+                Navigator.of(context).pushNamed(AppRoutes.settingsSync),
+            onPrivacy: () =>
+                Navigator.of(context).pushNamed(AppRoutes.settingsPrivacy),
+          ),
           SizedBox(height: PhoenixSpacing.xxl),
         ],
       ),

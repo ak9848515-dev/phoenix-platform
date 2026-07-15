@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/memory_insight.dart';
@@ -47,7 +48,11 @@ class _MemoryGraphDashboardScreenState
   Widget build(BuildContext context) {
     final svc = _service;
     if (svc == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const PhoenixLoadingWidget(
+        icon: Icons.hub_rounded,
+        title: 'Preparing your memory graph...',
+        subtitle: 'Loading entities and relationships.',
+      );
     }
 
     final stats = svc.stats;

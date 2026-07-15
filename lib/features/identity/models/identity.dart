@@ -11,7 +11,7 @@ class Identity {
     required this.id,
     required this.title,
     required this.description,
-    required this.icon,
+    required this.iconName,
     required this.category,
     required this.currentLevel,
     required this.targetLevel,
@@ -30,8 +30,11 @@ class Identity {
   /// Short description of what this identity entails.
   final String description;
 
-  /// Material icon for visual representation.
-  final IconData icon;
+  /// Icon identifier (resolved via [icon] getter to a compile-time constant).
+  final String iconName;
+
+  /// Resolved Material icon for visual representation.
+  IconData get icon => Identity.resolveIcon(iconName);
 
   /// Category grouping (e.g. "Technology", "Business", "Creative").
   final String category;
@@ -54,12 +57,47 @@ class Identity {
   /// Current status of this identity journey.
   final IdentityStatus status;
 
+  /// Resolves an icon name string to a compile-time constant [IconData].
+  ///
+  /// **Production note:** All icons used by Identity must be listed here so
+  /// that Flutter's tree shaker can statically determine which icons to keep.
+  static IconData resolveIcon(String name) {
+    switch (name) {
+      case 'code_outlined':
+        return Icons.code_outlined;
+      case 'business_outlined':
+        return Icons.business_outlined;
+      case 'phone_android_outlined':
+        return Icons.phone_android_outlined;
+      case 'edit_outlined':
+        return Icons.edit_outlined;
+      case 'person_outlined':
+        return Icons.person_outlined;
+      case 'rocket_launch_outlined':
+        return Icons.rocket_launch_outlined;
+      case 'store_outlined':
+        return Icons.store_outlined;
+      case 'school_outlined':
+        return Icons.school_outlined;
+      case 'add_circle_outlined':
+        return Icons.add_circle_outlined;
+      case 'code':
+        return Icons.code;
+      case 'flutter_dash':
+        return Icons.flutter_dash;
+      case 'star':
+        return Icons.star;
+      default:
+        return Icons.circle_outlined;
+    }
+  }
+
   /// Creates a copy of this identity with the given fields replaced.
   Identity copyWith({
     String? id,
     String? title,
     String? description,
-    IconData? icon,
+    String? iconName,
     String? category,
     int? currentLevel,
     int? targetLevel,
@@ -72,7 +110,7 @@ class Identity {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      icon: icon ?? this.icon,
+      iconName: iconName ?? this.iconName,
       category: category ?? this.category,
       currentLevel: currentLevel ?? this.currentLevel,
       targetLevel: targetLevel ?? this.targetLevel,
@@ -89,7 +127,7 @@ class Identity {
       'id': id,
       'title': title,
       'description': description,
-      'iconCodePoint': icon.codePoint,
+      'iconName': iconName,
       'category': category,
       'currentLevel': currentLevel,
       'targetLevel': targetLevel,
@@ -106,8 +144,7 @@ class Identity {
       id: map['id'] as String,
       title: map['title'] as String,
       description: map['description'] as String,
-      // ignore: non_const_argument_for_const_parameter
-      icon: IconData(map['iconCodePoint'] as int),
+      iconName: map['iconName'] as String? ?? 'circle_outlined',
       category: map['category'] as String,
       currentLevel: map['currentLevel'] as int,
       targetLevel: map['targetLevel'] as int,

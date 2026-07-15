@@ -19,6 +19,8 @@ class UpcomingMilestonesCard extends StatelessWidget {
     required this.completedCount,
     required this.totalCount,
     this.onViewAll,
+    this.onUnlockedTap,
+    this.onTotalTap,
   });
 
   /// List of achievement progress items.
@@ -32,6 +34,12 @@ class UpcomingMilestonesCard extends StatelessWidget {
 
   /// Called when the user taps to view all milestones.
   final VoidCallback? onViewAll;
+
+  /// Called when the Unlocked stat tile is tapped.
+  final VoidCallback? onUnlockedTap;
+
+  /// Called when the Total stat tile is tapped.
+  final VoidCallback? onTotalTap;
 
   @override
   Widget build(BuildContext context) {
@@ -57,20 +65,26 @@ class UpcomingMilestonesCard extends StatelessWidget {
           // ── Summary Stats Row ─────────────────────────────────────
           Row(
             children: [
-              PhoenixStatTile(
-                icon: PhoenixIcons.achievement,
-                label: 'Unlocked',
-                value: '$completedAchievements',
-                color: PhoenixColors.gold,
-                compact: true,
+              _TappableStatTile(
+                onTap: onUnlockedTap,
+                child: PhoenixStatTile(
+                  icon: PhoenixIcons.achievement,
+                  label: 'Unlocked',
+                  value: '$completedAchievements',
+                  color: PhoenixColors.gold,
+                  compact: true,
+                ),
               ),
               SizedBox(width: PhoenixSpacing.xl),
-              PhoenixStatTile(
-                icon: PhoenixIcons.target,
-                label: 'Total',
-                value: '$totalAchievements',
-                color: PhoenixColors.textSecondary,
-                compact: true,
+              _TappableStatTile(
+                onTap: onTotalTap,
+                child: PhoenixStatTile(
+                  icon: PhoenixIcons.target,
+                  label: 'Total',
+                  value: '$totalAchievements',
+                  color: PhoenixColors.textSecondary,
+                  compact: true,
+                ),
               ),
             ],
           ),
@@ -160,6 +174,29 @@ class UpcomingMilestonesCard extends StatelessWidget {
                 : PhoenixColors.textDisabled,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Wraps a stat tile in an [InkWell] to make it interactive.
+class _TappableStatTile extends StatelessWidget {
+  const _TappableStatTile({
+    required this.child,
+    this.onTap,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: child,
       ),
     );
   }

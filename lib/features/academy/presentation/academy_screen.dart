@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/bootstrap.dart';
 import '../../../routes/app_routes.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../shared/widgets/phoenix_primary_button.dart';
 import '../../../shared/widgets/phoenix_progress_indicator.dart';
 import '../../../theme/colors.dart';
@@ -70,7 +71,11 @@ class _AcademyScreenState extends State<AcademyScreen> {
     final svc = _academyService;
 
     if (svc == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const PhoenixLoadingWidget(
+        icon: Icons.school_rounded,
+        title: 'Preparing your Academy...',
+        subtitle: 'Loading learning paths and progress.',
+      );
     }
 
     return SingleChildScrollView(

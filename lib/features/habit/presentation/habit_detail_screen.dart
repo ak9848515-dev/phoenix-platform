@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../services/habit_service.dart';
@@ -44,7 +45,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     final svc = _service;
     if (svc == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: PhoenixLoadingWidget(
+          icon: Icons.checklist_rounded,
+          title: 'Loading habit details...',
+          subtitle: 'Preparing analytics and history.',
+        ),
       );
     }
 

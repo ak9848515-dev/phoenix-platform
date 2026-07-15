@@ -22,6 +22,10 @@ class GrowthSummaryCard extends StatelessWidget {
     required this.completedMissions,
     required this.totalMissions,
     required this.overallProgress,
+    this.onXpTap,
+    this.onLevelTap,
+    this.onStreakTap,
+    this.onMissionsTap,
   });
 
   /// Total XP earned.
@@ -42,6 +46,18 @@ class GrowthSummaryCard extends StatelessWidget {
   /// Overall progress as a value between 0.0 and 1.0.
   final double overallProgress;
 
+  /// Called when the XP stat tile is tapped.
+  final VoidCallback? onXpTap;
+
+  /// Called when the Level stat tile is tapped.
+  final VoidCallback? onLevelTap;
+
+  /// Called when the Streak stat tile is tapped.
+  final VoidCallback? onStreakTap;
+
+  /// Called when the Missions stat tile is tapped.
+  final VoidCallback? onMissionsTap;
+
   @override
   Widget build(BuildContext context) {
     return FadeAnimation(
@@ -56,25 +72,34 @@ class GrowthSummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                PhoenixStatTile(
-                  icon: PhoenixIcons.xp,
-                  label: 'Total XP',
-                  value: _formatXp(totalXp),
-                  color: PhoenixColors.primary,
+                _TappableStatTile(
+                  onTap: onXpTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.xp,
+                    label: 'Total XP',
+                    value: _formatXp(totalXp),
+                    color: PhoenixColors.primary,
+                  ),
                 ),
                 _verticalDivider(),
-                PhoenixStatTile(
-                  icon: PhoenixIcons.level,
-                  label: 'Level',
-                  value: '$currentLevel',
-                  color: PhoenixColors.primary,
+                _TappableStatTile(
+                  onTap: onLevelTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.level,
+                    label: 'Level',
+                    value: '$currentLevel',
+                    color: PhoenixColors.primary,
+                  ),
                 ),
                 _verticalDivider(),
-                PhoenixStatTile(
-                  icon: PhoenixIcons.streak,
-                  label: 'Streak',
-                  value: '$currentStreak days',
-                  color: PhoenixColors.warning,
+                _TappableStatTile(
+                  onTap: onStreakTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.streak,
+                    label: 'Streak',
+                    value: '$currentStreak days',
+                    color: PhoenixColors.warning,
+                  ),
                 ),
               ],
             ),
@@ -83,12 +108,15 @@ class GrowthSummaryCard extends StatelessWidget {
             // ── Mission Progress ──────────────────────────────────
             Row(
               children: [
-                PhoenixStatTile(
-                  icon: PhoenixIcons.mission,
-                  label: 'Missions',
-                  value: '$completedMissions / $totalMissions',
-                  color: PhoenixColors.primary,
-                  compact: true,
+                _TappableStatTile(
+                  onTap: onMissionsTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.mission,
+                    label: 'Missions',
+                    value: '$completedMissions / $totalMissions',
+                    color: PhoenixColors.primary,
+                    compact: true,
+                  ),
                 ),
               ],
             ),
@@ -122,5 +150,28 @@ class GrowthSummaryCard extends StatelessWidget {
       return '${(xp / 1000).toStringAsFixed(1)}k';
     }
     return xp.toString();
+  }
+}
+
+/// Wraps a stat tile in an [InkWell] to make it interactive.
+class _TappableStatTile extends StatelessWidget {
+  const _TappableStatTile({
+    required this.child,
+    this.onTap,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: child,
+      ),
+    );
   }
 }

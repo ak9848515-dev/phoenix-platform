@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/habit.dart';
@@ -49,7 +50,11 @@ class _HabitDashboardScreenState extends State<HabitDashboardScreen> {
   Widget build(BuildContext context) {
     final svc = _service;
     if (svc == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const PhoenixLoadingWidget(
+        icon: Icons.checklist_rounded,
+        title: 'Preparing your habits...',
+        subtitle: 'Loading habit data and trends.',
+      );
     }
 
     final habits = svc.activeHabits;

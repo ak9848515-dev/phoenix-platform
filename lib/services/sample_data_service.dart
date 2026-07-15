@@ -35,7 +35,7 @@ class SampleDataService {
     description:
         'Craft beautiful, performant cross-platform applications '
         'with Flutter and Dart.',
-    icon: Icons.phone_android_outlined,
+    iconName: 'phone_android_outlined',
     category: 'Technology',
     currentLevel: 1,
     targetLevel: 7,

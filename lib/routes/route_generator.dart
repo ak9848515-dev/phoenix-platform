@@ -5,7 +5,7 @@ import '../features/academy/presentation/lesson_detail_screen.dart';
 import '../features/academy/presentation/learning_path_screen.dart';
 import '../features/career/presentation/career_screen.dart';
 import '../features/daily_focus/presentation/daily_focus_screen.dart';
-import '../features/dashboard/dashboard_page.dart';
+import '../features/dashboard/command_center_screen.dart';
 import '../features/identity/presentation/identity_selection_screen.dart';
 import '../features/journey/presentation/journey_screen.dart';
 import '../features/memory/presentation/memory_screen.dart';
@@ -35,7 +35,11 @@ import '../features/memory_graph/models/entity_type.dart';
 import '../features/timeline/presentation/milestone_screen.dart';
 import '../features/timeline/presentation/timeline_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/splash_screen.dart';
+import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/search/presentation/global_search_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../shared/widgets/phoenix_shell.dart';
 import 'app_routes.dart';
 
@@ -49,8 +53,8 @@ class RouteGenerator {
           settings: settings,
           builder: (_) => const PhoenixShell(
             selectedIndex: 0,
-            title: 'Dashboard',
-            body: DashboardPage(),
+            title: 'Command Center',
+            body: CommandCenterScreen(),
           ),
         );
       case AppRoutes.missionCenter:
@@ -312,6 +316,42 @@ class RouteGenerator {
         return MaterialPageRoute<dynamic>(
           settings: settings,
           builder: (_) => const KnowledgeSearchScreen(),
+        );
+      case AppRoutes.splash:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const SplashScreen(),
+        );
+      case AppRoutes.login:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const LoginScreen(),
+        );
+      case AppRoutes.onboarding:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const OnboardingScreen(),
+        );
+      case AppRoutes.settings:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 3,
+            title: 'Settings',
+            body: SettingsScreen(),
+          ),
+        );
+      case AppRoutes.settingsTheme:
+      case AppRoutes.settingsNotifications:
+      case AppRoutes.settingsSync:
+      case AppRoutes.settingsPrivacy:
+        return MaterialPageRoute<dynamic>(
+          settings: settings,
+          builder: (_) => const PhoenixShell(
+            selectedIndex: 3,
+            title: 'Settings',
+            body: SettingsScreen(),
+          ),
         );
       case AppRoutes.globalSearch:
         return MaterialPageRoute<dynamic>(

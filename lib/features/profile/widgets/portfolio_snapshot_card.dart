@@ -23,6 +23,9 @@ class PortfolioSnapshotCard extends StatelessWidget {
     required this.technologyCount,
     required this.featuredProjectTitle,
     this.onViewPortfolio,
+    this.onProjectsTap,
+    this.onAchievementsTap,
+    this.onTechnologiesTap,
   });
 
   /// Portfolio score from 0.0 to 1.0.
@@ -42,6 +45,15 @@ class PortfolioSnapshotCard extends StatelessWidget {
 
   /// Navigate to the full portfolio screen.
   final VoidCallback? onViewPortfolio;
+
+  /// Called when the Projects stat tile is tapped.
+  final VoidCallback? onProjectsTap;
+
+  /// Called when the Achievements stat tile is tapped.
+  final VoidCallback? onAchievementsTap;
+
+  /// Called when the Technologies stat tile is tapped.
+  final VoidCallback? onTechnologiesTap;
 
   @override
   Widget build(BuildContext context) {
@@ -68,25 +80,34 @@ class PortfolioSnapshotCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                PhoenixStatTile(
-                  icon: PhoenixIcons.launch,
-                  label: 'Projects',
-                  value: '$projectCount',
-                  color: PhoenixColors.primary,
+                _TappableStatTile(
+                  onTap: onProjectsTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.launch,
+                    label: 'Projects',
+                    value: '$projectCount',
+                    color: PhoenixColors.primary,
+                  ),
                 ),
                 _verticalDivider(),
-                PhoenixStatTile(
-                  icon: PhoenixIcons.achievement,
-                  label: 'Achievements',
-                  value: '$achievementCount',
-                  color: PhoenixColors.gold,
+                _TappableStatTile(
+                  onTap: onAchievementsTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.achievement,
+                    label: 'Achievements',
+                    value: '$achievementCount',
+                    color: PhoenixColors.gold,
+                  ),
                 ),
                 _verticalDivider(),
-                PhoenixStatTile(
-                  icon: PhoenixIcons.knowledge,
-                  label: 'Technologies',
-                  value: '$technologyCount',
-                  color: PhoenixColors.primary,
+                _TappableStatTile(
+                  onTap: onTechnologiesTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.knowledge,
+                    label: 'Technologies',
+                    value: '$technologyCount',
+                    color: PhoenixColors.primary,
+                  ),
                 ),
               ],
             ),
@@ -154,6 +175,29 @@ class PortfolioSnapshotCard extends StatelessWidget {
       width: 1,
       height: 48,
       color: PhoenixColors.border,
+    );
+  }
+}
+
+/// Wraps a stat tile in an [InkWell] to make it interactive.
+class _TappableStatTile extends StatelessWidget {
+  const _TappableStatTile({
+    required this.child,
+    this.onTap,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: child,
+      ),
     );
   }
 }

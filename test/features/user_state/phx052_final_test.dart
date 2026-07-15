@@ -98,7 +98,7 @@ void main() {
     test('persisted state survives engine recreate round-trip', () async {
       await userStateService.setIdentity(Identity(
         id: 'dev', title: 'Flutter Engineer', description: 'desc',
-        icon: Icons.code, category: 'Tech', currentLevel: 1,
+        iconName: 'code', category: 'Tech', currentLevel: 1,
         targetLevel: 5, estimatedDuration: 100,
         requiredSkills: <String>[], roadmap: <String>[],
         status: IdentityStatus.active,
@@ -242,7 +242,7 @@ void main() {
     test('UserState provides identity data for screens', () async {
       final identity = Identity(
         id: 'test', title: 'Flutter Developer', description: 'desc',
-        icon: Icons.code, category: 'Tech', currentLevel: 1,
+        iconName: 'code', category: 'Tech', currentLevel: 1,
         targetLevel: 5, estimatedDuration: 100,
         requiredSkills: <String>[], roadmap: <String>[],
         status: IdentityStatus.active,
@@ -309,7 +309,7 @@ void main() {
       await tester.runAsync(() async {
         await userStateService.setIdentity(Identity(
           id: 'dev', title: 'Flutter Ninja', description: 'desc',
-          icon: Icons.code, category: 'Tech', currentLevel: 1,
+          iconName: 'code', category: 'Tech', currentLevel: 1,
           targetLevel: 5, estimatedDuration: 100,
           requiredSkills: <String>[], roadmap: <String>[],
           status: IdentityStatus.active,

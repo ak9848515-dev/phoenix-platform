@@ -200,7 +200,12 @@ class _DecisionDashboardScreenState extends State<DecisionDashboardScreen> {
             ...recent.map((analysis) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: InkWell(
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const DecisionHistoryScreen(),
+                  ),
+                ),
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(

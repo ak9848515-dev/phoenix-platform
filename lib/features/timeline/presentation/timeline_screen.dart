@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
+import '../../../routes/app_routes.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/timeline_event.dart';
@@ -48,7 +50,11 @@ class _TimelineScreenState extends State<TimelineScreen> {
   Widget build(BuildContext context) {
     final svc = _service;
     if (svc == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const PhoenixLoadingWidget(
+        icon: Icons.timeline_rounded,
+        title: 'Restoring your timeline...',
+        subtitle: 'Loading events and milestones.',
+      );
     }
 
     final theme = Theme.of(context);
@@ -194,29 +200,47 @@ class _TimelineScreenState extends State<TimelineScreen> {
     return Row(
       children: [
         Expanded(
-          child: _StatTile(
-            value: '$total',
-            label: 'Total Events',
-            icon: Icons.event_rounded,
-            color: AppColors.primary,
+          child: _TappableStatTile(
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.progress,
+              arguments: {'focus': 'xp'}),
+            child: _StatTile(
+              value: '$total',
+              label: 'Total Events',
+              icon: Icons.event_rounded,
+              color: AppColors.primary,
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: _StatTile(
-            value: '$msCount',
-            label: 'Milestones',
-            icon: Icons.emoji_events_rounded,
-            color: AppColors.warning,
+          child: _TappableStatTile(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const MilestoneScreen(),
+              ),
+            ),
+            child: _StatTile(
+              value: '$msCount',
+              label: 'Milestones',
+              icon: Icons.emoji_events_rounded,
+              color: AppColors.warning,
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: _StatTile(
-            value: '$today',
-            label: 'Today',
-            icon: Icons.today_rounded,
-            color: AppColors.success,
+          child: _TappableStatTile(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => TimelineDetailScreen(event: svc.todayEvents.isNotEmpty ? svc.todayEvents.first : svc.allEvents.first),
+              ),
+            ),
+            child: _StatTile(
+              value: '$today',
+              label: 'Today',
+              icon: Icons.today_rounded,
+              color: AppColors.success,
+            ),
           ),
         ),
       ],
@@ -294,6 +318,29 @@ class _TimelineScreenState extends State<TimelineScreen> {
                 size: 18, color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Wraps a stat tile in an [InkWell] to make it interactive.
+class _TappableStatTile extends StatelessWidget {
+  const _TappableStatTile({
+    required this.child,
+    this.onTap,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: child,
       ),
     );
   }

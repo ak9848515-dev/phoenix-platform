@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart';
 import 'package:phoenix_platform/features/identity/models/identity.dart';
 import 'package:phoenix_platform/features/user_state/engine/user_state_engine.dart';
 import 'package:phoenix_platform/features/user_state/models/user_state.dart';
@@ -47,7 +46,7 @@ void main() {
     test('copyWith clearFlags set fields to null', () {
       final identity = Identity(
         id: 'test', title: 'Developer', description: 'desc',
-        icon: Icons.code, category: 'Tech', currentLevel: 1,
+        iconName: 'code', category: 'Tech', currentLevel: 1,
         targetLevel: 5, estimatedDuration: 100,
         requiredSkills: [], roadmap: [], status: IdentityStatus.active,
       );
@@ -241,7 +240,7 @@ void main() {
       await service.init();
       final identity = Identity(
         id: 'test', title: 'Flutter Dev', description: 'desc',
-        icon: Icons.flutter_dash, category: 'Tech', currentLevel: 1,
+        iconName: 'flutter_dash', category: 'Tech', currentLevel: 1,
         targetLevel: 5, estimatedDuration: 100,
         requiredSkills: [], roadmap: [], status: IdentityStatus.active,
       );
@@ -304,7 +303,7 @@ void main() {
       await service.init();
       await service.setIdentity(Identity(
         id: 'test', title: 'T', description: 'd',
-        icon: Icons.star, category: 'C', currentLevel: 1,
+        iconName: 'star', category: 'C', currentLevel: 1,
         targetLevel: 5, estimatedDuration: 10,
         requiredSkills: [], roadmap: [], status: IdentityStatus.active,
       ));

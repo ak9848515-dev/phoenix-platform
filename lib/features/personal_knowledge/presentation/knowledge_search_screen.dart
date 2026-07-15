@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
+import '../../../shared/widgets/phoenix_empty_state.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/knowledge_domain.dart';
@@ -134,31 +135,19 @@ class _KnowledgeSearchScreenState extends State<KnowledgeSearchScreen> {
           // Results
           Expanded(
             child: _results.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _searchController.text.isNotEmpty
-                              ? Icons.search_off_rounded
-                              : Icons.psychology_rounded,
-                          size: 64,
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.3),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          _searchController.text.isNotEmpty
-                              ? 'No results found'
-                              : 'Search your knowledge',
-                          style:
-                              theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
+                ? _searchController.text.isNotEmpty
+                    ? const PhoenixEmptyState(
+                        icon: Icons.search_off_rounded,
+                        title: 'No results found',
+                        message: 'Try a different keyword or explore recommended\ncontent in the Knowledge Dashboard.',
+                        positiveMessage: 'Every search brings you closer to the answer.',
+                      )
+                    : const PhoenixEmptyState(
+                        icon: Icons.psychology_rounded,
+                        title: 'Search your knowledge',
+                        message: 'Explore your learning paths, skills, goals, and\nresources across all knowledge domains.',
+                        positiveMessage: 'Knowledge grows when you explore.',
+                      )
                 : ListView.builder(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     itemCount: _results.length,

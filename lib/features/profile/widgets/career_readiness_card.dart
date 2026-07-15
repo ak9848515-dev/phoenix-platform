@@ -25,6 +25,9 @@ class CareerReadinessCard extends StatelessWidget {
     this.opportunityReadiness,
     this.careerRecommendation,
     this.onViewCareer,
+    this.onCareerTap,
+    this.onInterviewTap,
+    this.onTimelineTap,
   });
 
   /// Job readiness label (e.g. "Building", "Nearly Ready").
@@ -51,6 +54,15 @@ class CareerReadinessCard extends StatelessWidget {
   /// Navigate to the career readiness screen.
   final VoidCallback? onViewCareer;
 
+  /// Called when the Career stat tile is tapped.
+  final VoidCallback? onCareerTap;
+
+  /// Called when the Interview stat tile is tapped.
+  final VoidCallback? onInterviewTap;
+
+  /// Called when the Timeline stat tile is tapped.
+  final VoidCallback? onTimelineTap;
+
   @override
   Widget build(BuildContext context) {
     return FadeAnimation(
@@ -76,25 +88,34 @@ class CareerReadinessCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                PhoenixStatTile(
-                  icon: PhoenixIcons.career,
-                  label: 'Career',
-                  value: jobReadiness,
-                  color: PhoenixColors.primary,
+                _TappableStatTile(
+                  onTap: onCareerTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.career,
+                    label: 'Career',
+                    value: jobReadiness,
+                    color: PhoenixColors.primary,
+                  ),
                 ),
                 _verticalDivider(),
-                PhoenixStatTile(
-                  icon: PhoenixIcons.interview,
-                  label: 'Interview',
-                  value: '${(interviewReadiness * 100).round()}%',
-                  color: PhoenixColors.warning,
+                _TappableStatTile(
+                  onTap: onInterviewTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.interview,
+                    label: 'Interview',
+                    value: '${(interviewReadiness * 100).round()}%',
+                    color: PhoenixColors.warning,
+                  ),
                 ),
                 _verticalDivider(),
-                PhoenixStatTile(
-                  icon: PhoenixIcons.time,
-                  label: 'Timeline',
-                  value: '$estimatedWeeks weeks',
-                  color: PhoenixColors.textSecondary,
+                _TappableStatTile(
+                  onTap: onTimelineTap,
+                  child: PhoenixStatTile(
+                    icon: PhoenixIcons.time,
+                    label: 'Timeline',
+                    value: '$estimatedWeeks weeks',
+                    color: PhoenixColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -222,6 +243,29 @@ class CareerReadinessCard extends StatelessWidget {
       width: 1,
       height: 48,
       color: PhoenixColors.border,
+    );
+  }
+}
+
+/// Wraps a stat tile in an [InkWell] to make it interactive.
+class _TappableStatTile extends StatelessWidget {
+  const _TappableStatTile({
+    required this.child,
+    this.onTap,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: child,
+      ),
     );
   }
 }

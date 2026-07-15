@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/sample_repository.dart';
 import '../../../theme/spacing.dart';
+import '../../decision/models/decision.dart';
 import '../../decision/services/decision_service.dart';
 import '../../mission_engine/mission_service.dart';
 import '../../progress_engine/progress_service.dart';
@@ -85,7 +86,7 @@ class DailyFocusScreen extends StatelessWidget {
             description: decision.description,
             estimatedDuration: decision.estimatedDuration,
             actionLabel: decision.actionLabel ?? 'Start',
-            priority: decision.priority.name,
+            priority: _decisionPriorityLabel(decision.priority),
             onStart: () => _onStartFocus(context, decision.title),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -118,12 +119,21 @@ class DailyFocusScreen extends StatelessWidget {
     );
   }
 
+  /// Returns a user-friendly label for a [DecisionPriority] enum value.
+  String _decisionPriorityLabel(DecisionPriority priority) {
+    switch (priority) {
+      case DecisionPriority.critical:
+        return 'Critical';
+      case DecisionPriority.high:
+        return 'High';
+      case DecisionPriority.medium:
+        return 'Medium';
+      case DecisionPriority.low:
+        return 'Low';
+    }
+  }
+
   void _onStartFocus(BuildContext context, String focusTitle) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Starting: $focusTitle'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    Navigator.of(context).pushNamed(AppRoutes.missionCenter);
   }
 }

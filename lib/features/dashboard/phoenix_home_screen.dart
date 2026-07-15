@@ -5,6 +5,8 @@ import '../../routes/app_routes.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../progress_engine/progress_engine.dart' show AchievementProgress;
+import '../timeline/models/timeline_event.dart';
+import '../timeline/presentation/timeline_detail_screen.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/progress_summary_card.dart';
 import 'widgets/today_mission_card.dart';
@@ -126,6 +128,18 @@ class PhoenixHomeScreen extends StatelessWidget {
             totalXp: totalXp,
             currentLevel: level,
             currentStreak: completedMissions,
+            onXpTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'xp'},
+            ),
+            onLevelTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'level'},
+            ),
+            onStreakTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'streak'},
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
 
@@ -169,6 +183,14 @@ class PhoenixHomeScreen extends StatelessWidget {
             totalCount: totalMissions,
             onViewAll: () =>
                 Navigator.of(context).pushNamed(AppRoutes.progress),
+            onUnlockedTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'achievements'},
+            ),
+            onTotalTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'achievements'},
+            ),
           ),
           const SizedBox(height: AppSpacing.xxl),
         ],
@@ -324,19 +346,41 @@ class PhoenixHomeScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             ...insights.map((insight) => Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('• ', style: theme.textTheme.bodySmall),
-                  Expanded(
-                    child: Text(
-                      insight.title,
-                      style: theme.textTheme.bodySmall,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+              child: Semantics(
+                label: 'View insight: ${insight.title}',
+                button: true,
+                child: InkWell(
+                  onTap: () => Navigator.of(context).pushNamed(
+                    AppRoutes.knowledge,
+                    arguments: {'focus': insight.title},
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.lightbulb_outline,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            insight.title,
+                            style: theme.textTheme.bodySmall,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             )),
           ],
@@ -394,7 +438,7 @@ class PhoenixHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentActivity(BuildContext context, List<dynamic> events) {
+  Widget _buildRecentActivity(BuildContext context, List<TimelineEvent> events) {
     final theme = Theme.of(context);
     final recent = events.take(5).toList();
 
@@ -429,19 +473,46 @@ class PhoenixHomeScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             ...recent.map((event) => Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                children: [
-                  Icon(Icons.circle, size: 6, color: theme.colorScheme.primary),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      event.title,
-                      style: theme.textTheme.bodySmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              child: Semantics(
+                label: 'View event: ${event.title}',
+                button: true,
+                child: InkWell(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => TimelineDetailScreen(event: event),
                     ),
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            event.title,
+                            style: theme.textTheme.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             )),
           ],

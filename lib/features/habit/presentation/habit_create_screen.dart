@@ -43,7 +43,10 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     if (svc == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Service not available')),
+          const SnackBar(
+            content: Text('Habit service is loading. Please try again.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
       setState(() => _isSaving = false);

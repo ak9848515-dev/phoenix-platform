@@ -11,6 +11,8 @@ import '../widgets/readiness_card.dart';
 import '../widgets/skill_gap_card.dart';
 import '../widgets/strengths_card.dart';
 
+
+
 /// The Career Screen measures how close the user is to becoming employable.
 ///
 /// Aggregates data from Identity, Journey, Mission, Knowledge DNA, Progress,
@@ -78,11 +80,6 @@ class CareerScreen extends StatelessWidget {
   }
 
   void _onStartGoal(BuildContext context, String goal) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Starting: $goal'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    Navigator.of(context).pushNamed(AppRoutes.journey);
   }
 }

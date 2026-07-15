@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../core/sample_repository.dart';
 import '../../../routes/app_routes.dart';
@@ -148,6 +149,18 @@ class _AIScreenState extends State<AIScreen> {
             resumeScore: guidance.resumeScore,
             careerScore: guidance.careerScore,
             jobReadiness: guidance.jobReadiness,
+            onXpTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'xp'},
+            ),
+            onLevelTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'level'},
+            ),
+            onStreakTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'streak'},
+            ),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 
@@ -184,7 +197,11 @@ class _AIScreenState extends State<AIScreen> {
                     error: _error,
                     onRetry: _handleRetry,
                   )
-                : const Center(child: CircularProgressIndicator()),
+                : const PhoenixLoadingWidget(
+                    icon: Icons.auto_awesome_rounded,
+                    title: 'Preparing AI Mentor...',
+                    subtitle: 'Loading conversation history.',
+                  ),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 

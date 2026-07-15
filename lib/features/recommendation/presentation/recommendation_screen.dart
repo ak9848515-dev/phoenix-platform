@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/sample_repository.dart';
+import '../../../routes/app_routes.dart';
 import '../../../theme/spacing.dart';
 import '../models/recommendation.dart';
 import '../services/recommendation_service.dart';
@@ -70,20 +71,29 @@ class RecommendationScreen extends StatelessWidget {
   }
 
   void _onStart(BuildContext context, Recommendation recommendation) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Starting: ${recommendation.title}'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    // Navigate to the most relevant screen based on recommendation type
+    switch (recommendation.type) {
+      case RecommendationType.mission:
+        Navigator.of(context).pushNamed(AppRoutes.missionCenter);
+      case RecommendationType.learning:
+        Navigator.of(context).pushNamed(AppRoutes.academy);
+      case RecommendationType.practice:
+        Navigator.of(context).pushNamed(AppRoutes.knowledgeDna);
+      case RecommendationType.project:
+        Navigator.of(context).pushNamed(AppRoutes.portfolio);
+      case RecommendationType.career:
+        Navigator.of(context).pushNamed(AppRoutes.career);
+      case RecommendationType.business:
+        Navigator.of(context).pushNamed(AppRoutes.marketplace);
+      case RecommendationType.reflection:
+        Navigator.of(context).pushNamed(AppRoutes.journey);
+      case RecommendationType.review:
+        Navigator.of(context).pushNamed(AppRoutes.progress);
+    }
   }
 
   void _onDismiss(BuildContext context, Recommendation recommendation) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Dismissed: ${recommendation.title}'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    // Dismiss returns to the dashboard where users can find new recommendations
+    Navigator.of(context).pushNamed(AppRoutes.dashboard);
   }
 }

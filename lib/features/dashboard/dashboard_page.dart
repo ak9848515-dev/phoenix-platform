@@ -94,6 +94,18 @@ class DashboardPage extends StatelessWidget {
             totalXp: progressSummary.totalXp,
             currentLevel: progressSummary.level,
             currentStreak: progressSummary.streaks.daily,
+            onXpTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'xp'},
+            ),
+            onLevelTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'level'},
+            ),
+            onStreakTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'streak'},
+            ),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 
@@ -119,6 +131,14 @@ class DashboardPage extends StatelessWidget {
                 missionProgress.weeklyMissions.length,
             onViewAll: () =>
                 Navigator.of(context).pushNamed(AppRoutes.progress),
+            onUnlockedTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'achievements'},
+            ),
+            onTotalTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'achievements'},
+            ),
           ),
           SizedBox(height: PhoenixSpacing.lg),
 

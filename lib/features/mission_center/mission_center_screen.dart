@@ -60,6 +60,22 @@ class MissionCenterScreen extends StatelessWidget {
             completedTasks: missionProgress.completedCount,
             pendingTasks: missionProgress.pendingCount,
             completionPercentage: missionProgress.completionPercentage,
+            onTotalTasksTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'tasks'},
+            ),
+            onCompletedTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'completed'},
+            ),
+            onPendingTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'pending'},
+            ),
+            onCompletionTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.progress,
+              arguments: {'focus': 'completion'},
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           MissionActionsCard(

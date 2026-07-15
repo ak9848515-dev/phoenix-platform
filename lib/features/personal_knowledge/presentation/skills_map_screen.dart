@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/knowledge_domain.dart';
@@ -43,7 +44,11 @@ class _SkillsMapScreenState extends State<SkillsMapScreen> {
     final svc = _service;
     if (svc == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: PhoenixLoadingWidget(
+          icon: Icons.psychology_rounded,
+          title: 'Loading your skills...',
+          subtitle: 'Building proficiency distribution.',
+        ),
       );
     }
 

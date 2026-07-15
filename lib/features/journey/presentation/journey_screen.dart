@@ -56,7 +56,7 @@ class JourneyScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           CurrentStageCard(
             stage: currentStage,
-            onContinue: () => _onContinueStage(context, currentStage.title),
+            onContinue: () => _onContinueStage(context),
           ),
           if (upcomingStage != null) ...[
             const SizedBox(height: AppSpacing.lg),
@@ -66,8 +66,7 @@ class JourneyScreen extends StatelessWidget {
           JourneyStatisticsCard(stages: journey.stages),
           const SizedBox(height: AppSpacing.lg),
           JourneyActionsCard(
-            onContinueJourney: () =>
-                _onContinueStage(context, currentStage.title),
+            onContinueJourney: () => _onContinueStage(context),
             onDashboard: () =>
                 Navigator.of(context).pushNamed(AppRoutes.dashboard),
             onLearn: () => Navigator.of(context).pushNamed(AppRoutes.academy),
@@ -79,12 +78,7 @@ class JourneyScreen extends StatelessWidget {
     );
   }
 
-  void _onContinueStage(BuildContext context, String stageTitle) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Continuing: $stageTitle'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+  void _onContinueStage(BuildContext context) {
+    Navigator.of(context).pushNamed(AppRoutes.missionCenter);
   }
 }

@@ -64,4 +64,28 @@ class AppRoutes {
 
   /// Global search.
   static const String globalSearch = '/search';
+
+  /// Splash screen.
+  static const String splash = '/splash';
+
+  /// Login screen.
+  static const String login = '/login';
+
+  /// Settings screen.
+  static const String settings = '/settings';
+
+  /// Settings — theme preferences.
+  static const String settingsTheme = '/settings/theme';
+
+  /// Settings — notification preferences.
+  static const String settingsNotifications = '/settings/notifications';
+
+  /// Settings — sync status.
+  static const String settingsSync = '/settings/sync';
+
+  /// Settings — privacy.
+  static const String settingsPrivacy = '/settings/privacy';
+
+  /// Onboarding flow (first-time experience).
+  static const String onboarding = '/onboarding';
 }

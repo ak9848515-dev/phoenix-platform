@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/spacing.dart';
 import '../services/memory_graph_service.dart';
 import '../widgets/entity_card.dart';
@@ -42,7 +43,11 @@ class _GraphExplorerScreenState extends State<GraphExplorerScreen> {
     final svc = _service;
     if (svc == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: PhoenixLoadingWidget(
+          icon: Icons.hub_rounded,
+          title: 'Loading graph explorer...',
+          subtitle: 'Preparing visualization.',
+        ),
       );
     }
 

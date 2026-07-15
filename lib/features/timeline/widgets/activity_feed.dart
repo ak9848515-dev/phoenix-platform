@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/phoenix_empty_state.dart';
 import '../../../theme/spacing.dart';
 import '../models/timeline_event.dart';
 import 'timeline_card.dart';
@@ -28,22 +29,12 @@ class ActivityFeed extends StatelessWidget {
     final days = sortedDays.take(maxDays).toList();
 
     if (days.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.inbox_rounded,
-                size: 48,
-                color: Theme.of(context).colorScheme.onSurfaceVariant),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'No activity yet',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
+      return const PhoenixEmptyState(
+        icon: Icons.timeline_rounded,
+        title: 'No activity yet',
+        message: 'Your timeline will track missions, habits, and milestones '
+            'as you progress through your journey.',
+        positiveMessage: 'Every step forward is worth recording.',
       );
     }
 

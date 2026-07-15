@@ -38,6 +38,12 @@ dependencies:
   # Local persistence for the Repository layer.
   shared_preferences: ^2.3.0
 
+  # Supabase backend — database, auth, realtime, storage.
+  supabase_flutter: ^2.8.0
+
+  # Secure token storage (never use SharedPreferences for secrets).
+  flutter_secure_storage: ^9.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

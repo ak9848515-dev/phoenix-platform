@@ -9,7 +9,7 @@ class PortfolioAchievement {
     required this.id,
     required this.title,
     this.description,
-    this.icon,
+    this.iconName,
     this.date,
     this.type = 'achievement',
   });
@@ -23,8 +23,12 @@ class PortfolioAchievement {
   /// Optional short description of how this was earned.
   final String? description;
 
-  /// Optional icon representing this achievement.
-  final IconData? icon;
+  /// Icon identifier (resolved via [icon] getter to a compile-time constant).
+  final String? iconName;
+
+  /// Resolved Material icon for visual representation, or `null` if none set.
+  IconData? get icon =>
+      iconName != null ? PortfolioAchievement.resolveIcon(iconName!) : null;
 
   /// When this achievement was earned.
   final DateTime? date;
@@ -38,12 +42,34 @@ class PortfolioAchievement {
   /// Whether this is a milestone type.
   bool get isMilestone => type == 'milestone';
 
+  /// Resolves an icon name string to a compile-time constant [IconData].
+  ///
+  /// **Production note:** All icons used by PortfolioAchievement must be
+  /// listed here so that Flutter's tree shaker can statically determine
+  /// which icons to keep.
+  static IconData resolveIcon(String name) {
+    switch (name) {
+      case 'stars_outlined':
+        return Icons.stars_outlined;
+      case 'emoji_events_outlined':
+        return Icons.emoji_events_outlined;
+      case 'military_tech_outlined':
+        return Icons.military_tech_outlined;
+      case 'workspace_premium_outlined':
+        return Icons.workspace_premium_outlined;
+      case 'verified_outlined':
+        return Icons.verified_outlined;
+      default:
+        return Icons.stars_outlined;
+    }
+  }
+
   /// Creates a copy with the given fields replaced.
   PortfolioAchievement copyWith({
     String? id,
     String? title,
     String? description,
-    IconData? icon,
+    String? iconName,
     DateTime? date,
     String? type,
   }) {
@@ -51,7 +77,7 @@ class PortfolioAchievement {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      icon: icon ?? this.icon,
+      iconName: iconName ?? this.iconName,
       date: date ?? this.date,
       type: type ?? this.type,
     );
@@ -63,7 +89,7 @@ class PortfolioAchievement {
       'id': id,
       'title': title,
       'description': description,
-      'iconCodePoint': icon?.codePoint,
+      'iconName': iconName,
       'date': date?.toIso8601String(),
       'type': type,
     };
@@ -75,10 +101,7 @@ class PortfolioAchievement {
       id: map['id'] as String,
       title: map['title'] as String,
       description: map['description'] as String?,
-      icon: map['iconCodePoint'] != null
-          // ignore: non_const_argument_for_const_parameter
-          ? IconData(map['iconCodePoint'] as int)
-          : null,
+      iconName: map['iconName'] as String?,
       date: map['date'] != null
           ? DateTime.parse(map['date'] as String)
           : null,
@@ -93,14 +116,14 @@ class PortfolioAchievement {
         other.id == id &&
         other.title == title &&
         other.description == description &&
-        other.icon?.codePoint == icon?.codePoint &&
+        other.iconName == iconName &&
         other.date == date &&
         other.type == type;
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, title, description, icon?.codePoint, date, type);
+      Object.hash(id, title, description, iconName, date, type);
 
   @override
   String toString() =>

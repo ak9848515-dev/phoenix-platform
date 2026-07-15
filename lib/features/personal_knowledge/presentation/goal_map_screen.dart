@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
+import '../../../shared/widgets/phoenix_empty_state.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/knowledge_domain.dart';
@@ -43,7 +45,11 @@ class _GoalMapScreenState extends State<GoalMapScreen> {
     final svc = _service;
     if (svc == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: PhoenixLoadingWidget(
+          icon: Icons.flag_rounded,
+          title: 'Loading your goals...',
+          subtitle: 'Preparing goal map and priorities.',
+        ),
       );
     }
 
@@ -136,32 +142,11 @@ class _GoalMapScreenState extends State<GoalMapScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
             if (goals.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    children: [
-                      Icon(Icons.flag_rounded,
-                          size: 48,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withValues(alpha: 0.3)),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'No goals yet',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+              const PhoenixEmptyState(
+                icon: Icons.flag_rounded,
+                title: 'No goals yet',
+                message: 'Goals help you stay focused on what matters most.',
+                positiveMessage: 'Every great achievement starts with a clear goal.',
               )
             else
               ...goals.map((goal) => Padding(

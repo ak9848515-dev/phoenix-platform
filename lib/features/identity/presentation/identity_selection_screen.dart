@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../routes/app_routes.dart';
 import '../../../shared/widgets/phoenix_primary_button.dart';
 import '../../../theme/spacing.dart';
 import '../models/identity.dart';
@@ -47,20 +48,16 @@ class IdentitySelectionScreen extends StatelessWidget {
   }
 
   void _onIdentitySelected(BuildContext context, Identity identity) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Selected: ${identity.title}'),
-        behavior: SnackBarBehavior.floating,
-      ),
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.dashboard,
+      (route) => false,
     );
   }
 
   void _onSkip(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('You can always choose an identity later.'),
-        behavior: SnackBarBehavior.floating,
-      ),
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.dashboard,
+      (route) => false,
     );
   }
 }

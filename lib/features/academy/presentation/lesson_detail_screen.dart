@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_error_state.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../shared/widgets/phoenix_primary_button.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
@@ -104,20 +106,21 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const PhoenixLoadingWidget(
+        icon: Icons.menu_book_rounded,
+        title: 'Loading your lesson...',
+        subtitle: 'Preparing content and exercises.',
+      );
     }
 
     final lesson = _lesson;
     if (lesson == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 64),
-            const SizedBox(height: AppSpacing.md),
-            Text('Lesson not found', style: Theme.of(context).textTheme.titleMedium),
-          ],
-        ),
+      return PhoenixErrorState(
+        category: PhoenixErrorCategory.data,
+        onAction: () {
+          setState(() => _isLoading = true);
+          _loadLesson();
+        },
       );
     }
 
@@ -156,6 +159,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.arrow_back_rounded,
                       color: Colors.white),
+                  tooltip: 'Go back',
                 ),
                 const Spacer(),
                 if (_progress?.state == LessonState.inProgress)
@@ -590,7 +594,8 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
       final explanation = await svc.explainLesson(lesson);
       setState(() => _aiExplanation = explanation);
     } catch (_) {
-      setState(() => _aiExplanation = 'AI explanation is not available right now.');
+      setState(() => _aiExplanation = 'AI explanation isn\'t available at the moment. '
+              'Please try again later.');
     }
   }
 

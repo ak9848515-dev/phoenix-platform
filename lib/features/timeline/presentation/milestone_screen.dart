@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../shared/widgets/phoenix_card.dart';
+import '../../../shared/widgets/phoenix_loading_widget.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../models/milestone.dart';
@@ -46,7 +47,11 @@ class _MilestoneScreenState extends State<MilestoneScreen> {
   Widget build(BuildContext context) {
     final svc = _service;
     if (svc == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const PhoenixLoadingWidget(
+        icon: Icons.emoji_events_rounded,
+        title: 'Loading milestones...',
+        subtitle: 'Preparing your achievement timeline.',
+      );
     }
 
     final theme = Theme.of(context);

@@ -82,6 +82,10 @@ class KnowledgeDNAScreen extends StatelessWidget {
 }
 
 /// Displays recommended missions and academies from the engine.
+///
+/// Each list item is tappable and navigates to the relevant screen:
+/// - Missions → Mission Center
+/// - Academies → Academy
 class _RecommendedFocusCard extends StatelessWidget {
   const _RecommendedFocusCard({
     required this.missions,
@@ -136,21 +140,35 @@ class _RecommendedFocusCard extends StatelessWidget {
                   .map(
                     (mission) => Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.rocket_launch_outlined,
-                            size: 16,
-                            color: theme.colorScheme.primary,
+                      child: InkWell(
+                        onTap: () => Navigator.of(context).pushNamed(
+                          AppRoutes.missionCenter,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.rocket_launch_outlined,
+                                size: 16,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  mission.title,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                size: 16,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              mission.title,
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -169,21 +187,35 @@ class _RecommendedFocusCard extends StatelessWidget {
                   .map(
                     (academy) => Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.school_outlined,
-                            size: 16,
-                            color: theme.colorScheme.tertiary,
+                      child: InkWell(
+                        onTap: () => Navigator.of(context).pushNamed(
+                          AppRoutes.academy,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.school_outlined,
+                                size: 16,
+                                color: theme.colorScheme.tertiary,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  academy,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                size: 16,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              academy,
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

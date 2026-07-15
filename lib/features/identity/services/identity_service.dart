@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../models/identity.dart';
 
 /// Provides a curated list of sample identities for the user to choose from.
@@ -17,7 +15,7 @@ class IdentityService {
       description:
           'Design, build, and maintain scalable software systems '
           'that solve real-world problems.',
-      icon: Icons.code_outlined,
+      iconName: 'code_outlined',
       category: 'Technology',
       currentLevel: 1,
       targetLevel: 8,
@@ -42,7 +40,7 @@ class IdentityService {
       description:
           'Help enterprises optimise their business processes using '
           'SAP modules and best practices.',
-      icon: Icons.business_outlined,
+      iconName: 'business_outlined',
       category: 'Business',
       currentLevel: 1,
       targetLevel: 7,
@@ -67,7 +65,7 @@ class IdentityService {
       description:
           'Craft beautiful, performant cross-platform applications '
           'with Flutter and Dart.',
-      icon: Icons.phone_android_outlined,
+      iconName: 'phone_android_outlined',
       category: 'Technology',
       currentLevel: 1,
       targetLevel: 7,
@@ -92,7 +90,7 @@ class IdentityService {
       description:
           'Produce engaging digital content that educates, entertains, '
           'and inspires your audience.',
-      icon: Icons.edit_outlined,
+      iconName: 'edit_outlined',
       category: 'Creative',
       currentLevel: 1,
       targetLevel: 6,
@@ -117,7 +115,7 @@ class IdentityService {
       description:
           'Build a personal brand and influence your community across '
           'social media platforms.',
-      icon: Icons.person_outlined,
+      iconName: 'person_outlined',
       category: 'Creative',
       currentLevel: 1,
       targetLevel: 6,
@@ -142,7 +140,7 @@ class IdentityService {
       description:
           'Identify opportunities, build ventures, and create value '
           'through innovation and leadership.',
-      icon: Icons.rocket_launch_outlined,
+      iconName: 'rocket_launch_outlined',
       category: 'Business',
       currentLevel: 1,
       targetLevel: 8,
@@ -167,7 +165,7 @@ class IdentityService {
       description:
           'Run and grow a profitable business while building a strong '
           'team and operational foundation.',
-      icon: Icons.store_outlined,
+      iconName: 'store_outlined',
       category: 'Business',
       currentLevel: 1,
       targetLevel: 7,
@@ -192,7 +190,7 @@ class IdentityService {
       description:
           'Excel in your academic journey while building skills that '
           'prepare you for a successful career.',
-      icon: Icons.school_outlined,
+      iconName: 'school_outlined',
       category: 'Education',
       currentLevel: 1,
       targetLevel: 5,
@@ -217,7 +215,7 @@ class IdentityService {
       description:
           'Define your own path. Create a personalised identity '
           'tailored to your unique goals and aspirations.',
-      icon: Icons.add_circle_outlined,
+      iconName: 'add_circle_outlined',
       category: 'General',
       currentLevel: 1,
       targetLevel: 5,

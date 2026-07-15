@@ -6,6 +6,7 @@ import '../config/app_config.dart';
 import '../features/academy/engine/learning_path_registry.dart';
 import '../features/academy/services/academy_service.dart';
 import '../features/ai/services/ai_mentor_service.dart';
+import '../features/auth/services/auth_service.dart';
 import '../features/decision/services/decision_intelligence_service.dart';
 import '../features/habit/services/habit_service.dart';
 import '../features/memory_graph/services/memory_graph_service.dart';
@@ -54,6 +55,12 @@ class AppBootstrap {
     );
     return _storageService!;
   }
+
+  /// Returns the [StorageService] instance or `null` if not initialized.
+  ///
+  /// Safe for use in screens and widgets that may render before
+  /// [init] completes.
+  static StorageService? get maybeStorageService => _storageService;
 
   /// The application-wide [UserStateService] instance.
   ///
@@ -130,6 +137,18 @@ class AppBootstrap {
   /// Returns the [KnowledgeService] instance or `null` if not initialized.
   static KnowledgeService? get maybeKnowledgeService => _knowledgeService;
 
+  /// The application-wide [AuthService] instance.
+  ///
+  /// Initialized once during [init] and accessible throughout the app.
+  /// All screens use this service for authentication operations.
+  static AuthService? _authService;
+
+  /// Returns the [AuthService] instance or `null` if not initialized.
+  ///
+  /// Safe for use in screens and widgets that may render before
+  /// [init] completes.
+  static AuthService? get maybeAuthService => _authService;
+
   /// Initializes all app-wide services.
   ///
   /// Must be called once before [createApp]. Currently initializes:
@@ -140,6 +159,11 @@ class AppBootstrap {
     final storage = SharedPreferencesStorageService();
     await storage.init();
     _storageService = storage;
+
+    // Initialize auth service (restores session from secure storage)
+    final authService = AuthService();
+    await authService.init();
+    _authService = authService;
 
     final userStateRepo = UserStateRepository();
     final userStateEngine = UserStateEngine(repository: userStateRepo);

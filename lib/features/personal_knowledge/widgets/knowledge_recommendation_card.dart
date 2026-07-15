@@ -60,7 +60,7 @@ class KnowledgeRecommendationCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          recommendation.priority.name.toUpperCase(),
+                          _priorityLabel(recommendation.priority),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: priorityColor,
                             fontSize: 9,
@@ -103,6 +103,17 @@ class KnowledgeRecommendationCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _priorityLabel(RecommendationPriority priority) {
+    switch (priority) {
+      case RecommendationPriority.high:
+        return 'High';
+      case RecommendationPriority.medium:
+        return 'Medium';
+      case RecommendationPriority.low:
+        return 'Low';
+    }
   }
 
   Color _priorityColor(RecommendationPriority priority) {
