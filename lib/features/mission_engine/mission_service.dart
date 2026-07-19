@@ -1,5 +1,6 @@
 import '../../core/repository.dart';
 import '../../core/sample_repository.dart';
+import '../growth_index/engine/growth_index_engine.dart';
 import '../user_state/services/user_state_service.dart';
 import '../progress_engine/progress_service.dart';
 import '../knowledge_dna/knowledge_dna_service.dart';
@@ -22,18 +23,23 @@ import 'services/mission_service.dart' as new_service;
 /// new Dynamic Mission Engine. All existing consumers continue
 /// to work without modification.
 class MissionService {
-  MissionService({Repository? repository, this._userStateService})
-    : _repository = repository ?? const SampleRepository();
+  MissionService({
+    Repository? repository,
+    this._userStateService,
+    this._growthEngine,
+  }) : _repository = repository ?? const SampleRepository();
 
   final Repository _repository;
   final UserStateService? _userStateService;
+  final GrowthIndexEngine? _growthEngine;
 
   late final MissionRepository _missionRepository =
       MissionRepository();
   late final ProgressService _progressService =
       ProgressService(repository: _repository);
 
-  late final MissionPrioritizer _prioritizer = MissionPrioritizer();
+  late final MissionPrioritizer _prioritizer =
+      MissionPrioritizer(growthEngine: _growthEngine);
 
   late final MissionScheduler _scheduler = MissionScheduler();
 
@@ -51,6 +57,7 @@ class MissionService {
     scheduler: _scheduler,
     progressService: _progressService,
     userStateService: _userStateService,
+    growthEngine: _growthEngine,
     initialMissions: _loadSeededMissions(),
   );
 
@@ -63,6 +70,7 @@ class MissionService {
       opportunityService: OpportunityService(repository: _repository),
       recommendationService:
           RecommendationService(repository: _repository),
+      growthEngine: _growthEngine,
     );
   }
 

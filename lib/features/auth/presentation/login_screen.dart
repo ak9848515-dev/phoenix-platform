@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../routes/app_routes.dart';
-import '../../../theme/colors.dart';
-import '../../../theme/spacing.dart';
-import '../services/auth_service.dart';
+import '../../../core/design/theme/phoenix_colors.dart';
+import '../../../core/design/theme/phoenix_radius.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
+import '../services/authentication_service.dart';
 
-/// Login Screen — email/password authentication.
+/// Login Screen — Google Sign-In primary, Guest mode as limited experience.
 ///
 /// Flow:
-/// 1. User enters email and password
-/// 2. Calls [AuthService.login]
-/// 3. On success, navigates to Dashboard
-/// 4. On failure, shows error message
+/// 1. Google Sign-In is the primary action (FilledButton)
+/// 2. Guest mode available as "Limited Experience (Guest)"
+/// 3. Email/password login removed for v1.0 production release
 ///
 /// No business logic. Presentation only.
 class LoginScreen extends StatefulWidget {
@@ -23,52 +23,95 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   bool _isLoading = false;
-  bool _obscurePassword = true;
-  String? _errorMessage;
+  AuthenticationService? _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = AppBootstrap.maybeAuthenticationService;
+
+    // Check for expired/error arguments passed from AuthGate
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null) {
+        String? message;
+        if (args['expired'] == true) {
+          message = 'Your session has expired. Please sign in again.';
+        } else if (args['error'] != null) {
+          message = args['error'] as String;
+        }
+        if (message != null && mounted) {
+          final msg = message;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(msg),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    final authService = AppBootstrap.maybeAuthService;
+    final authService = _authService;
     if (authService == null) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Authentication service not available.';
-      });
+      setState(() => _isLoading = false);
+      _showError('Authentication service not available.');
       return;
     }
 
-    final success = await authService.login(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+    final success = await authService.signInWithGoogle();
 
     if (!mounted) return;
 
     if (success) {
       Navigator.of(context).pushReplacementNamed(AppRoutes.dashboard);
     } else {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = authService.lastError ?? 'Login failed. Please try again.';
-      });
+      setState(() => _isLoading = false);
+      _showError(authService.lastErrorMessage ?? 'Google Sign-In failed.');
     }
+  }
+
+  Future<void> _handleAnonymousLogin() async {
+    setState(() => _isLoading = true);
+
+    final authService = _authService;
+    if (authService == null) {
+      setState(() => _isLoading = false);
+      _showError('Authentication service not available.');
+      return;
+    }
+
+    final success = await authService.signInAnonymously();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.dashboard);
+    } else {
+      setState(() => _isLoading = false);
+      _showError(authService.lastErrorMessage ?? 'Sign-in failed.');
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -80,191 +123,110 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.auto_awesome_rounded,
-                        size: 48,
-                        color: AppColors.primary,
-                      ),
+            padding: const EdgeInsets.all(PhoenixSpacing.xl),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ── Logo ──────────────────────────────────────────────
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(PhoenixSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: PhoenixColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.auto_awesome_rounded,
+                      size: 48,
+                      color: PhoenixColors.primary,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                ),
+                const SizedBox(height: PhoenixSpacing.lg),
 
-                  // Title
-                  Text(
-                    'Welcome to Phoenix',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                // ── Title ─────────────────────────────────────────────
+                Text(
+                  'Phoenix',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Sign in to continue your growth journey',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                ),
+                const SizedBox(height: PhoenixSpacing.sm),
+                Text(
+                  'AI Career Operating System',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
+                ),
+                const SizedBox(height: PhoenixSpacing.xxl),
 
-                  // Email field
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'you@example.com',
-                      prefixIcon: const Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                // ── Google Sign-In (PRIMARY) ──────────────────────────
+                SizedBox(
+                  height: 52,
+                  child: FilledButton.icon(
+                    onPressed: _isLoading ? null : _handleGoogleSignIn,
+                    icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
+                    label: const Text('Continue with Google'),
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: PhoenixRadius.mdRadius,
                       ),
+                      backgroundColor: PhoenixColors.primary,
+                      foregroundColor: PhoenixColors.onPrimary,
                     ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-                          .hasMatch(value.trim())) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                ),
+                const SizedBox(height: PhoenixSpacing.xl),
 
-                  // Password field
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _handleLogin(),
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                        ),
-                        onPressed: () {
-                          setState(() => _obscurePassword = !_obscurePassword);
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Error message
-                  if (_errorMessage != null) ...[
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.error.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.error.withValues(alpha: 0.3),
+                // ── Divider ───────────────────────────────────────────
+                Row(
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: PhoenixSpacing.md),
+                      child: Text(
+                        'guest',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: AppColors.error.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.error_outline_rounded,
-                                size: 16, color: AppColors.error),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Unable to sign in',
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                    color: AppColors.error,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _errorMessage!,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.error,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const Expanded(child: Divider()),
                   ],
+                ),
+                const SizedBox(height: PhoenixSpacing.md),
 
-                  // Login button
-                  SizedBox(
-                    height: 48,
-                    child: FilledButton.icon(
-                      onPressed: _isLoading ? null : _handleLogin,
-                      icon: _isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.login_rounded),
-                      label: Text(_isLoading ? 'Signing in...' : 'Sign In'),
+                // ── Guest Login (Limited Experience) ──────────────
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _handleAnonymousLogin,
+                    icon: const Icon(Icons.person_outline_rounded),
+                    label: const Text('Limited Experience (Guest)'),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(
+                        color: theme.colorScheme.outlineVariant,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Skip / Demo mode hint
-                  Text(
-                    'Demo: any valid email + 6+ char password',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant
-                          .withValues(alpha: 0.6),
-                    ),
+                ),
+                const SizedBox(height: PhoenixSpacing.md),
+                Text(
+                  'Sign in with Google for the full experience. '
+                  'Guest mode has limited functionality.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

@@ -16,6 +16,10 @@ class AppRoutes {
   static const String portfolio = '/portfolio';
   static const String resume = '/resume';
   static const String interview = '/interview';
+
+  /// Mock interview session screen.
+  static const String interviewSession = '/interview/session';
+
   static const String opportunity = '/opportunity';
   static const String marketplace = '/marketplace';
   static const String ai = '/ai';
@@ -65,6 +69,9 @@ class AppRoutes {
   /// Global search.
   static const String globalSearch = '/search';
 
+  /// Auth gate — root-level authentication routing.
+  static const String authGate = '/auth-gate';
+
   /// Splash screen.
   static const String splash = '/splash';
 
@@ -74,18 +81,44 @@ class AppRoutes {
   /// Settings screen.
   static const String settings = '/settings';
 
-  /// Settings — theme preferences.
-  static const String settingsTheme = '/settings/theme';
+  /// AI Providers list screen.
+  static const String aiProviders = '/settings/ai-providers';
 
-  /// Settings — notification preferences.
-  static const String settingsNotifications = '/settings/notifications';
 
-  /// Settings — sync status.
-  static const String settingsSync = '/settings/sync';
 
-  /// Settings — privacy.
-  static const String settingsPrivacy = '/settings/privacy';
+  // ── Content Generation Routes ──────────────────────────────────
+
+  /// Content Generation Hub — main landing page.
+  static const String contentHub = '/content';
+
+  /// Content Library — browse generated content.
+  static const String contentLibrary = '/content/library';
+
+  /// Generate Course / Learning Path.
+  static const String generateCourse = '/content/generate/course';
+
+  /// Generate Portfolio Project.
+  static const String generateProject = '/content/generate/project';
+
+  /// Generate Portfolio Enhancement.
+  static const String generatePortfolioEnhancement = '/content/generate/portfolio-enhancement';
+
+  /// Generate Resume Enhancement.
+  static const String generateResumeEnhancement = '/content/generate/resume-enhancement';
+
+  /// Generate Interview Questions.
+  static const String generateInterviewQuestions = '/content/generate/interview-questions';
+
+  /// Notification Center screen.
+  static const String notifications = '/notifications';
 
   /// Onboarding flow (first-time experience).
   static const String onboarding = '/onboarding';
+
+  /// Daily Journey — the default landing experience after login.
+  static const String dailyJourney = '/daily-journey';
+
+  /// Identity Setup — mandatory first-login flow after authentication.
+  static const String identitySetup = '/identity-setup';
 }
+

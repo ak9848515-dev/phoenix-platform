@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/sample_repository.dart';
+import '../../../core/bootstrap.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../routes/app_routes.dart';
+import '../../../shared/widgets/phoenix_empty_state.dart';
+import '../../../shared/widgets/phoenix_error_state.dart';
 import '../../../theme/spacing.dart';
-import '../services/opportunity_service.dart';
 import '../widgets/action_plan_card.dart';
 import '../widgets/opportunity_actions_card.dart';
 import '../widgets/opportunity_header.dart';
@@ -16,63 +18,81 @@ import '../widgets/skill_gap_card.dart';
 /// opportunities based on the user's Journey, Portfolio, Resume,
 /// Interview readiness, Career Profile, Decision, and Identity.
 ///
-/// This is NOT a job board. It is a recommendation engine.
-/// No AI, no networking, no persistence.
-///
-/// Presentation only. StatelessWidget.
+/// Data sourced from OpportunityIntelligenceEngine snapshot only.
+/// No SampleRepository. StatelessWidget.
 class OpportunityScreen extends StatelessWidget {
   const OpportunityScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final repository = const SampleRepository();
-    final opportunityService = OpportunityService(repository: repository);
-    final opportunities = opportunityService.getRecommendedOpportunities();
+    final engine = AppBootstrap.maybeOpportunityIntelligenceEngine;
+    final snap = engine?.snapshot;
 
-    final bestMatch = opportunities.isEmpty
-        ? 0.0
-        : opportunities
-              .map((o) => o.matchScore)
-              .reduce((a, b) => a > b ? a : b);
+    if (engine == null || snap == null) {
+      return PhoenixErrorState(
+        category: PhoenixErrorCategory.data,
+        title: 'Opportunities unavailable',
+        message: "We couldn't load your career opportunities right now. "
+            'Please try again shortly.',
+        actionLabel: 'Try Again',
+        onAction: () => Navigator.of(context).pushReplacementNamed(
+          AppRoutes.opportunity,
+        ),
+      );
+    }
 
-    // Collect all missing skills for the gap analysis
-    final allMissingSkills = <String>{};
-    for (final opp in opportunities) {
-      allMissingSkills.addAll(opp.missingSkills);
+    if (!snap.hasData) {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(PhoenixSpacing.lg),
+        child: PhoenixEmptyState(
+          icon: Icons.work_outline,
+          title: 'No Opportunities Yet',
+          message: 'Complete your Career Profile to discover matching opportunities.',
+          primaryAction: FilledButton.icon(
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.career),
+            icon: const Icon(Icons.trending_up_outlined, size: 18),
+            label: const Text('Complete Career Profile'),
+          ),
+        ),
+      );
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(PhoenixSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OpportunityHeader(
-            identityTitle: repository.selectedIdentity.title,
-            opportunityCount: opportunities.length,
+            identityTitle: snap.topOpportunity?.title ?? 'Opportunities',
+            opportunityCount: snap.opportunityCount,
           ),
           const SizedBox(height: AppSpacing.lg),
           OpportunityStatisticsCard(
-            opportunityCount: opportunities.length,
-            bestMatchScore: bestMatch,
-            overallReadiness: opportunities.first.matchScore,
+            opportunityCount: snap.opportunityCount,
+            bestMatchScore: snap.bestMatchScore,
+            overallReadiness: snap.overallReadiness,
           ),
           const SizedBox(height: AppSpacing.lg),
           ReadinessMatchCard(
-            overallReadiness: opportunities.first.matchScore,
-            bestMatchScore: bestMatch,
-            estimatedTimeline: opportunities.isNotEmpty
-                ? opportunities.first.estimatedTimeline
+            overallReadiness: snap.overallReadiness,
+            bestMatchScore: snap.bestMatchScore,
+            estimatedTimeline: snap.insight.estimatedTimeline.isNotEmpty
+                ? snap.insight.estimatedTimeline
                 : 'N/A',
           ),
           const SizedBox(height: AppSpacing.lg),
-          RecommendedOpportunitiesCard(opportunities: opportunities),
-          const SizedBox(height: AppSpacing.lg),
-          SkillGapCard(
-            missingSkills: allMissingSkills.toList(),
-            gaps: const [],
+          RecommendedOpportunitiesCard(
+            opportunities: snap.opportunities,
           ),
           const SizedBox(height: AppSpacing.lg),
-          ActionPlanCard(opportunities: opportunities),
+          SkillGapCard(
+            missingSkills: snap.analytics.topSkillGaps,
+            gaps: snap.matches.isEmpty
+                ? []
+                : snap.matches.first.gaps,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          ActionPlanCard(opportunities: snap.opportunities),
           const SizedBox(height: AppSpacing.lg),
           OpportunityActionsCard(
             onDashboard: () =>

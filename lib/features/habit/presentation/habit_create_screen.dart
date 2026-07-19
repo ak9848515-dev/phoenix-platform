@@ -204,6 +204,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.remove_circle_outline_rounded),
+                    tooltip: 'Decrease target',
                     onPressed: _targetPerDay > 1
                         ? () => setState(() => _targetPerDay--)
                         : null,
@@ -216,6 +217,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline_rounded),
+                    tooltip: 'Increase target',
                     onPressed: _targetPerDay < 10
                         ? () => setState(() => _targetPerDay++)
                         : null,

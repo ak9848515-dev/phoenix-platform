@@ -44,6 +44,35 @@ dependencies:
   # Secure token storage (never use SharedPreferences for secrets).
   flutter_secure_storage: ^9.2.0
 
+  # ── Firebase ───────────────────────────────────────────────────────
+  # Firebase Core — required for all Firebase services.
+  firebase_core: ^3.12.0
+
+  # Firebase Authentication — optional, for Auth service migration.
+  firebase_auth: ^5.5.0
+
+  # Cloud Firestore — optional, for cloud sync & persistence.
+  cloud_firestore: ^5.6.0
+
+  # Cloud Storage — optional, for file/asset storage.
+  firebase_storage: ^12.4.0
+
+  # Crashlytics — optional, for crash reporting.
+  firebase_crashlytics: ^4.3.0
+
+  # Analytics — optional, for usage metrics.
+  firebase_analytics: ^11.4.0
+
+  # Remote Config — optional, for feature flags.
+  firebase_remote_config: ^5.4.0
+
+  # Performance Monitoring — optional, for app performance.
+  firebase_performance: ^0.10.0+1
+  google_sign_in: ^7.2.0
+
+  # HTTP client for AI provider integrations.
+  http: ^1.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

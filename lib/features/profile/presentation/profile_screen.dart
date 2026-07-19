@@ -1,213 +1,245 @@
 import 'package:flutter/material.dart';
 
+import '../../../config/app_config.dart';
 import '../../../core/bootstrap.dart';
+import '../../../core/design/theme/phoenix_colors.dart';
 import '../../../core/design/theme/phoenix_spacing.dart';
-import '../../../core/sample_repository.dart';
 import '../../../routes/app_routes.dart';
-import '../../career/services/career_service.dart';
-import '../../interview/services/interview_service.dart';
-import '../../knowledge_dna/knowledge_dna_service.dart';
-import '../../mission_engine/mission_service.dart';
-import '../../opportunity/services/opportunity_service.dart';
-import '../../portfolio/services/portfolio_service.dart';
-import '../../progress_engine/progress_service.dart';
-import '../../recommendation/services/recommendation_service.dart';
-import '../../resume/services/resume_service.dart';
-import '../widgets/career_readiness_card.dart';
-import '../widgets/growth_summary_card.dart';
-import '../widgets/knowledge_skills_card.dart';
-import '../widgets/portfolio_snapshot_card.dart';
-import '../widgets/preferences_card.dart';
-import '../widgets/profile_header.dart';
-import '../widgets/resume_snapshot_card.dart';
+import '../../auth/services/authentication_service.dart';
 
-/// The premium Profile Experience for Phoenix OS.
+/// Identity Hub — single source of truth for user identity.
 ///
-/// Presentation-only. All data comes from existing services.
-/// No business logic, no calculations.
+/// PHX-087: Simplified minimal layout. Shows ONLY what matters:
+/// • Profile identity card (compact)
+/// • Account essentials
+/// • Quick settings links
 ///
-/// Sections:
-/// 1. Profile Header — avatar, identity, journey stage, level badge
-/// 2. Growth Summary — XP, Level, Streak, Missions, Progress
-/// 3. Knowledge & Skills — Knowledge DNA, strengths, improvements
-/// 4. Portfolio Snapshot — projects, score, featured project
-/// 5. Resume Snapshot — score, completion, highlights
-/// 6. Career Readiness — interview, career, timeline, next goal
-/// 7. Preferences — navigation to settings
-class ProfileScreen extends StatelessWidget {
+/// No redundant cards, no cluttered sections, maximum simplicity.
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  AuthenticationService? _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = AppBootstrap.maybeAuthenticationService;
+    _authService?.addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    _authService?.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final repository = const SampleRepository();
-    final userStateService = AppBootstrap.maybeUserStateService;
-    final progressSummary = ProgressService(
-      repository: repository,
-      userStateService: userStateService,
-    ).buildSummary();
-    final knowledgeAnalysis = KnowledgeDNAService(
-      repository: repository,
-    ).buildAnalysis();
-    final portfolio = PortfolioService(
-      repository: repository,
-    ).buildPortfolio();
-    final resume = ResumeService(
-      repository: repository,
-    ).buildResume();
-    final careerProfile = CareerService(
-      repository: repository,
-    ).buildProfile();
-    final interviewProfile = InterviewService(
-      repository: repository,
-    ).buildProfile();
-    final opportunityService = OpportunityService(
-      repository: repository,
-    );
-    final opportunities = opportunityService.getRecommendedOpportunities();
-    final topRecommendation = RecommendationService(
-      repository: repository,
-    ).getTodaysFocus();
-    final missionService = MissionService(
-      repository: repository,
-      userStateService: userStateService,
-    );
-    final missionProgress = missionService.buildProgress();
-
-    // Read identity and journey from UserStateService when available,
-    // fall back to SampleRepository for backward compatibility.
-    final identity = userStateService?.identity ?? repository.selectedIdentity;
-    final journey = userStateService?.journey ?? repository.journey;
-    final stage = userStateService?.currentJourneyStage ?? repository.currentJourneyStage;
-
-    final totalMissions =
-        missionProgress.dailyMissions.length +
-        missionProgress.weeklyMissions.length;
+    final theme = Theme.of(context);
+    final identityEngine = AppBootstrap.maybeIdentityEngine;
+    final identitySnap = identityEngine?.snapshot;
+    final identityTitle = identitySnap?.currentIdentityTitle ?? 'Explorer';
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(PhoenixSpacing.lg),
+      padding: const EdgeInsets.all(PhoenixSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── 1. Profile Header ──────────────────────────────────────
-          ProfileHeader(
-            identityTitle: identity.title,
-            journeyStage: stage.title,
-            currentLevel: progressSummary.level,
-            journeyCompletion: journey.completion,
-          ),
-          SizedBox(height: PhoenixSpacing.lg),
-
-          // ── 2. Growth Summary ──────────────────────────────────────
-          GrowthSummaryCard(
-            totalXp: progressSummary.totalXp,
-            currentLevel: progressSummary.level,
-            currentStreak: progressSummary.streaks.daily,
-            completedMissions: missionProgress.completedCount,
-            totalMissions: totalMissions,
-            overallProgress: progressSummary.completionPercentage,
-            onXpTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.progress,
-              arguments: {'focus': 'xp'},
+          // ── Identity Card (compact) ───────────────────────────────
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(PhoenixSpacing.xl),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  PhoenixColors.primary.withValues(alpha: 0.08),
+                  PhoenixColors.surface,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
             ),
-            onLevelTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.progress,
-              arguments: {'focus': 'level'},
-            ),
-            onStreakTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.progress,
-              arguments: {'focus': 'streak'},
-            ),
-            onMissionsTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.missionCenter,
-            ),
-          ),
-          SizedBox(height: PhoenixSpacing.lg),
-
-          // ── 3. Knowledge & Skills ──────────────────────────────────
-          KnowledgeSkillsCard(
-            knowledgeScore: knowledgeAnalysis.knowledgeScore,
-            confidenceScore: knowledgeAnalysis.confidenceScore,
-            retentionScore: knowledgeAnalysis.retentionScore,
-            skillStrengths: knowledgeAnalysis.skillStrengths,
-            skillWeaknesses: knowledgeAnalysis.skillWeaknesses,
-            summary: knowledgeAnalysis.summary,
-          ),
-          SizedBox(height: PhoenixSpacing.lg),
-
-          // ── 4. Portfolio Snapshot ──────────────────────────────────
-          PortfolioSnapshotCard(
-            portfolioScore: portfolio.portfolioScore,
-            projectCount: portfolio.projectCount,
-            achievementCount: portfolio.achievementCount,
-            technologyCount: portfolio.technologyCount,
-            featuredProjectTitle:
-                portfolio.featuredProjects.isNotEmpty
-                    ? portfolio.featuredProjects.first.title
-                    : 'No projects yet',
-            onViewPortfolio: () =>
-                Navigator.of(context).pushNamed(AppRoutes.portfolio),
-            onProjectsTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.portfolio),
-            onAchievementsTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.progress,
-              arguments: {'focus': 'achievements'},
-            ),
-            onTechnologiesTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.knowledge),
-          ),
-          SizedBox(height: PhoenixSpacing.lg),
-
-          // ── 5. Resume Snapshot ─────────────────────────────────────
-          ResumeSnapshotCard(
-            resumeScore: resume.resumeScore,
-            skillCount: resume.skillCount,
-            projectCount: resume.projectCount,
-            careerHighlights: resume.careerHighlights,
-            lastUpdated: resume.generatedAt,
-            isComplete: resume.resumeScore >= 0.7,
-            onViewResume: () =>
-                Navigator.of(context).pushNamed(AppRoutes.resume),
-          ),
-          SizedBox(height: PhoenixSpacing.lg),
-
-          // ── 6. Career Readiness ────────────────────────────────────
-          CareerReadinessCard(
-            jobReadiness: careerProfile.jobReadiness,
-            careerScore: careerProfile.careerScore,
-            interviewReadiness: interviewProfile.interviewReadiness,
-            estimatedWeeks: careerProfile.estimatedWeeks,
-            nextGoal: careerProfile.nextGoal,
-            opportunityReadiness:
-                opportunities.isNotEmpty
-                    ? opportunities.first.matchScore
-                    : null,
-            careerRecommendation: topRecommendation?.title,
-            onViewCareer: () =>
-                Navigator.of(context).pushNamed(AppRoutes.career),
-            onCareerTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.career),
-            onInterviewTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.career),
-            onTimelineTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.progress,
-              arguments: {'focus': 'streak'},
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: PhoenixColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Icon(
+                    Icons.person_rounded,
+                    color: PhoenixColors.primary,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: PhoenixSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        identityTitle,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        identitySnap?.currentGoal.isNotEmpty == true
+                            ? identitySnap!.currentGoal
+                            : 'Begin your journey',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
             ),
           ),
-          SizedBox(height: PhoenixSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.xxl),
 
-          // ── 7. Preferences ────────────────────────────────────────
-          PreferencesCard(
-            onTheme: () =>
-                Navigator.of(context).pushNamed(AppRoutes.settingsTheme),
-            onNotifications: () =>
-                Navigator.of(context).pushNamed(AppRoutes.settingsNotifications),
-            onSync: () =>
-                Navigator.of(context).pushNamed(AppRoutes.settingsSync),
-            onPrivacy: () =>
-                Navigator.of(context).pushNamed(AppRoutes.settingsPrivacy),
+          // ── Quick Actions ─────────────────────────────────────────
+          _buildSectionTitle(theme, 'Quick Actions'),
+          const SizedBox(height: PhoenixSpacing.md),
+          _ActionCard(
+            icon: Icons.tune_rounded,
+            label: 'Settings',
+            subtitle: 'App preferences, theme, notifications',
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.settings),
           ),
-          SizedBox(height: PhoenixSpacing.xxl),
+          const SizedBox(height: PhoenixSpacing.md),
+          _ActionCard(
+            icon: Icons.auto_awesome_rounded,
+            label: 'AI Providers',
+            subtitle: 'Configure AI models and API keys',
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.aiProviders),
+          ),
+          const SizedBox(height: PhoenixSpacing.md),
+          _ActionCard(
+            icon: Icons.security_rounded,
+            label: 'Account',
+            subtitle: 'Security, privacy, connected devices',
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.settings),
+          ),
+
+          const SizedBox(height: PhoenixSpacing.xxl),
+
+          // ── About ─────────────────────────────────────────────────
+          _buildSectionTitle(theme, 'About'),
+          const SizedBox(height: PhoenixSpacing.md),
+          _ActionCard(
+            icon: Icons.info_outline_rounded,
+            label: 'Phoenix OS',
+            subtitle: 'AI Career Operating System · ${AppConfig.appVersion}',
+            onTap: () => showLicensePage(context: context),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(ThemeData theme, String title) {
+    return Text(
+      title.toUpperCase(),
+      style: theme.textTheme.labelMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+}
+
+/// Minimal action card with icon, label, subtitle, and tap target.
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(PhoenixSpacing.lg),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest
+              .withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: PhoenixColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 20, color: PhoenixColors.primary),
+            ),
+            const SizedBox(width: PhoenixSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
       ),
     );
   }

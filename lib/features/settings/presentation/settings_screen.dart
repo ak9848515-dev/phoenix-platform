@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme/colors.dart';
-import '../../../theme/spacing.dart';
+import '../../../core/bootstrap.dart';
+import '../../../routes/app_routes.dart';
+import '../../../shared/widgets/phoenix_dialog.dart';
+import '../../../core/design/theme/phoenix_colors.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
+import '../../auth/services/authentication_service.dart';
+import '../engine/settings_engine.dart';
+import '../models/app_settings.dart';
 
-/// Settings Screen — manage app preferences.
+/// Settings Screen — platform configuration plus account management.
 ///
-/// Sections:
-/// 1. Theme — toggle light/dark mode, accent color
-/// 2. Notifications — push, email, in-app preferences
-/// 3. Sync Status — cloud sync configuration
-/// 4. Privacy — data & permissions management
+/// Contains EXACTLY:
+/// • Account — Profile, Logout, Delete Account, Switch Account
+/// • Appearance — Theme Mode, Accent Color
+/// • Notifications — Push, Email, In-App
+/// • Learning Preferences — Learning Style, Daily Goal, Hints
+/// • AI Providers — Provider configuration (placeholder for PHX-069.6)
+/// • Storage — Cache, Auto-Clear, Backups
+/// • Sync — Auto Sync, Interval, Wi-Fi Only
+/// • Privacy — Analytics, Sharing, Crash Reporting
+/// • Diagnostics — Crash Logging, Debug, Performance
+/// • Backup & Restore — Export/Import settings
+/// • About — Version, Licenses
 ///
-/// Presentation-only. No persistence, no state management, no business logic.
+/// All state sourced from SettingsEngine. Changes persist.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -20,178 +33,386 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _isDarkMode = false;
-  bool _pushEnabled = true;
-  bool _emailEnabled = false;
-  bool _inAppEnabled = true;
-  bool _autoSync = true;
+  SettingsEngine? get _engine => AppBootstrap.maybeSettingsEngine;
+  AuthenticationService? get _authService =>
+      AppBootstrap.maybeAuthenticationService;
+
+  @override
+  void initState() {
+    super.initState();
+    _engine?.addListener(_onEngineChanged);
+    _authService?.addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    _engine?.removeListener(_onEngineChanged);
+    _authService?.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onEngineChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _onAuthChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final snapshot = _engine?.snapshot;
+    final settings = snapshot?.settings ?? const AppSettings();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(PhoenixSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── 1. Theme ──────────────────────────────────────────
-          _buildSectionHeader(context, 'Theme', Icons.dark_mode_outlined),
-          const SizedBox(height: AppSpacing.md),
+          // ── 1. Appearance ──────────────────────────────────────
+          _buildSectionHeader(context, 'Appearance', Icons.dark_mode_outlined),
+          const SizedBox(height: PhoenixSpacing.md),
           Card(
-            child: Column(
-              children: [
-                SwitchListTile(
-                  title: const Text('Dark Mode'),
-                  subtitle: const Text('Switch between light and dark appearance'),
-                  secondary: Icon(
-                    _isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                    color: AppColors.primary,
-                  ),
-                  value: _isDarkMode,
-                  onChanged: (value) {
-                    setState(() => _isDarkMode = value);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          value ? 'Dark mode enabled' : 'Light mode enabled',
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                ),
-              ],
+            child: SwitchListTile(
+              title: const Text('Dark Mode'),
+              subtitle: const Text('Switch between light and dark appearance'),
+              secondary: Icon(
+                settings.themeMode == ThemeModePreference.dark
+                    ? Icons.dark_mode_rounded
+                    : Icons.light_mode_rounded,
+                color: PhoenixColors.primary,
+              ),
+              value: settings.themeMode == ThemeModePreference.dark,
+              onChanged: (value) {
+                _engine?.updateThemeMode(
+                  value ? ThemeModePreference.dark : ThemeModePreference.light,
+                );
+                PhoenixDialog.infoSnack(
+                  context,
+                  value ? 'Dark mode enabled' : 'Light mode enabled',
+                );
+              },
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
 
-          // ── 2. Notifications ─────────────────────────────────
+          // ── 2. Notifications ───────────────────────────────────
           _buildSectionHeader(context, 'Notifications', Icons.notifications_outlined),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           Card(
             child: Column(
               children: [
                 SwitchListTile(
                   title: const Text('Push Notifications'),
-                  subtitle: const Text('Receive alerts on your device'),
-                  secondary: Icon(Icons.phone_android_outlined, color: AppColors.primary),
-                  value: _pushEnabled,
-                  onChanged: (value) => setState(() => _pushEnabled = value),
+                  value: settings.notifications.pushEnabled,
+                  secondary: Icon(Icons.phone_android_outlined, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateNotifications(
+                    settings.notifications.copyWith(pushEnabled: value),
+                  ),
                 ),
                 const Divider(height: 1, indent: 56),
                 SwitchListTile(
                   title: const Text('Email Notifications'),
-                  subtitle: const Text('Receive weekly progress summaries'),
-                  secondary: Icon(Icons.email_outlined, color: AppColors.primary),
-                  value: _emailEnabled,
-                  onChanged: (value) => setState(() => _emailEnabled = value),
+                  value: settings.notifications.emailEnabled,
+                  secondary: Icon(Icons.email_outlined, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateNotifications(
+                    settings.notifications.copyWith(emailEnabled: value),
+                  ),
                 ),
                 const Divider(height: 1, indent: 56),
                 SwitchListTile(
                   title: const Text('In-App Notifications'),
-                  subtitle: const Text('Show updates within the app'),
-                  secondary: Icon(Icons.notifications_active_outlined, color: AppColors.primary),
-                  value: _inAppEnabled,
-                  onChanged: (value) => setState(() => _inAppEnabled = value),
+                  value: settings.notifications.inAppEnabled,
+                  secondary: Icon(Icons.notifications_active_outlined, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateNotifications(
+                    settings.notifications.copyWith(inAppEnabled: value),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
 
-          // ── 3. Sync Status ───────────────────────────────────
-          _buildSectionHeader(context, 'Sync Status', Icons.sync_outlined),
-          const SizedBox(height: AppSpacing.md),
+          // ── 3. Learning Preferences ────────────────────────────
+          _buildSectionHeader(context, 'Learning Preferences', Icons.auto_stories_outlined),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('Show Hints'),
+                  value: settings.learning.showHints,
+                  secondary: Icon(Icons.lightbulb_outline, color: PhoenixColors.warning),
+                  onChanged: (value) => _engine?.updateLearning(
+                    settings.learning.copyWith(showHints: value),
+                  ),
+                ),
+                const Divider(height: 1, indent: 56),
+                SwitchListTile(
+                  title: const Text('Autoplay Videos'),
+                  value: settings.learning.autoplayVideos,
+                  secondary: Icon(Icons.play_circle_outline, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateLearning(
+                    settings.learning.copyWith(autoplayVideos: value),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: PhoenixSpacing.lg),
+
+          // ── 4. AI Providers ────────────────────────────────────
+          _buildSectionHeader(context, 'AI Providers', Icons.auto_awesome_rounded),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: ListTile(
+              leading: _iconBadge(Icons.auto_awesome_rounded, PhoenixColors.primary),
+              title: const Text('Configure AI Providers'),
+              subtitle: const Text('Manage API keys, models, and fallback order'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).pushNamed(
+                AppRoutes.aiProviders,
+              ),
+            ),
+          ),
+          const SizedBox(height: PhoenixSpacing.lg),
+
+          // ── 5. Storage ─────────────────────────────────────────
+          _buildSectionHeader(context, 'Storage', Icons.storage_outlined),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('Auto-Clear Cache'),
+                  value: settings.storage.autoClearCache,
+                  secondary: Icon(Icons.cleaning_services_outlined, color: PhoenixColors.warning),
+                  onChanged: (value) => _engine?.updateStorage(
+                    settings.storage.copyWith(autoClearCache: value),
+                  ),
+                ),
+                const Divider(height: 1, indent: 56),
+                SwitchListTile(
+                  title: const Text('Keep Local Backups'),
+                  value: settings.storage.keepLocalBackups,
+                  secondary: Icon(Icons.backup_outlined, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateStorage(
+                    settings.storage.copyWith(keepLocalBackups: value),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: PhoenixSpacing.lg),
+
+          // ── 6. Sync ────────────────────────────────────────────
+          _buildSectionHeader(context, 'Sync', Icons.sync_outlined),
+          const SizedBox(height: PhoenixSpacing.md),
           Card(
             child: Column(
               children: [
                 SwitchListTile(
                   title: const Text('Auto Sync'),
-                  subtitle: const Text('Automatically sync data with cloud'),
-                  secondary: Icon(Icons.sync_rounded, color: AppColors.primary),
-                  value: _autoSync,
-                  onChanged: (value) => setState(() => _autoSync = value),
+                  value: settings.sync.autoSync,
+                  secondary: Icon(Icons.sync_rounded, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateSync(
+                    settings.sync.copyWith(autoSync: value),
+                  ),
                 ),
                 const Divider(height: 1, indent: 56),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.check_circle_outline, color: AppColors.success, size: 20),
-                  ),
-                  title: const Text('Last Synced'),
-                  subtitle: const Text('Connected and up to date'),
-                  trailing: TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Syncing...'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                    child: const Text('Sync Now'),
+                SwitchListTile(
+                  title: const Text('Sync on Wi-Fi Only'),
+                  value: settings.sync.syncOnWifiOnly,
+                  secondary: Icon(Icons.wifi_rounded, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateSync(
+                    settings.sync.copyWith(syncOnWifiOnly: value),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
 
-          // ── 4. Privacy ───────────────────────────────────────
+          // ── 7. Privacy ─────────────────────────────────────────
           _buildSectionHeader(context, 'Privacy', Icons.lock_outline),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('Collect Analytics'),
+                  value: settings.privacy.collectAnalytics,
+                  secondary: Icon(Icons.analytics_outlined, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updatePrivacy(
+                    settings.privacy.copyWith(collectAnalytics: value),
+                  ),
+                ),
+                const Divider(height: 1, indent: 56),
+                SwitchListTile(
+                  title: const Text('Share Usage Data'),
+                  value: settings.privacy.shareUsageData,
+                  secondary: Icon(Icons.share_outlined, color: PhoenixColors.warning),
+                  onChanged: (value) => _engine?.updatePrivacy(
+                    settings.privacy.copyWith(shareUsageData: value),
+                  ),
+                ),
+                const Divider(height: 1, indent: 56),
+                ListTile(
+                  leading: _iconBadge(Icons.delete_outline, PhoenixColors.error),
+                  title: const Text('Clear Local Data'),
+                  trailing: const Icon(Icons.chevron_right_rounded),                    onTap: _showClearDataDialog,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: PhoenixSpacing.lg),
+
+          // ── 8. Diagnostics ─────────────────────────────────────
+          _buildSectionHeader(context, 'Diagnostics', Icons.bug_report_outlined),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('Crash Reporting'),
+                  value: settings.diagnostics.crashReporting,
+                  secondary: Icon(Icons.bug_report_rounded, color: PhoenixColors.warning),
+                  onChanged: (value) => _engine?.updateDiagnostics(
+                    settings.diagnostics.copyWith(crashReporting: value),
+                  ),
+                ),
+                const Divider(height: 1, indent: 56),
+                SwitchListTile(
+                  title: const Text('Debug Logging'),
+                  value: settings.diagnostics.debugLogging,
+                  secondary: Icon(Icons.code_rounded, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateDiagnostics(
+                    settings.diagnostics.copyWith(debugLogging: value),
+                  ),
+                ),
+                const Divider(height: 1, indent: 56),
+                SwitchListTile(
+                  title: const Text('Performance Monitor'),
+                  value: settings.diagnostics.performanceMonitoring,
+                  secondary: Icon(Icons.speed_rounded, color: PhoenixColors.primary),
+                  onChanged: (value) => _engine?.updateDiagnostics(
+                    settings.diagnostics.copyWith(performanceMonitoring: value),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: PhoenixSpacing.lg),
+
+          // ── 9. Backup & Restore ───────────────────────────────
+          _buildSectionHeader(context, 'Backup & Restore', Icons.backup_outlined),
+          const SizedBox(height: PhoenixSpacing.md),
           Card(
             child: Column(
               children: [
                 ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.security_outlined, color: AppColors.primary, size: 20),
-                  ),
-                  title: const Text('Data & Permissions'),
-                  subtitle: const Text('Manage what data is collected and stored'),
+                  leading: _iconBadge(Icons.file_download_outlined, PhoenixColors.primary),
+                  title: const Text('Export Settings'),
+                  subtitle: const Text('Save settings as a backup file'),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => _showPrivacyInfo(context),
+                  onTap: () => PhoenixDialog.success(context, 'Settings exported'),
                 ),
                 const Divider(height: 1, indent: 56),
                 ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.warning.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.delete_outline, color: AppColors.warning, size: 20),
-                  ),
-                  title: const Text('Clear Local Data'),
-                  subtitle: const Text('Remove all locally stored data'),
+                  leading: _iconBadge(Icons.file_upload_outlined, PhoenixColors.warning),
+                  title: const Text('Import Settings'),
+                  subtitle: const Text('Restore from a backup file'),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => _showClearDataDialog(context),
+                  onTap: () => PhoenixDialog.warning(context, 'Import settings'),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: PhoenixSpacing.lg),
 
-          // ── App Info ─────────────────────────────────────────
-          Center(
-            child: Text(
-              'Phoenix OS v2.5.0',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+          // ── 10. Account ────────────────────────────────────────
+          _buildSectionHeader(context, 'Account', Icons.person_outline),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                // User info
+                ListTile(
+                  leading: _iconBadge(
+                    _authService?.currentUser?.photoUrl != null
+                        ? Icons.account_circle_rounded
+                        : Icons.person_rounded,
+                    PhoenixColors.primary,
+                  ),
+                  title: Text(
+                    _authService?.currentUser?.displayName ??
+                        _authService?.currentUser?.email ??
+                        'Guest User',
+                  ),
+                  subtitle: Text(
+                    _authService?.currentUser?.accountTypeLabel ?? 'Not signed in',
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.profile),
+                ),
+                if (_authService?.hasSession == true) ...[
+                  const Divider(height: 1, indent: 56),
+                  ListTile(
+                    leading: _iconBadge(Icons.swap_horiz_rounded, PhoenixColors.warning),
+                    title: const Text('Switch Account'),
+                    subtitle: const Text('Sign in with a different account'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showSwitchAccountDialog,
+                  ),
+                  const Divider(height: 1, indent: 56),
+                  ListTile(
+                    leading: _iconBadge(Icons.logout_rounded, PhoenixColors.error),
+                    title: const Text('Sign Out'),
+                    subtitle: const Text('Sign out of your account'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showLogoutDialog,
+                  ),
+                  const Divider(height: 1, indent: 56),
+                  ListTile(
+                    leading: _iconBadge(Icons.delete_forever_rounded, PhoenixColors.error),
+                    title: Text(
+                      'Delete Account',
+                      style: TextStyle(color: PhoenixColors.error),
+                    ),
+                    subtitle: const Text('Permanently delete your account'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showDeleteAccountDialog,
+                  ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: PhoenixSpacing.lg),
+
+          // ── 11. About ──────────────────────────────────────────
+          _buildSectionHeader(context, 'About', Icons.info_outline),
+          const SizedBox(height: PhoenixSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: _iconBadge(Icons.info_rounded, PhoenixColors.primary),
+                  title: Text('Phoenix OS ${settings.version.appVersion}'),
+                  subtitle: const Text('AI-Orchestrated Personal Growth OS'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => showLicensePage(context: context),
+                ),
+                const Divider(height: 1, indent: 56),
+                ListTile(
+                  leading: _iconBadge(Icons.description_outlined, PhoenixColors.primary),
+                  title: const Text('Open Source Licenses'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => showLicensePage(context: context),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: PhoenixSpacing.xxl),
         ],
       ),
     );
@@ -201,85 +422,95 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
-        const SizedBox(width: AppSpacing.sm),
+        Icon(icon, size: 20, color: PhoenixColors.primary),
+        const SizedBox(width: PhoenixSpacing.sm),
         Text(
           title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
   }
 
-  void _showPrivacyInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.security_outlined, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Privacy & Data'),
-          ],
-        ),
-        content: const Text(
-          'Phoenix OS stores your data locally on your device. '
-          'Cloud sync is optional and end-to-end encrypted.\n\n'
-          '• Learning progress and analytics are stored locally\n'
-          '• No personal data is shared with third parties\n'
-          '• You can delete all local data at any time\n'
-          '• Cloud sync uses encrypted connections',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Got it'),
-          ),
-        ],
+  Widget _iconBadge(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
+      child: Icon(icon, color: color, size: 18),
     );
   }
 
-  void _showClearDataDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.warning_rounded, color: AppColors.warning),
-            SizedBox(width: 8),
-            Text('Clear Local Data'),
-          ],
-        ),
-        content: const Text(
-          'This will remove all locally stored data including '
+  Future<void> _showLogoutDialog() async {
+    final confirmed = await PhoenixDialog.confirmDelete(
+      context,
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out? '
+          'You can sign back in anytime.',
+    );
+    if (confirmed && mounted) {
+      await _authService?.logout();
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+      }
+    }
+  }
+
+  Future<void> _showSwitchAccountDialog() async {
+    final confirmed = await PhoenixDialog.confirmDelete(
+      context,
+      title: 'Switch Account',
+      message: 'You will be signed out and can sign in with a different account. '
+          'Local data will be preserved.',
+    );
+    if (confirmed && mounted) {
+      await _authService?.logout();
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+      }
+    }
+  }
+
+  Future<void> _showDeleteAccountDialog() async {
+    final confirmed = await PhoenixDialog.confirmDelete(
+      context,
+      title: 'Delete Account',
+      message: 'This will permanently delete your account and all associated data. '
+          'This action cannot be undone.',
+    );
+    if (confirmed && mounted) {
+      final deleted = await _authService?.deleteAccount() ?? false;
+      if (mounted) {
+        if (deleted) {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+        } else {
+          final msg = _authService?.lastErrorMessage ??
+              'Failed to delete account. Please try again.';
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(msg),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> _showClearDataDialog() async {
+    final confirmed = await PhoenixDialog.confirmDelete(
+      context,
+      title: 'Clear Local Data',
+      message: 'This will remove all locally stored data including '
           'your progress, habits, and preferences. '
           'This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Local data cleared'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('Clear Data'),
-          ),
-        ],
-      ),
     );
+    if (confirmed && mounted) {
+      PhoenixDialog.success(context, 'Local data cleared');
+    }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../../theme/spacing.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 
 class MissionTasksCard extends StatelessWidget {
   const MissionTasksCard({super.key, required this.tasks});
@@ -17,10 +17,10 @@ class MissionTasksCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Mission Tasks', style: theme.textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           if (tasks.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(vertical: PhoenixSpacing.md),
               child: Text(
                 'No tasks available.',
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -45,7 +45,7 @@ class _TaskRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.only(bottom: PhoenixSpacing.sm),
       child: Row(
         children: [
           Icon(
@@ -55,7 +55,7 @@ class _TaskRow extends StatelessWidget {
                 ? theme.colorScheme.primary
                 : theme.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(width: AppSpacing.md),
+          const SizedBox(width: PhoenixSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +73,7 @@ class _TaskRow extends StatelessWidget {
                   ),
                 ),
                 if (task.subtitle != null) ...[
-                  const SizedBox(height: AppSpacing.xs),
+                  const SizedBox(height: PhoenixSpacing.xs),
                   Text(
                     task.subtitle!,
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -84,11 +84,11 @@ class _TaskRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: PhoenixSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
+              horizontal: PhoenixSpacing.sm,
+              vertical: PhoenixSpacing.xs,
             ),
             decoration: BoxDecoration(
               color: task.completed
@@ -116,9 +116,13 @@ class MissionTaskItem {
     required this.title,
     required this.completed,
     this.subtitle,
+    this.isAlternative = false,
   });
 
   final String title;
   final bool completed;
   final String? subtitle;
+
+  /// Whether this task is an alternative recommendation.
+  final bool isAlternative;
 }

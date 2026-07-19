@@ -77,13 +77,14 @@ class _KnowledgeSearchScreenState extends State<KnowledgeSearchScreen> {
                     hintText: 'Search knowledge...',
                     prefixIcon: const Icon(Icons.search_rounded),
                     suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _results = []);
-                            },
-                          )
+                        ?IconButton(
+                              icon: const Icon(Icons.clear_rounded),
+                              tooltip: 'Clear search',
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _results = []);
+                              },
+                            )
                         : null,
                     filled: true,
                     fillColor: theme.colorScheme.surfaceContainerHighest

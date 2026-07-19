@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/storage_service.dart';
 import '../../ai/services/ai_mentor_service.dart';
 import '../../user_state/services/user_state_service.dart';
-import '../engine/decision_engine.dart';
+import '../engine/decision_analyzer.dart';
 import '../models/decision_analysis.dart';
 import '../models/decision_criterion.dart';
 import '../models/decision_option.dart';
@@ -17,7 +17,7 @@ import '../models/decision_type.dart';
 ///
 /// [DecisionIntelligenceService] is the ONLY entry point for
 /// decision analysis functionality. Screens and widgets never
-/// interact with [DecisionEngine] directly.
+/// interact with [DecisionAnalyzer] directly.
 ///
 /// Responsibilities:
 /// - Decision analysis creation and management
@@ -35,16 +35,16 @@ class DecisionIntelligenceService extends ChangeNotifier {
   DecisionIntelligenceService({
     required this._userStateService,
     required this._aiMentorService,
-    DecisionEngine? engine,
+    DecisionAnalyzer? engine,
     /// Optional [StorageService] for explicit persistence of decision
     /// history. When provided, analysis saves are mirrored to storage.
     StorageService? storageService,
-  })  : _engine = engine ?? const DecisionEngine(),
+  })  : _engine = engine ?? const DecisionAnalyzer(),
         _storage = storageService;
 
   final UserStateService _userStateService;
   final AIMentorService _aiMentorService;
-  final DecisionEngine _engine;
+  final DecisionAnalyzer _engine;
   final StorageService? _storage;
 
   /// Whether persisted data has been loaded into UserState.

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../shared/infrastructure/logging/phoenix_logger.dart';
 
 import '../features/career/models/career_profile.dart';
 import '../features/identity/models/identity.dart';
@@ -229,7 +230,11 @@ class SharedPreferencesStorageService implements StorageService {
     try {
       return Identity.fromJson(raw);
     } catch (e) {
-      debugPrint('StorageService: failed to parse Identity: $e');
+      PhoenixLogger.shared.warning(
+        'StorageService: failed to parse Identity: $e',
+        category: LogCategory.engine,
+        source: 'StorageService',
+      );
       return null;
     }
   }
@@ -248,7 +253,11 @@ class SharedPreferencesStorageService implements StorageService {
     try {
       return Journey.fromJson(raw);
     } catch (e) {
-      debugPrint('StorageService: failed to parse Journey: $e');
+      PhoenixLogger.shared.warning(
+        'StorageService: failed to parse Journey: $e',
+        category: LogCategory.engine,
+        source: 'StorageService',
+      );
       return null;
     }
   }
@@ -286,7 +295,11 @@ class SharedPreferencesStorageService implements StorageService {
           )
           .toList();
     } catch (e) {
-      debugPrint('StorageService: failed to parse Memories: $e');
+      PhoenixLogger.shared.warning(
+        'StorageService: failed to parse Memories: $e',
+        category: LogCategory.engine,
+        source: 'StorageService',
+      );
       return const [];
     }
   }
@@ -305,7 +318,11 @@ class SharedPreferencesStorageService implements StorageService {
     try {
       return CareerProfile.fromJson(raw);
     } catch (e) {
-      debugPrint('StorageService: failed to parse CareerProfile: $e');
+      PhoenixLogger.shared.warning(
+        'StorageService: failed to parse CareerProfile: $e',
+        category: LogCategory.engine,
+        source: 'StorageService',
+      );
       return null;
     }
   }
@@ -324,7 +341,11 @@ class SharedPreferencesStorageService implements StorageService {
     try {
       return UserSettings.fromJson(raw);
     } catch (e) {
-      debugPrint('StorageService: failed to parse UserSettings: $e');
+      PhoenixLogger.shared.warning(
+        'StorageService: failed to parse UserSettings: $e',
+        category: LogCategory.engine,
+        source: 'StorageService',
+      );
       return const UserSettings();
     }
   }

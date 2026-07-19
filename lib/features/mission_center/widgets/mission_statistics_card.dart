@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../../theme/spacing.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 
 class MissionStatisticsCard extends StatelessWidget {
   const MissionStatisticsCard({
@@ -43,7 +43,7 @@ class MissionStatisticsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Mission Statistics', style: theme.textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           Row(
             children: [
               Expanded(
@@ -68,7 +68,7 @@ class MissionStatisticsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           Row(
             children: [
               Expanded(
@@ -127,14 +127,14 @@ class _TappableStatTile extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(AppSpacing.sm),
+              padding: const EdgeInsets.all(PhoenixSpacing.sm),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, size: 20, color: color),
             ),
-            const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: PhoenixSpacing.sm),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

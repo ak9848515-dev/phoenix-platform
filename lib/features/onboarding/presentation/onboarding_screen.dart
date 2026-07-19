@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/bootstrap.dart';
 import '../../../routes/app_routes.dart';
-import '../../../theme/colors.dart';
-import '../../../theme/spacing.dart';
+import '../../../core/design/theme/phoenix_colors.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 import '../../../models/user_settings.dart';
 
 /// First-Time Experience onboarding flow.
@@ -44,6 +44,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final Set<String> _selectedPreferences = {};
 
   static const int _totalPages = 7;
+
+  // Quick access spacing constants
+  static const _m = PhoenixSpacing.md;
+  static const _l = PhoenixSpacing.lg;
+  static const _xxl = PhoenixSpacing.xxl;
 
   // ── Identity options ─────────────────────────────────────────────────
   static const List<_IdentityOption> _identityOptions = [
@@ -98,6 +103,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  // ── Spacing shortcuts (used only in _buildWelcomePage) ──────────
+  static const _gapMd = SizedBox(height: _m);
+  static const _gapLg = SizedBox(height: _l);
+  static const _gapXxl = SizedBox(height: _xxl);
+
   void _goBack() {
     if (_currentPage > 0) {
       _pageController.previousPage(
@@ -126,9 +136,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // ── Progress Indicator ─────────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
+                PhoenixSpacing.lg,
+                PhoenixSpacing.md,
+                PhoenixSpacing.lg,
                 0,
               ),
               child: Row(
@@ -158,8 +168,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           height: 8,
                           decoration: BoxDecoration(
                             color: isActive
-                                ? AppColors.primary
-                                : AppColors.primary.withValues(alpha: 0.2),
+                                ? PhoenixColors.primary
+                                : PhoenixColors.primary.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         );
@@ -209,8 +219,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // ═══════════════════════════════════════════════════════════════════
 
   Widget _buildWelcomePage() {
+    final gapMd = _gapMd; final gapLg = _gapLg; final gapXxl = _gapXxl;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -218,18 +229,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           // Logo
           Container(
-            padding: const EdgeInsets.all(AppSpacing.xxl),
+            padding: const EdgeInsets.all(PhoenixSpacing.xxl),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: PhoenixColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.auto_awesome_rounded,
               size: 72,
-              color: AppColors.primary,
+              color: PhoenixColors.primary,
             ),
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          gapXxl,
 
           Text(
             'Welcome to Phoenix',
@@ -238,7 +249,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.md),
+          gapMd,
 
           Text(
             'Your Personal Growth Operating System',
@@ -247,7 +258,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.lg),
+          gapLg,
 
           Text(
             'Phoenix helps you define who you want to become,\n'
@@ -278,7 +289,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          gapMd,
 
           // Secondary CTA
           SizedBox(
@@ -309,7 +320,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildIdentityPage() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -321,20 +332,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: PhoenixSpacing.xs),
           Text(
             'Choose the identity that best matches your aspirations.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
 
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              mainAxisSpacing: AppSpacing.sm,
-              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: PhoenixSpacing.sm,
+              crossAxisSpacing: PhoenixSpacing.sm,
               childAspectRatio: 1.1,
               physics: const NeverScrollableScrollPhysics(),
               children: _identityOptions.map((opt) {
@@ -368,7 +379,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
         ],
       ),
     );
@@ -380,7 +391,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildGoalPage() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -392,20 +403,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: PhoenixSpacing.xs),
           Text(
             'Pick one main focus for your journey.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
 
           Expanded(
             child: ListView.separated(
               itemCount: _goalOptions.length,
               separatorBuilder: (_, _) =>
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: PhoenixSpacing.sm),
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final opt = _goalOptions[index];
@@ -438,7 +449,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
         ],
       ),
     );
@@ -450,7 +461,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildExperiencePage() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -462,14 +473,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: PhoenixSpacing.xs),
           Text(
             'This helps us tailor the journey to your needs.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: PhoenixSpacing.xl),
 
           Expanded(
             child: Column(
@@ -477,7 +488,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: _experienceOptions.map((opt) {
                 final selected = _selectedExperience == opt.name;
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  padding: const EdgeInsets.only(bottom: PhoenixSpacing.md),
                   child: _CardOption(
                     selected: selected,
                     icon: _experienceIcon(opt.name),
@@ -508,7 +519,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
         ],
       ),
     );
@@ -535,7 +546,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildPreferencesPage() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -547,20 +558,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: PhoenixSpacing.xs),
           Text(
             'Select all that apply.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
 
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              mainAxisSpacing: AppSpacing.sm,
-              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: PhoenixSpacing.sm,
+              crossAxisSpacing: PhoenixSpacing.sm,
               childAspectRatio: 1.1,
               physics: const NeverScrollableScrollPhysics(),
               children: _preferenceOptions.map((opt) {
@@ -604,7 +615,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
         ],
       ),
     );
@@ -618,7 +629,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final identity = _selectedIdentity ?? 'learner';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -630,49 +641,49 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: PhoenixSpacing.xs),
           Text(
             'A sneak peek at what\'s waiting for you.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: PhoenixSpacing.xxl),
 
           // Preview card
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.xl),
+            padding: const EdgeInsets.all(PhoenixSpacing.xl),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary.withValues(alpha: 0.1),
-                  AppColors.primary.withValues(alpha: 0.05),
+                  PhoenixColors.primary.withValues(alpha: 0.1),
+                  PhoenixColors.primary.withValues(alpha: 0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.2),
+                color: PhoenixColors.primary.withValues(alpha: 0.2),
               ),
             ),
             child: Column(
               children: [
                 // Icon
                 Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+                  padding: const EdgeInsets.all(PhoenixSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.15),
+                    color: PhoenixColors.primary.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.rocket_launch_rounded,
                     size: 40,
-                    color: AppColors.primary,
+                    color: PhoenixColors.primary,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: PhoenixSpacing.lg),
 
                 Text(
                   'Complete $identity Fundamentals',
@@ -681,7 +692,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: PhoenixSpacing.md),
 
                 Text(
                   'Learn the core concepts and skills needed to start '
@@ -692,7 +703,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: PhoenixSpacing.xl),
 
                 // Stats
                 Row(
@@ -706,7 +717,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Container(
                       width: 1,
                       height: 40,
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: PhoenixColors.primary.withValues(alpha: 0.2),
                     ),
                     _PreviewStat(
                       icon: Icons.stars_outlined,
@@ -716,7 +727,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Container(
                       width: 1,
                       height: 40,
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: PhoenixColors.primary.withValues(alpha: 0.2),
                     ),
                     _PreviewStat(
                       icon: Icons.flag_outlined,
@@ -745,7 +756,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
         ],
       ),
     );
@@ -757,7 +768,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildFinishPage() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: PhoenixSpacing.xl),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -765,18 +776,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           // Celebration
           Container(
-            padding: const EdgeInsets.all(AppSpacing.xxl),
+            padding: const EdgeInsets.all(PhoenixSpacing.xxl),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary,
-                  AppColors.primary.withValues(alpha: 0.6),
+                  PhoenixColors.primary,
+                  PhoenixColors.primary.withValues(alpha: 0.6),
                 ],
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: PhoenixColors.primary.withValues(alpha: 0.3),
                   blurRadius: 30,
                   spreadRadius: 5,
                 ),
@@ -788,7 +799,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: PhoenixSpacing.xxl),
 
           Text(
             'Welcome to Phoenix!',
@@ -797,7 +808,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
 
           Text(
             'Your journey begins now.\n'
@@ -824,7 +835,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: PhoenixSpacing.lg),
         ],
       ),
     );
@@ -860,16 +871,16 @@ class _CardOption extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(PhoenixSpacing.md),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary.withValues(alpha: 0.1)
+              ? PhoenixColors.primary.withValues(alpha: 0.1)
               : theme.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected
-                ? AppColors.primary
+                ? PhoenixColors.primary
                 : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: selected ? 2 : 1,
           ),
@@ -880,15 +891,15 @@ class _CardOption extends StatelessWidget {
             Icon(
               icon,
               size: 32,
-              color: selected ? AppColors.primary : theme.colorScheme.primary,
+              color: selected ? PhoenixColors.primary : theme.colorScheme.primary,
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: PhoenixSpacing.sm),
             Text(
               label,
               style: theme.textTheme.labelLarge?.copyWith(
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                 color: selected
-                    ? AppColors.primary
+                    ? PhoenixColors.primary
                     : theme.colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
@@ -912,7 +923,7 @@ class _CardOption extends StatelessWidget {
                 child: Icon(
                   Icons.check_circle_rounded,
                   size: 18,
-                  color: AppColors.primary,
+                  color: PhoenixColors.primary,
                 ),
               ),
           ],
@@ -944,18 +955,18 @@ class _ListTileOption extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          horizontal: PhoenixSpacing.md,
+          vertical: PhoenixSpacing.sm,
         ),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary.withValues(alpha: 0.1)
+              ? PhoenixColors.primary.withValues(alpha: 0.1)
               : theme.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: selected
-                ? AppColors.primary
+                ? PhoenixColors.primary
                 : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: selected ? 2 : 1,
           ),
@@ -965,16 +976,16 @@ class _ListTileOption extends StatelessWidget {
             Icon(
               icon,
               size: 24,
-              color: selected ? AppColors.primary : theme.colorScheme.primary,
+              color: selected ? PhoenixColors.primary : theme.colorScheme.primary,
             ),
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: PhoenixSpacing.md),
             Expanded(
               child: Text(
                 label,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   color: selected
-                      ? AppColors.primary
+                      ? PhoenixColors.primary
                       : theme.colorScheme.onSurface,
                 ),
               ),
@@ -983,7 +994,7 @@ class _ListTileOption extends StatelessWidget {
               Icon(
                 Icons.check_circle_rounded,
                 size: 22,
-                color: AppColors.primary,
+                color: PhoenixColors.primary,
               ),
           ],
         ),
@@ -1009,7 +1020,7 @@ class _PreviewStat extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Icon(icon, size: 22, color: AppColors.primary),
+        Icon(icon, size: 22, color: PhoenixColors.primary),
         const SizedBox(height: 6),
         Text(
           value,

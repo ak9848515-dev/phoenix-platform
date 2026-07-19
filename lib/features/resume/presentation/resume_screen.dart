@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/sample_repository.dart';
+import '../../../core/bootstrap.dart';
 import '../../../routes/app_routes.dart';
 import '../../../theme/spacing.dart';
-import '../services/resume_service.dart';
+import '../models/resume.dart';
 import '../widgets/achievements_card.dart';
 import '../widgets/career_highlights_card.dart';
 import '../widgets/professional_summary_card.dart';
@@ -16,8 +16,8 @@ import '../widgets/skills_card.dart';
 /// The Living Resume screen automatically generates a resume from the
 /// user's Living Portfolio and Career Profile.
 ///
-/// All data is derived from existing Phoenix modules — no manual editing,
-/// no AI, no persistence, no networking, no duplicate storage.
+/// All data is derived from existing Phoenix engine snapshots — no
+/// SampleRepository, no manual editing, no AI.
 ///
 /// Presentation only. StatelessWidget.
 class ResumeScreen extends StatelessWidget {
@@ -25,9 +25,18 @@ class ResumeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repository = const SampleRepository();
-    final resumeService = ResumeService(repository: repository);
-    final resume = resumeService.buildResume();
+    final identityEngine = AppBootstrap.maybeIdentityEngine;
+    final identitySnap = identityEngine?.snapshot;
+    final portfolioEngine = AppBootstrap.maybePortfolioEngine;
+    final portfolioSnap = portfolioEngine?.snapshot;
+    final careerEngine = AppBootstrap.maybeCareerEngine;
+    final careerSnap = careerEngine?.snapshot;
+    final resumeEngine = AppBootstrap.maybeResumeIntelligenceEngine;
+    final resumeSnap = resumeEngine?.snapshot;
+
+    final identityTitle = identitySnap?.currentIdentityTitle ?? 'Phoenix User';
+    final careerReadiness = careerSnap?.jobReadiness ?? 'Starting Out';
+    final resumeScore = resumeSnap?.overallScore ?? 0.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -35,29 +44,36 @@ class ResumeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ResumeHeader(
-            title: repository.selectedIdentity.title,
-            resumeType: resume.resumeType,
-            resumeScore: resume.resumeScore,
-            careerReadiness: resume.careerReadiness,
+            title: identityTitle,
+            resumeType: ResumeType.fromIdentityTitle(identityTitle),
+            resumeScore: resumeScore / 100.0,
+            careerReadiness: careerReadiness,
           ),
           const SizedBox(height: AppSpacing.lg),
           ResumeStatisticsCard(
-            projectCount: resume.projectCount,
-            skillCount: resume.skillCount,
-            achievementCount: resume.achievements.length,
-            technologyCount: resume.technologyStack.length,
-            resumeScore: resume.resumeScore,
+            projectCount: portfolioSnap?.projectCount ?? 0,
+            skillCount: portfolioSnap?.skillCount ?? 0,
+            achievementCount: portfolioSnap?.achievementCount ?? 0,
+            technologyCount: portfolioSnap?.technologyCount ?? 0,
+            resumeScore: resumeScore / 100.0,
           ),
           const SizedBox(height: AppSpacing.lg),
-          ProfessionalSummaryCard(summary: resume.professionalSummary),
+          ProfessionalSummaryCard(summary: 'Professional $identityTitle with career readiness: $careerReadiness'),
           const SizedBox(height: AppSpacing.lg),
-          SkillsCard(skills: resume.skills),
+          SkillsCard(skills: []),
           const SizedBox(height: AppSpacing.lg),
-          ProjectsCard(projects: resume.projects),
+          ProjectsCard(projects: []),
           const SizedBox(height: AppSpacing.lg),
-          AchievementsCard(achievements: resume.achievements),
+          AchievementsCard(achievements: []),
           const SizedBox(height: AppSpacing.lg),
-          CareerHighlightsCard(highlights: resume.careerHighlights),
+          CareerHighlightsCard(highlights: [
+            if (careerSnap != null) ...[
+              'Career score: ${(careerSnap.careerScore * 100).round()}%',
+              'Readiness: $careerReadiness',
+              if (careerSnap.strengths.isNotEmpty)
+                'Strengths: ${careerSnap.strengths.join(", ")}',
+            ],
+          ]),
           const SizedBox(height: AppSpacing.lg),
           ResumeActionsCard(
             onDashboard: () =>

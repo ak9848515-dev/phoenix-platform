@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/phoenix_card.dart';
 import '../../../shared/widgets/phoenix_progress_indicator.dart';
-import '../../../theme/spacing.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 
 class MissionProgressCard extends StatelessWidget {
   const MissionProgressCard({
@@ -26,7 +26,7 @@ class MissionProgressCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Mission Progress', style: theme.textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -47,7 +47,7 @@ class MissionProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           PhoenixProgressIndicator(value: progressPercentage),
         ],
       ),
@@ -79,7 +79,7 @@ class _StatItem extends StatelessWidget {
             color: color,
           ),
         ),
-        const SizedBox(height: AppSpacing.xs),
+        const SizedBox(height: PhoenixSpacing.xs),
         Text(
           label,
           style: theme.textTheme.labelMedium?.copyWith(

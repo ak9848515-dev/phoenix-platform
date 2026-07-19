@@ -6,7 +6,7 @@ import 'decision_type.dart' show DecisionType;
 
 /// The result of a full decision analysis.
 ///
-/// Immutable. Produced by [DecisionEngine] and consumed by UI screens.
+/// Immutable. Produced by [DecisionAnalyzer] and consumed by UI screens.
 /// Contains weighted scores, trade-off insights, risks, and a
 /// top recommendation.
 class DecisionAnalysis {

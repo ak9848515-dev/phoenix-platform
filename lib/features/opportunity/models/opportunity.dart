@@ -1,12 +1,15 @@
 /// Type of career opportunity.
 enum OpportunityType {
-  fullTimeJob,
-  internship,
-  freelance,
-  openSource,
-  certification,
-  startup,
-  hackathon,
+  fullTimeJob('Full-Time'),
+  internship('Internship'),
+  freelance('Freelance'),
+  openSource('Open Source'),
+  certification('Certification'),
+  startup('Startup'),
+  hackathon('Hackathon');
+
+  const OpportunityType(this.label);
+  final String label;
 }
 
 /// Immutable representation of a recommended career opportunity.

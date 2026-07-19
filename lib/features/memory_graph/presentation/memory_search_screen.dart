@@ -73,6 +73,7 @@ class _MemorySearchScreenState extends State<MemorySearchScreen> {
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear_rounded),
+                        tooltip: 'Clear search',
                         onPressed: () {
                           _searchController.clear();
                           _search('');

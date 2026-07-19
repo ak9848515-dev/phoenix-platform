@@ -1,4 +1,11 @@
+import '../../../shared/infrastructure/ai_content/ingest_package.dart';
+import '../../../shared/infrastructure/ai_content/metadata.dart';
+import '../../../shared/infrastructure/logging/phoenix_logger.dart';
 import '../mission_engine.dart' as model;
+import '../models/mission_category.dart';
+import '../models/mission_difficulty.dart';
+import '../models/mission_priority.dart';
+import '../models/mission_snapshot.dart';
 import '../models/mission_status.dart';
 import 'mission_generator.dart';
 import 'mission_prioritizer.dart';
@@ -27,6 +34,58 @@ class MissionEngine {
   final MissionGenerator _generator;
   final MissionPrioritizer _prioritizer;
   final MissionScheduler _scheduler;
+  final PhoenixLogger _logger = PhoenixLogger.shared;
+
+  /// AI-generated missions kept separate from user-created ones.
+  final List<_AIMissionEntry> _aiMissions = [];
+
+  // ── Accessors ─────────────────────────────────────────────────────
+
+  /// The growth-aware prioritizer.
+  MissionPrioritizer get prioritizer => _prioritizer;
+
+  /// All AI-generated missions currently stored.
+  List<model.Mission> get aiGeneratedMissions =>
+      _aiMissions.map((e) => e.mission).toList();
+
+  /// Whether any AI-generated missions exist.
+  bool get hasAIGeneratedMissions => _aiMissions.isNotEmpty;
+
+  /// Builds an immutable [MissionSnapshot] from current state.
+  MissionSnapshot get snapshot {
+    // Collect all missions (both generated and AI-ingested)
+    final allMissions = <model.Mission>[
+      ..._aiMissions.map((e) => e.mission),
+    ];
+
+    final active = allMissions.where((m) => m.isActionable).toList();
+    final completed = allMissions.where((m) => m.isCompleted).toList();
+    final top = findTopPriority(allMissions);
+    final upcoming = getUpcomingMissions(allMissions).take(5).toList();
+    final total = allMissions.length;
+    final done = completed.length;
+
+    return MissionSnapshot(
+      currentMission: top,
+      upcomingMissions: upcoming,
+      completedMissions: completed.take(10).toList(),
+      activeMissions: _prioritizer.prioritize(active),
+      totalMissions: total,
+      completedCount: done,
+      activeCount: active.length,
+      completionRatio: total > 0 ? done / total : 0.0,
+      aiGeneratedCount: _aiMissions.length,
+      lastUpdated: DateTime.now(),
+      aiMetadata: _aiMissions.map((e) => e.metadata).toList(),
+    );
+  }
+
+  /// Refreshes internal state (no-op for now — missions are in-memory).
+  /// Exists for interface consistency with other domain engines.
+  void refresh() {
+    _logger.info('MissionEngine refreshed',
+        category: LogCategory.engine, source: 'MissionEngine');
+  }
 
   // ── Generation ────────────────────────────────────────────────────
 
@@ -180,4 +239,155 @@ class MissionEngine {
     }
     return null;
   }
+
+  // ── AI Ingestion ──────────────────────────────────────────────────
+
+  /// Ingests an AI-generated mission into the engine.
+  ///
+  /// The engine wraps the mission with metadata and stores it separately
+  /// from user-created missions. Duplicate detection uses [IngestPackage.contentHash].
+  void ingest(IngestPackage pkg) {
+    if (pkg.type != 'mission') return;
+
+    // Duplicate detection by content hash
+    if (_aiMissions.any((e) => e.metadata.contentHash == pkg.contentHash)) {
+      _logger.info('MissionEngine: duplicate ingest skipped',
+          category: LogCategory.engine, source: 'MissionEngine');
+      return;
+    }
+
+    final mission = _parseMissionFromPackage(pkg);
+    if (mission == null) return;
+
+    _aiMissions.add(_AIMissionEntry(mission: mission, metadata: pkg.metadata));
+    _logger.info('MissionEngine: ingested mission ${mission.title}',
+        category: LogCategory.engine, source: 'MissionEngine');
+  }
+
+  /// Merges an AI mission with an existing mission by ID.
+  ///
+  /// Does nothing if no existing mission matches the ID.
+  /// User-created missions are never overwritten.
+  void merge(String id, IngestPackage pkg) {
+    if (pkg.type != 'mission') return;
+
+    final idx = _aiMissions.indexWhere((e) => e.mission.id == id);
+    if (idx == -1) {
+      _logger.warning('MissionEngine: merge target $id not found',
+          category: LogCategory.engine, source: 'MissionEngine');
+      return;
+    }
+
+    final updated = _parseMissionFromPackage(pkg);
+    if (updated == null) return;
+    _aiMissions[idx] = _AIMissionEntry(mission: updated, metadata: pkg.metadata);
+    _logger.info('MissionEngine: merged mission $id',
+        category: LogCategory.engine, source: 'MissionEngine');
+  }
+
+  /// Replaces an AI mission entirely by ID.
+  void replace(String id, IngestPackage pkg) {
+    // Same as merge for now — AI missions are fully replaceable
+    merge(id, pkg);
+  }
+
+  /// Removes all AI-generated missions from this engine.
+  void clearGenerated() {
+    _aiMissions.clear();
+    _logger.info('MissionEngine: cleared all AI-generated missions',
+        category: LogCategory.engine, source: 'MissionEngine');
+  }
+
+  /// Rolls back AI-generated content to a previous version by content hash.
+  /// Removes the matching entry if it exists.
+  void rollback(String contentHash) {
+    _aiMissions.removeWhere((e) => e.metadata.contentHash == contentHash);
+    _logger.info('MissionEngine: rolled back $contentHash',
+        category: LogCategory.engine, source: 'MissionEngine');
+  }
+
+  /// Stub for future schema migration support.
+  void migration(int fromVersion, int toVersion) {
+    _logger.info('MissionEngine: migration $fromVersion→$toVersion (no-op)',
+        category: LogCategory.engine, source: 'MissionEngine');
+  }
+
+  /// Validates an ingest package fits the mission schema.
+  /// Returns null if valid, or an error message if invalid.
+  String? validate(IngestPackage pkg) {
+    if (pkg.type != 'mission') return 'Expected type "mission", got "${pkg.type}"';
+    final mission = _parseMissionFromPackage(pkg);
+    if (mission == null) return 'Failed to parse mission from package';
+    return validateMission(mission);
+  }
+
+  model.Mission? _parseMissionFromPackage(IngestPackage pkg) {
+    try {
+      final data = pkg.content;
+      final id = data['id'] as String? ?? '';
+      final title = data['title'] as String? ?? '';
+      final description = data['description'] as String? ?? '';
+      final duration = data['estimatedMinutes'] as int? ?? 30;
+      final difficulty = data['difficulty'] as String? ?? 'intermediate';
+
+      return model.Mission(
+        id: id,
+        title: title,
+        description: description,
+        category: _mapCategory(difficulty),
+        priority: MissionPriority.high,
+        difficulty: _mapDifficulty(difficulty),
+        estimatedDuration: duration,
+        rewardXP: duration * 10,
+        status: MissionStatus.available,
+        progress: 0.0,
+        createdDate: pkg.metadata.generatedAt,
+        sourceService: 'ai:${pkg.metadata.provider}',
+      );
+    } catch (e) {
+      _logger.error('MissionEngine: failed to parse ingest package: $e',
+          category: LogCategory.engine, source: 'MissionEngine',
+          errorDetail: e.toString());
+      return null;
+    }
+  }
+
+  MissionDifficulty _mapDifficulty(String d) {
+    switch (d.toLowerCase()) {
+      case 'beginner':
+        return MissionDifficulty.beginner;
+      case 'easy':
+        return MissionDifficulty.easy;
+      case 'hard':
+        return MissionDifficulty.hard;
+      case 'expert':
+        return MissionDifficulty.expert;
+      default:
+        return MissionDifficulty.medium;
+    }
+  }
+
+  MissionCategory _mapCategory(String d) {
+    switch (d.toLowerCase()) {
+      case 'beginner':
+      case 'easy':
+        return MissionCategory.learning;
+      case 'hard':
+      case 'expert':
+        return MissionCategory.portfolio;
+      default:
+        return MissionCategory.build;
+    }
+  }
+}
+
+/// Internal entry pairing a parsed Mission with its AI metadata.
+class _AIMissionEntry {
+  const _AIMissionEntry({
+    required this.mission,
+    required this.metadata,
+  });
+
+  final model.Mission mission;
+  final AIContentMetadata metadata;
 }

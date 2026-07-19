@@ -6,21 +6,36 @@ import '../../features/voice/services/voice_service.dart';
 import '../../features/voice/widgets/listening_overlay.dart';
 import '../../features/voice/widgets/voice_button.dart';
 import '../../core/bootstrap.dart';
+import '../../features/notification_center/engine/notification_engine.dart';
 import '../../routes/app_routes.dart';
-import '../../theme/spacing.dart';
-import '../../theme/colors.dart';
+import '../../core/design/theme/phoenix_colors.dart';
+import '../../core/design/theme/phoenix_spacing.dart';
 
-/// A reusable shell layout that owns the AppBar, navigation, and content area.
+/// Returns the FAB icon for each navigation tab.
+IconData _fabIconForIndex(int index) {
+  switch (index) {
+    case 0:
+      return Icons.play_circle_rounded; // Dashboard: Continue Journey
+    case 1:
+      return Icons.play_arrow_rounded; // Missions: Resume Mission
+    case 2:
+      return Icons.auto_awesome_rounded; // Learn: Ask AI
+    case 3:
+      return Icons.assessment_rounded; // Progress: Generate Report
+    case 4:
+      return Icons.edit_rounded; // Profile: Quick Edit
+    default:
+      return Icons.add_rounded;
+  }
+}
+
+/// A reusable shell layout that owns the AppBar, navigation, FAB, and content area.
 ///
-/// This shell adapts to the form factor:
 /// - **Phone**: BottomNavigationBar at the bottom
 /// - **Tablet/Desktop**: NavigationRail on the left
+/// - **FAB**: One per screen, changes by tab
 ///
-/// It expects to be hosted inside a route and will navigate to the appropriate
-/// route when a navigation destination is tapped.
-///
-/// The shell does **not** contain any business logic. It is purely a layout
-/// and navigation wrapper.
+/// The shell does **not** contain any business logic.
 class PhoenixShell extends StatefulWidget {
   const PhoenixShell({
     super.key,
@@ -28,12 +43,13 @@ class PhoenixShell extends StatefulWidget {
     required this.selectedIndex,
     this.title,
     this.actions,
+    this.onFabTap,
   });
 
   /// The content widget displayed in the shell's body area.
   final Widget body;
 
-  /// The index of the currently selected navigation destination.
+  /// The index of the currently selected navigation destination (0-4).
   final int selectedIndex;
 
   /// Optional title displayed in the AppBar.
@@ -42,12 +58,16 @@ class PhoenixShell extends StatefulWidget {
   /// Optional list of widgets displayed as actions in the AppBar.
   final List<Widget>? actions;
 
+  /// Optional FAB tap handler. If null, no FAB is shown.
+  final VoidCallback? onFabTap;
+
   @override
   State<PhoenixShell> createState() => _PhoenixShellState();
 }
 
 class _PhoenixShellState extends State<PhoenixShell> {
   final VoiceCommandRouter _voiceRouter = VoiceCommandRouter();
+  NotificationEngine? _notifEngine;
 
   static const List<_NavigationDestination> _destinations = [
     _NavigationDestination(
@@ -57,7 +77,7 @@ class _PhoenixShellState extends State<PhoenixShell> {
       route: '/dashboard',
     ),
     _NavigationDestination(
-      label: 'Mission',
+      label: 'Missions',
       icon: Icons.rocket_launch_outlined,
       activeIcon: Icons.rocket_launch,
       route: '/',
@@ -67,6 +87,12 @@ class _PhoenixShellState extends State<PhoenixShell> {
       icon: Icons.school_outlined,
       activeIcon: Icons.school,
       route: '/academy',
+    ),
+    _NavigationDestination(
+      label: 'Progress',
+      icon: Icons.trending_up_outlined,
+      activeIcon: Icons.trending_up,
+      route: '/progress',
     ),
     _NavigationDestination(
       label: 'Profile',
@@ -84,6 +110,23 @@ class _PhoenixShellState extends State<PhoenixShell> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _notifEngine = AppBootstrap.maybeNotificationEngine;
+    _notifEngine?.addListener(_onNotifChanged);
+  }
+
+  @override
+  void dispose() {
+    _notifEngine?.removeListener(_onNotifChanged);
+    super.dispose();
+  }
+
+  void _onNotifChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -98,21 +141,45 @@ class _PhoenixShellState extends State<PhoenixShell> {
     );
   }
 
-  Widget _buildWithBottomNav(BuildContext context) {
-    final theme = Theme.of(context);
+  // ── Shared AppBar Actions ──────────────────────────────────────────
+  //
+  // Top App Bar contains ONLY:
+  //   Community · Notifications · Phoenix AI · Search · Voice
+  //
+  // Profile icon removed to eliminate duplicate navigation.
+  // Profile is accessed via bottom navigation (tab index 4).
+
+  List<Widget> _buildAppBarActions(BuildContext context) {
     final voiceService = AppBootstrap.maybeVoiceService;
 
-    // Build AppBar actions with Search + VoiceButton appended
-    final appBarActions = <Widget>[
+    return [
       if (widget.actions != null) ...widget.actions!,
+      Semantics(
+        label: 'Notifications',
+        button: true,
+        child: _NotificationBadge(
+          count: AppBootstrap.maybeNotificationEngine?.unreadCount ?? 0,
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.notifications),
+        ),
+      ),
+      Semantics(
+        label: 'AI Assistant',
+        button: true,
+        child: IconButton(
+          icon: const Icon(Icons.auto_awesome_rounded),
+          tooltip: 'AI Assistant',
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.ai),
+        ),
+      ),
       Semantics(
         label: 'Search Knowledge',
         button: true,
         child: IconButton(
-        icon: const Icon(Icons.search_rounded),
-        tooltip: 'Search',
-        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
-      ),
+          icon: const Icon(Icons.search_rounded),
+          tooltip: 'Search',
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
+        ),
       ),
       if (voiceService != null)
         VoiceButton(
@@ -121,19 +188,34 @@ class _PhoenixShellState extends State<PhoenixShell> {
           onCommand: (command) => _handleVoiceCommand(context, command),
         ),
     ];
+  }
+
+  // ── Phone Layout ──────────────────────────────────────────────────
+
+  Widget _buildWithBottomNav(BuildContext context) {
+    final theme = Theme.of(context);
+    final voiceService = AppBootstrap.maybeVoiceService;
 
     return Scaffold(
       appBar: AppBar(
         title: widget.title != null
             ? Text(widget.title!, style: theme.textTheme.titleLarge)
             : null,
-        actions: appBarActions,
+        actions: _buildAppBarActions(context),
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),
       body: SafeArea(
         child: _buildBodyWithVoiceOverlay(context, voiceService),
       ),
+      floatingActionButton: widget.onFabTap != null
+          ? FloatingActionButton(
+              mini: true,
+              onPressed: widget.onFabTap,
+              tooltip: _fabLabelForIndex(widget.selectedIndex),
+              child: Icon(_fabIconForIndex(widget.selectedIndex)),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: widget.selectedIndex,
         onDestinationSelected: (index) => _onDestinationTap(context, index),
@@ -148,36 +230,18 @@ class _PhoenixShellState extends State<PhoenixShell> {
     );
   }
 
+  // ── Tablet/Desktop Layout ─────────────────────────────────────────
+
   Widget _buildWithNavigationRail(BuildContext context) {
     final theme = Theme.of(context);
     final voiceService = AppBootstrap.maybeVoiceService;
-
-    // Build AppBar actions with Search + VoiceButton appended
-    final appBarActions = <Widget>[
-      if (widget.actions != null) ...widget.actions!,
-      Semantics(
-        label: 'Search Knowledge',
-        button: true,
-        child: IconButton(
-        icon: const Icon(Icons.search_rounded),
-        tooltip: 'Search',
-        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.globalSearch),
-      ),
-      ),
-      if (voiceService != null)
-        VoiceButton(
-          voiceService: voiceService,
-          size: 40,
-          onCommand: (command) => _handleVoiceCommand(context, command),
-        ),
-    ];
 
     return Scaffold(
       appBar: AppBar(
         title: widget.title != null
             ? Text(widget.title!, style: theme.textTheme.titleLarge)
             : null,
-        actions: appBarActions,
+        actions: _buildAppBarActions(context),
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),
@@ -190,10 +254,10 @@ class _PhoenixShellState extends State<PhoenixShell> {
                   _onDestinationTap(context, index),
               labelType: NavigationRailLabelType.all,
               leading: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                padding: const EdgeInsets.symmetric(vertical: PhoenixSpacing.md),
                 child: Icon(
                   Icons.auto_awesome,
-                  color: AppColors.primary,
+                  color: PhoenixColors.primary,
                   size: 32,
                 ),
               ),
@@ -212,11 +276,36 @@ class _PhoenixShellState extends State<PhoenixShell> {
           ],
         ),
       ),
+      floatingActionButton: widget.onFabTap != null
+          ? FloatingActionButton(
+              mini: true,
+              onPressed: widget.onFabTap,
+              tooltip: _fabLabelForIndex(widget.selectedIndex),
+              child: Icon(_fabIconForIndex(widget.selectedIndex)),
+            )
+          : null,
     );
   }
 
-  /// Wraps the body in a Stack with the voice overlay positioned
-  /// at the bottom when voice is available.
+  // ── Helpers ──────────────────────────────────────────────────────
+
+  static String _fabLabelForIndex(int index) {
+    switch (index) {
+      case 0:
+        return 'Continue Journey';
+      case 1:
+        return 'Resume Mission';
+      case 2:
+        return 'Ask AI';
+      case 3:
+        return 'Generate Report';
+      case 4:
+        return 'Quick Edit';
+      default:
+        return 'Action';
+    }
+  }
+
   Widget _buildBodyWithVoiceOverlay(
     BuildContext context,
     VoiceService? voiceService,
@@ -236,14 +325,37 @@ class _PhoenixShellState extends State<PhoenixShell> {
     );
   }
 
-  /// Handles a recognised voice command by routing it to the
-  /// appropriate navigation destination.
-  ///
-  /// Uses the pre-parsed [VoiceCommand] directly to avoid a redundant
-  /// re-parse cycle. The command's [VoiceCommand.route] is pushed
-  /// onto the navigator stack via [VoiceCommandRouter.execute].
   void _handleVoiceCommand(BuildContext context, VoiceCommand command) {
     _voiceRouter.execute(command, Navigator.of(context));
+  }
+}
+
+/// A notification bell icon with an animated unread badge count.
+class _NotificationBadge extends StatelessWidget {
+  const _NotificationBadge({
+    required this.count,
+    required this.onPressed,
+  });
+
+  final int count;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: count > 0
+          ? Badge(
+              isLabelVisible: count > 0,
+              label: Text(
+                count > 99 ? '99+' : '$count',
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+              ),
+              child: const Icon(Icons.notifications_outlined),
+            )
+          : const Icon(Icons.notifications_outlined),
+      tooltip: 'Notifications',
+      onPressed: onPressed,
+    );
   }
 }
 

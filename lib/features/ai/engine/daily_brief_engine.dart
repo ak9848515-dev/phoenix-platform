@@ -1,4 +1,6 @@
 import '../../academy/services/academy_service.dart';
+import '../../growth_index/engine/growth_index_engine.dart';
+import '../../growth_index/models/growth_trend.dart';
 import '../../habit/services/habit_service.dart';
 import '../../timeline/services/timeline_service.dart';
 import '../../personal_knowledge/services/knowledge_service.dart';
@@ -26,6 +28,7 @@ class DailyBriefEngine {
     required this._knowledgeService,
     required this._decisionService,
     required this._memoryGraphService,
+    this._growthEngine,
   });
 
   final AcademyService _academyService;
@@ -34,6 +37,7 @@ class DailyBriefEngine {
   final KnowledgeService _knowledgeService;
   final DecisionIntelligenceService _decisionService;
   final MemoryGraphService _memoryGraphService;
+  final GrowthIndexEngine? _growthEngine;
 
   // ── Public API ──────────────────────────────────────────────────────
 
@@ -46,6 +50,7 @@ class DailyBriefEngine {
       ..._recommendationsFromKnowledge(),
       ..._recommendationsFromDecisions(),
       ..._recommendationsFromGraph(),
+      ..._recommendationsFromGrowth(),
     ];
     return rankByPriority(recs);
   }
@@ -525,6 +530,110 @@ class DailyBriefEngine {
         sourceService: 'DecisionIntelligenceService',
         metadata: {
           'decisionId': latest.id,
+          'hasData': true,
+          'signalCount': 1,
+          'timeSensitive': false,
+          'isBlocking': false,
+        },
+      ));
+    }
+
+    return recs;
+  }
+
+  // ── Growth Index Recommendations ───────────────────────────────────
+
+  /// Generates recommendations based on growth scores and trends.
+  ///
+  /// Reads from [GrowthIndexEngine.snapshot] to create:
+  /// 1. Weakest dimension focus — high priority if score < 0.6
+  /// 2. Declining trend alert — medium priority if any dimension declining
+  /// 3. Growth summary — low priority context
+  List<DailyRecommendation> _recommendationsFromGrowth() {
+    final engine = _growthEngine;
+    if (engine == null || engine.snapshot == null) return [];
+
+    final snapshot = engine.snapshot!;
+    final recs = <DailyRecommendation>[];
+
+    // 1. Weakest dimension — high priority focus
+    final weakest = snapshot.weakestDimension;
+    if (weakest.score < 0.6) {
+      recs.add(DailyRecommendation(
+        id: 'growth-weakest-${weakest.dimension.name}',
+        type: RecommendationType.learning,
+        title: 'Focus on ${weakest.dimension.displayName}',
+        description:
+            'Your ${weakest.dimension.displayName} score is '
+            '${(weakest.score * 100).round()}% — '
+            'the lowest area. Improving it will boost overall growth.',
+        priority: RecommendationPriority.high,
+        urgency: 0.7,
+        confidence: 0.8,
+        sourceService: 'GrowthIndexEngine',
+        metadata: {
+          'dimension': weakest.dimension.name,
+          'score': weakest.score,
+          'trend': weakest.trend.name,
+          'hasData': true,
+          'signalCount': 3,
+          'timeSensitive': true,
+          'isBlocking': false,
+        },
+      ));
+    }
+
+    // 2. Declining trends — medium priority alert
+    final declining = snapshot.allMetrics
+        .where((m) => m.trend == GrowthTrend.declining && m.score > 0.1)
+        .toList();
+    for (final dim in declining.take(2)) {
+      recs.add(DailyRecommendation(
+        id: 'growth-declining-${dim.dimension.name}',
+        type: RecommendationType.learning,
+        title: '${dim.dimension.displayName} is declining',
+        description:
+            'Your ${dim.dimension.displayName} score dropped '            'from ${((dim.previousScore ?? 0.0) * 100).round()}% '
+            'to ${(dim.score * 100).round()}%.'
+            'Review what changed and take action.',
+        priority: RecommendationPriority.medium,
+        urgency: 0.5,
+        confidence: 0.7,
+        sourceService: 'GrowthIndexEngine',
+        metadata: {
+          'dimension': dim.dimension.name,
+          'score': dim.score,
+          'trend': dim.trend.name,
+          'hasData': true,
+          'signalCount': 2,
+          'timeSensitive': true,
+          'isBlocking': false,
+        },
+      ));
+    }
+
+    // 3. Improving trends — low praise
+    final improving = snapshot.allMetrics
+        .where((m) => m.trend == GrowthTrend.improving && m.score > 0.1)
+        .toList();
+    if (improving.isNotEmpty) {
+      final top = improving.first;
+      recs.add(DailyRecommendation(
+        id: 'growth-improving-${top.dimension.name}',
+        type: RecommendationType.learning,
+        title: '${top.dimension.displayName} is improving',
+        description:
+            'Your ${top.dimension.displayName} score increased to '
+            '${(top.score * 100).round()}%. '
+            'Keep up the momentum!',
+        priority: RecommendationPriority.low,
+        urgency: 0.2,
+        confidence: 0.8,
+        sourceService: 'GrowthIndexEngine',
+        metadata: {
+          'dimension': top.dimension.name,
+          'score': top.score,
+          'trend': top.trend.name,
           'hasData': true,
           'signalCount': 1,
           'timeSensitive': false,

@@ -67,6 +67,7 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
+            tooltip: 'Search memory graph',
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => const MemorySearchScreen(),

@@ -3,6 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:phoenix_platform/features/auth/models/auth_user.dart';
 import 'package:phoenix_platform/features/auth/models/auth_session.dart';
+import 'package:phoenix_platform/features/auth/models/authenticated_user.dart';
+import 'package:phoenix_platform/features/auth/models/user_session.dart';
 import 'package:phoenix_platform/features/auth/services/auth_service.dart';
 import 'package:phoenix_platform/features/auth/services/secure_storage_service.dart';
 
@@ -312,9 +314,9 @@ void main() {
 
     test('token refresh returns false when no refresh token', () async {
       // Create a session without refresh token via storage directly
-      final session = AuthSession(
-        user: AuthUser(id: 'usr_001', email: 'test@example.com'),
-        accessToken: 'token_without_refresh',
+      final session = UserSession(
+        user: AuthenticatedUser(id: 'usr_001', email: 'test@example.com'),
+        idToken: 'token_without_refresh',
       );
       await sharedStorage.saveSession(session);
       await authService.init();
@@ -405,10 +407,10 @@ void main() {
     });
 
     test('hasSession returns true after saving session', () async {
-      final user = AuthUser(id: 'usr_001', email: 'test@example.com');
-      final session = AuthSession(
+      final user = AuthenticatedUser(id: 'usr_001', email: 'test@example.com');
+      final session = UserSession(
         user: user,
-        accessToken: 'token_123',
+        idToken: 'token_123',
         refreshToken: 'refresh_123',
       );
       await secureStorage.saveSession(session);
@@ -422,10 +424,10 @@ void main() {
     });
 
     test('restoreSession returns saved session', () async {
-      final user = AuthUser(id: 'usr_001', email: 'test@example.com');
-      final session = AuthSession(
+      final user = AuthenticatedUser(id: 'usr_001', email: 'test@example.com');
+      final session = UserSession(
         user: user,
-        accessToken: 'token_123',
+        idToken: 'token_123',
         refreshToken: 'refresh_123',
       );
       await secureStorage.saveSession(session);
@@ -433,14 +435,14 @@ void main() {
       final restored = await secureStorage.restoreSession();
       expect(restored, isNotNull);
       expect(restored!.user.email, equals('test@example.com'));
-      expect(restored.accessToken, equals('token_123'));
+      expect(restored.idToken, equals('token_123'));
     });
 
     test('restoreSession restores session without refresh token', () async {
-      final user = AuthUser(id: 'usr_001', email: 'test@example.com');
-      final session = AuthSession(
+      final user = AuthenticatedUser(id: 'usr_001', email: 'test@example.com');
+      final session = UserSession(
         user: user,
-        accessToken: 'token_no_refresh',
+        idToken: 'token_no_refresh',
       );
       await secureStorage.saveSession(session);
 
@@ -451,10 +453,10 @@ void main() {
     });
 
     test('clearSession removes all data', () async {
-      final user = AuthUser(id: 'usr_001', email: 'test@example.com');
-      final session = AuthSession(
+      final user = AuthenticatedUser(id: 'usr_001', email: 'test@example.com');
+      final session = UserSession(
         user: user,
-        accessToken: 'token_123',
+        idToken: 'token_123',
       );
       await secureStorage.saveSession(session);
       expect(await secureStorage.hasSession(), isTrue);
@@ -463,24 +465,24 @@ void main() {
       expect(await secureStorage.hasSession(), isFalse);
     });
 
-    test('updateAccessToken updates token in storage', () async {
-      final user = AuthUser(id: 'usr_001', email: 'test@example.com');
-      final session = AuthSession(
+    test('updateIdToken updates token in storage', () async {
+      final user = AuthenticatedUser(id: 'usr_001', email: 'test@example.com');
+      final session = UserSession(
         user: user,
-        accessToken: 'original_token',
+        idToken: 'original_token',
       );
       await secureStorage.saveSession(session);
 
-      await secureStorage.updateAccessToken('updated_token');
+      await secureStorage.updateIdToken('updated_token');
       final restored = await secureStorage.restoreSession();
-      expect(restored!.accessToken, equals('updated_token'));
+      expect(restored!.idToken, equals('updated_token'));
     });
 
     test('updateRefreshToken updates refresh token in storage', () async {
-      final user = AuthUser(id: 'usr_001', email: 'test@example.com');
-      final session = AuthSession(
+      final user = AuthenticatedUser(id: 'usr_001', email: 'test@example.com');
+      final session = UserSession(
         user: user,
-        accessToken: 'token_123',
+        idToken: 'token_123',
         refreshToken: 'original_refresh',
       );
       await secureStorage.saveSession(session);
@@ -492,9 +494,9 @@ void main() {
 
     test('diagnostics returns correct structure', () async {
       final diag = await secureStorage.diagnostics();
-      expect(diag['hasSession'], isFalse);
-      expect(diag['hasRefreshToken'], isFalse);
       expect(diag['hasUser'], isFalse);
+      expect(diag['hasRefreshToken'], isFalse);
+      expect(diag['hasIdToken'], isFalse);
     });
   });
 }

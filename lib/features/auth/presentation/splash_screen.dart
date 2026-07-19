@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/bootstrap.dart';
 import '../../../routes/app_routes.dart';
-import '../../../theme/colors.dart';
-import '../../../theme/spacing.dart';
-import '../services/auth_service.dart';
+import '../../../core/design/theme/phoenix_colors.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 
-/// Splash Screen — checks authentication state on startup.
+/// Splash Screen — shows a branded splash animation then delegates to
+/// [AuthGate] for authentication routing.
 ///
-/// Flow:
-/// 1. Show splash animation
-/// 2. Check auth state via [AuthService]
-/// 3. Navigate to Login or Dashboard
+/// AuthGate is the single source of truth for all auth-based routing.
+/// SplashScreen only displays the animation and forwards to AuthGate.
 ///
 /// No business logic. Presentation only.
 class SplashScreen extends StatefulWidget {
@@ -25,41 +22,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    _redirectToAuthGate();
   }
 
-  Future<void> _checkAuth() async {
+  Future<void> _redirectToAuthGate() async {
     // Brief delay for splash visibility
     await Future.delayed(const Duration(milliseconds: 1200));
 
     if (!mounted) return;
 
-    // Check if onboarding has been completed
-    final storage = AppBootstrap.maybeStorageService;
-    if (storage != null) {
-      final settings = storage.readUserSettings();
-      if (!settings.onboardingComplete) {
-        // First-time user — show onboarding flow
-        Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-        return;
-      }
-    }
-
-    // Onboarding complete — check auth state
-    final authService = AppBootstrap.maybeAuthService;
-    if (authService == null) {
-      // Auth service not initialized — go to dashboard
-      Navigator.of(context).pushReplacementNamed(AppRoutes.dashboard);
-      return;
-    }
-
-    if (authService.isAuthenticated) {
-      // User is logged in — go to dashboard
-      Navigator.of(context).pushReplacementNamed(AppRoutes.dashboard);
-    } else {
-      // User is not logged in — go to login
-      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
-    }
+    // Delegate all auth routing to AuthGate
+    Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
   }
 
   @override
@@ -74,33 +47,33 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Phoenix logo
             Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(PhoenixSpacing.xl),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: PhoenixColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.auto_awesome_rounded,
                 size: 64,
-                color: AppColors.primary,
+                color: PhoenixColors.primary,
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: PhoenixSpacing.lg),
             Text(
               'Phoenix',
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                color: PhoenixColors.primary,
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: PhoenixSpacing.sm),
             Text(
-              'Personal Growth OS',
+              'AI Career Operating System',
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: AppSpacing.xxl),
+            const SizedBox(height: PhoenixSpacing.xxl),
             const SizedBox(
               width: 24,
               height: 24,

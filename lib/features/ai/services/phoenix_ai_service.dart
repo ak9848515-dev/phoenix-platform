@@ -1,4 +1,5 @@
 import '../../academy/services/academy_service.dart';
+import '../../growth_index/engine/growth_index_engine.dart';
 import '../../habit/services/habit_service.dart';
 import '../../timeline/services/timeline_service.dart';
 import '../../personal_knowledge/services/knowledge_service.dart';
@@ -35,6 +36,7 @@ class PhoenixAIService {
     required KnowledgeService knowledgeService,
     required DecisionIntelligenceService decisionService,
     required MemoryGraphService memoryGraphService,
+    GrowthIndexEngine? growthEngine,
     DailyBriefEngine? briefEngine,
     CrossFeatureReasoner? crossFeatureEngine,
   })  : _dailyBriefEngine = briefEngine ??
@@ -45,6 +47,7 @@ class PhoenixAIService {
               knowledgeService: knowledgeService,
               decisionService: decisionService,
               memoryGraphService: memoryGraphService,
+              growthEngine: growthEngine,
             ),
         _crossFeatureEngine = crossFeatureEngine ??
             CrossFeatureReasoner(

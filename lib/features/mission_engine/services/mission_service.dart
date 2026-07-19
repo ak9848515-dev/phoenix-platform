@@ -1,3 +1,4 @@
+import '../../growth_index/engine/growth_index_engine.dart';
 import '../../user_state/services/user_state_service.dart';
 import '../../progress_engine/progress_service.dart';
 import '../engine/mission_engine.dart';
@@ -31,6 +32,7 @@ class MissionService {
     required this._progressService,
     List<model.Mission>? initialMissions,
     this._userStateService,
+    GrowthIndexEngine? growthEngine,
   }) : _allMissions = initialMissions ?? [];
 
   final MissionEngine _engine;

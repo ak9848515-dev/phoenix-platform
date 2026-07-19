@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/phoenix_card.dart';
-import '../../../theme/spacing.dart';
+import '../../../core/design/theme/phoenix_spacing.dart';
 
 class MissionHeader extends StatelessWidget {
   const MissionHeader({
@@ -43,11 +43,11 @@ class MissionHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: PhoenixSpacing.sm),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
+                  horizontal: PhoenixSpacing.sm,
+                  vertical: PhoenixSpacing.xs,
                 ),
                 decoration: BoxDecoration(
                   color: priorityColor.withValues(alpha: 0.12),
@@ -63,18 +63,18 @@ class MissionHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: PhoenixSpacing.sm),
           Text(
             description,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: PhoenixSpacing.md),
           Row(
             children: [
               Icon(Icons.flag_outlined, size: 16, color: priorityColor),
-              const SizedBox(width: AppSpacing.xs),
+              const SizedBox(width: PhoenixSpacing.xs),
               Text(
                 'Priority: $priority',
                 style: theme.textTheme.labelMedium?.copyWith(

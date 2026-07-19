@@ -2,45 +2,24 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import '../models/auth_session.dart';
-import '../models/auth_user.dart';
+import '../models/authenticated_user.dart';
+import '../models/user_session.dart';
 import 'secure_storage_service.dart';
 
-/// Authentication states for the app-wide auth flow.
+/// Legacy auth states for the app-wide auth flow.
+///
+/// @deprecated Use [AuthenticationState] from the new AuthenticationService.
 enum AuthState {
-  /// Initial state — auth check has not yet completed.
   unknown,
-
-  /// User is authenticated with a valid session.
   authenticated,
-
-  /// User is not authenticated (no session or session expired without refresh).
   unauthenticated,
-
-  /// Authentication is in progress (login loading).
   loading,
-
-  /// An error occurred during authentication.
   error,
 }
 
-/// Public API for all authentication functionality in Phoenix OS.
+/// Legacy auth service maintained for backward compatibility.
 ///
-/// This is the ONLY entry point for auth operations.
-/// Screens and widgets never interact with [SecureStorageService] directly.
-///
-/// Responsibilities:
-/// - Login with email/password (persistent)
-/// - Secure logout (clears all auth data)
-/// - Session restoration on app start
-/// - Token refresh support
-/// - Offline session support (cached sessions still work)
-/// - Auth state change notifications
-///
-/// Architecture Rules:
-/// - NEVER own UserState, Identity, or Journey logic
-/// - NEVER interact with SharedPreferences for auth data
-/// - All token storage goes through [SecureStorageService]
+/// @deprecated Use [AuthenticationService] for all new code.
 class AuthService extends ChangeNotifier {
   AuthService({
     SecureStorageService? secureStorage,
@@ -49,43 +28,20 @@ class AuthService extends ChangeNotifier {
   final SecureStorageService _secureStorage;
 
   AuthState _state = AuthState.unknown;
-  AuthSession? _currentSession;
+  UserSession? _currentSession;
   String? _lastError;
 
-  // ── State Access ─────────────────────────────────────────────────
-
-  /// The current authentication state.
   AuthState get state => _state;
-
-  /// The current session, or `null` if not authenticated.
-  AuthSession? get currentSession => _currentSession;
-
-  /// The currently authenticated user, or `null`.
-  AuthUser? get currentUser => _currentSession?.user;
-
-  /// Whether the user is currently authenticated.
+  UserSession? get currentSession => _currentSession;
+  AuthenticatedUser? get currentUser => _currentSession?.user;
   bool get isAuthenticated => _state == AuthState.authenticated;
-
-  /// Whether the authentication state is still being determined.
   bool get isUnknown => _state == AuthState.unknown;
-
-  /// The last error message, or `null` if no error.
   String? get lastError => _lastError;
 
-  // ── Lifecycle ────────────────────────────────────────────────────
-
-  /// Initializes the auth service by attempting to restore a persisted
-  /// session from secure storage.
-  ///
-  /// Called once during app bootstrap. Sets state to:
-  /// - [AuthState.authenticated] if a valid session was restored
-  /// - [AuthState.unauthenticated] if no session exists
   Future<void> init() async {
     try {
       final session = await _secureStorage.restoreSession();
       if (session != null) {
-        // Offline support: even if expired, use cached session
-        // (token refresh will happen on next online interaction)
         _currentSession = session;
         _state = AuthState.authenticated;
       } else {
@@ -98,17 +54,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Login ────────────────────────────────────────────────────────
-
-  /// Authenticates the user with email and password.
-  ///
-  /// On success:
-  /// - Persists the session to secure storage
-  /// - Sets state to [AuthState.authenticated]
-  ///
-  /// On failure:
-  /// - Sets state to [AuthState.error]
-  /// - Stores the error message in [lastError]
   Future<bool> login({
     required String email,
     required String password,
@@ -118,12 +63,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // For the initial implementation, we support two modes:
-      //
-      // 1. Demo mode: any email/password with valid format works
-      // 2. Supabase mode: uses Supabase auth client (future)
-      //
-      // The architecture supports both without changing the public API.
       final session = await _performAuthentication(
         email: email,
         password: password,
@@ -150,14 +89,6 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // ── Logout ───────────────────────────────────────────────────────
-
-  /// Logs the user out and clears all persisted auth data.
-  ///
-  /// **This is a destructive operation.** After calling:
-  /// - Session is cleared from secure storage
-  /// - State is set to [AuthState.unauthenticated]
-  /// - UI should navigate to the login screen
   Future<void> logout() async {
     try {
       await _secureStorage.clearSession();
@@ -170,12 +101,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Token Refresh ────────────────────────────────────────────────
-
-  /// Attempts to refresh the access token using the stored refresh token.
-  ///
-  /// Returns `true` if the token was successfully refreshed.
-  /// Returns `false` if no refresh token is available or refresh fails.
   Future<bool> refreshToken() async {
     final session = _currentSession;
     if (session == null || !session.canRefresh) return false;
@@ -193,27 +118,15 @@ class AuthService extends ChangeNotifier {
       debugPrint('AuthService.refreshToken: $e');
     }
 
-    // Token refresh failed — log out for security
     await logout();
     return false;
   }
 
-  // ── Offline Support ──────────────────────────────────────────────
-
-  /// Whether the current session can be used in offline mode.
-  ///
-  /// Returns `true` if there is a valid session (even if the token is
-  /// expired, as long as a refresh token exists for later refresh).
   bool get supportsOffline {
     final session = _currentSession;
     return session != null && session.isValid;
   }
 
-  /// Returns the current access token for API calls.
-  ///
-  /// If the token is expired and a refresh token is available,
-  /// attempts a silent refresh first. Returns `null` if no
-  /// valid token can be obtained.
   Future<String?> getAccessToken() async {
     final session = _currentSession;
     if (session == null) return null;
@@ -221,68 +134,52 @@ class AuthService extends ChangeNotifier {
     if (session.isExpired && session.canRefresh) {
       final refreshed = await refreshToken();
       if (refreshed) {
-        return _currentSession?.accessToken;
+        return _currentSession?.idToken;
       }
       return null;
     }
 
-    return session.accessToken;
+    return session.idToken;
   }
 
-  // ── Authentication Providers ─────────────────────────────────────
-
-  /// Performs the actual authentication against the backend.
-  ///
-  /// Currently uses demo mode (local validation).
-  /// Future: delegate to Supabase auth client.
-  Future<AuthSession?> _performAuthentication({
+  Future<UserSession?> _performAuthentication({
     required String email,
     required String password,
   }) async {
-    // Validate inputs
     if (email.trim().isEmpty || password.isEmpty) return null;
     if (!_isValidEmail(email)) return null;
     if (password.length < 6) return null;
 
-    // Demo mode: simulate authentication with a mock response.
-    // This is replaced by Supabase auth in production.
     await Future.delayed(const Duration(milliseconds: 800));
 
     final userId = _generateUserId(email);
-    final user = AuthUser(
+    final user = AuthenticatedUser(
       id: userId,
       email: email.trim().toLowerCase(),
       displayName: email.split('@').first,
       createdAt: DateTime.now(),
     );
 
-    return AuthSession(
+    return UserSession(
       user: user,
-      accessToken: _generateToken(userId, email),
+      idToken: _generateToken(userId, email),
       refreshToken: _generateToken('refresh-$userId', email),
       expiresAt: DateTime.now().add(const Duration(hours: 24)),
+      lastAuthenticatedAt: DateTime.now(),
     );
   }
 
-  /// Attempts to refresh an expired session.
-  ///
-  /// Current: generates new demo tokens.
-  /// Future: calls Supabase auth refresh endpoint.
-  Future<AuthSession?> _performTokenRefresh(AuthSession session) async {
+  Future<UserSession?> _performTokenRefresh(UserSession session) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
-    return AuthSession(
+    return UserSession(
       user: session.user,
-      accessToken: _generateToken(
-        session.user.id,
-        session.user.email,
-      ),
+      idToken: _generateToken(session.user.id, session.user.email),
       refreshToken: session.refreshToken,
       expiresAt: DateTime.now().add(const Duration(hours: 24)),
+      lastAuthenticatedAt: DateTime.now(),
     );
   }
-
-  // ── Helpers ──────────────────────────────────────────────────────
 
   bool _isValidEmail(String email) {
     return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
@@ -295,12 +192,8 @@ class AuthService extends ChangeNotifier {
   String _generateToken(String salt, String email) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final raw = '$salt:$email:$timestamp';
-    // In production, this would be a JWT from the auth server.
-    // For demo, we return a base64-encoded opaque token.
     return 'phx_${base64Encode(utf8.encode(raw))}';
   }
-
-  // ── Diagnostics ──────────────────────────────────────────────────
 
   Map<String, dynamic> diagnostics() {
     return {

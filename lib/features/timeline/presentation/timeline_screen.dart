@@ -159,6 +159,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                 icon: Icon(
                   _isSearching ? Icons.close_rounded : Icons.search_rounded,
                 ),
+                tooltip: _isSearching ? 'Close search' : 'Search',
                 onPressed: () {
                   setState(() {
                     _isSearching = !_isSearching;

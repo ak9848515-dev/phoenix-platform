@@ -504,6 +504,7 @@ class _MessageInput extends StatelessWidget {
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Colors.white),
                           ),
+                    tooltip: 'Send message',
                     onPressed:
                         enabled ? () => onSend(controller.text) : null,
                   ),

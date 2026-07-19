@@ -14,7 +14,7 @@ void main() {
       expect(summary.streaks.daily, 2);
       expect(summary.streaks.weekly, 0);
       expect(summary.streaks.monthly, 2);
-      expect(summary.achievements.length, 2);
+      expect(summary.achievements.length, 5);
     });
   });
 }

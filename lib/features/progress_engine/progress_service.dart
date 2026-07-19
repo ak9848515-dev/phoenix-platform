@@ -68,7 +68,7 @@ class ProgressService {
         missions.map((mission) => mission.isCompleted).toList(),
       ),
     );
-    final achievements = AchievementEngine().calculate(
+    final achievements = AchievementEngine.calculate(
       completedMissions.length,
       missions.length,
     );

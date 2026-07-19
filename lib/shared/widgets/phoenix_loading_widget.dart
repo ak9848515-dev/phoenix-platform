@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/spacing.dart';
+import '../../core/design/theme/phoenix_colors.dart';
+import '../../core/design/theme/phoenix_radius.dart';
+import '../../core/design/theme/phoenix_spacing.dart';
 
 /// A context-aware loading experience for the Phoenix Platform.
 ///
@@ -8,12 +10,12 @@ import '../../theme/spacing.dart';
 /// guidance that reassures the user Phoenix is actively preparing content.
 ///
 /// Every loading state includes:
-/// 1. Relevant icon/illustration
-/// 2. Context-aware title (e.g. "Preparing your dashboard...")
+/// 1. Relevant icon/illustration with animated glow
+/// 2. Context-aware title
 /// 3. Optional subtitle with more detail
 /// 4. Animated progress indicator
 ///
-/// Dark mode compatible. Responsive layout.
+/// Uses the Phoenix Design System tokens for premium, consistent styling.
 class PhoenixLoadingWidget extends StatelessWidget {
   const PhoenixLoadingWidget({
     super.key,
@@ -25,7 +27,7 @@ class PhoenixLoadingWidget extends StatelessWidget {
   /// The icon representing what's being loaded.
   final IconData icon;
 
-  /// Context-aware loading message (e.g. "Preparing your dashboard…").
+  /// Context-aware loading message.
   final String title;
 
   /// Optional secondary loading message.
@@ -37,7 +39,7 @@ class PhoenixLoadingWidget extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.all(PhoenixSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -47,39 +49,43 @@ class PhoenixLoadingWidget extends StatelessWidget {
               excludeSemantics: true,
               child: _LoadingIcon(icon: icon, theme: theme),
             ),
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: PhoenixSpacing.xl),
 
             // 2. Context-aware title
             Text(
               title,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
+                height: 1.3,
               ),
               textAlign: TextAlign.center,
             ),
 
             // 3. Optional subtitle
             if (subtitle != null) ...[
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: PhoenixSpacing.sm),
               Text(
                 subtitle!,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
+                  height: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
             ],
 
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: PhoenixSpacing.xxl),
 
-            // 4. Animated progress indicator
+            // 4. Animated progress indicator with premium styling
             SizedBox(
-              width: 120,
-              child: LinearProgressIndicator(
-                backgroundColor:
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-                color: theme.colorScheme.primary,
-                minHeight: 3,
+              width: 160,
+              child: ClipRRect(
+                borderRadius: PhoenixRadius.smRadius,
+                child: LinearProgressIndicator(
+                  backgroundColor: PhoenixColors.primary.withValues(alpha: 0.08),
+                  color: PhoenixColors.primary,
+                  minHeight: 4,
+                ),
               ),
             ),
           ],
@@ -130,16 +136,22 @@ class _LoadingIconState extends State<_LoadingIcon>
         return Transform.scale(
           scale: _pulseAnimation.value,
           child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(PhoenixSpacing.lg),
             decoration: BoxDecoration(
-              color: widget.theme.colorScheme.primaryContainer
-                  .withValues(alpha: 0.3),
-              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  PhoenixColors.primary.withValues(alpha: 0.12),
+                  PhoenixColors.primary.withValues(alpha: 0.04),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: PhoenixRadius.xlRadius,
             ),
             child: Icon(
               widget.icon,
               size: 48,
-              color: widget.theme.colorScheme.primary,
+              color: PhoenixColors.primary,
             ),
           ),
         );

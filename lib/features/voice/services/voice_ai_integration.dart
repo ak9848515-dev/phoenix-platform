@@ -1,98 +1,186 @@
-import '../../ai/services/ai_mentor_service.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+
+import '../../ai_assistant/services/phoenix_assistant_service.dart';
+import '../../knowledge_relationship/services/knowledge_relationship_service.dart';
+import '../../mission_engine/engine/mission_engine.dart';
+import '../../recommendation_engine/engine/recommendation_engine.dart';
 import '../models/voice_command.dart';
 import 'voice_service.dart';
 
-/// Integrates AI Mentor responses with the Voice Framework.
+/// Voice AI Integration — wires voice commands through the full AI pipeline.
 ///
-/// Allows AI responses to be spoken aloud. Uses the existing
-/// [AIMentorService] — does NOT duplicate AI logic.
+/// Flow:
+/// ```
+/// Speech → VoiceService → VoiceCommandRouter → PhoenixAssistantService
+///   ↓
+/// AI Response → Knowledge Engine → Recommendation Engine → Mission Engine
+/// ```
 ///
-/// Two modes:
-/// 1. `respondToCommand` — sends a transcribed command to the AI,
-///    then speaks the AI's response.
-/// 2. `speakText` — speaks any arbitrary text (e.g. greeting, status).
+/// Handles:
+/// - Microphone permissions
+/// - Recognition failure with retry
+/// - Cancellation
+/// - Downstream engine updates
 class VoiceAIIntegration {
   VoiceAIIntegration({
-    required this._aiService,
-    required this._voiceService,
+    required this.voiceService,
+    required this.assistantService,
+    this.knowledgeRelationshipService,
+    this.recommendationEngine,
+    this.missionEngine,
   });
 
-  final AIMentorService _aiService;
-  final VoiceService _voiceService;
+  final VoiceService voiceService;
+  final PhoenixAssistantService assistantService;
+  final KnowledgeRelationshipService? knowledgeRelationshipService;
+  final RecommendationEngine? recommendationEngine;
+  final MissionEngine? missionEngine;
 
-  /// Sends a voice command's transcript to the AI mentor and speaks
-  /// the response.
-  ///
-  /// Returns `true` if the response was spoken successfully.
-  Future<bool> respondToCommand(VoiceCommand command) async {
-    if (!_voiceService.isAvailable) return false;
-    if (command.transcript.isEmpty) return false;
+  int _retryCount = 0;
+  static const int _maxRetries = 3;
 
-    // Don't respond to navigation commands — those should navigate
-    if (command.route != null) return true;
+  /// Starts listening and processes voice commands through AI.
+  Future<void> startVoiceSession({
+    required ValueChanged<String> onResult,
+    ValueChanged<String>? onError,
+    VoidCallback? onListeningStarted,
+    VoidCallback? onListeningStopped,
+  }) async {
+    // Check microphone permission first
+    final initialized = await voiceService.initialize();
+    if (!initialized) {
+      onError?.call(
+        'Microphone access is required for voice commands. '
+        'Please grant microphone permission in your device settings.',
+      );
+      return;
+    }
 
-    // Get AI mentor response
+    voiceService.startListening(
+      onCommand: (command) => _handleCommand(command, onResult, onError),
+      onListeningStarted: onListeningStarted,
+      onListeningStopped: onListeningStopped,
+    );
+  }
+
+  /// Handles a recognized voice command through the AI pipeline.
+  Future<void> _handleCommand(
+    VoiceCommand command,
+    ValueChanged<String> onResult,
+    ValueChanged<String>? onError,
+  ) async {
+    if (!command.isValid) {
+      // Unknown command — send to AI for smart interpretation
+      await _handleUnknownCommand(command.transcript, onResult, onError);
+      return;
+    }
+
+    // Known command — use AI to generate response
+    await _processWithAI(command.transcript, onResult, onError);
+  }
+
+  /// Processes voice input through the full AI pipeline.
+  Future<void> _processWithAI(
+    String transcript,
+    ValueChanged<String> onResult,
+    ValueChanged<String>? onError,
+  ) async {
     try {
-      final response = await _aiService.chat(command.transcript);
-      if (response.content.isEmpty) return false;
+      // 1. Send through AI pipeline
+      final response = await assistantService.chat(
+        userMessage: '[Voice Command] $transcript. '
+            'Provide a brief, spoken-friendly response.',
+      );
 
-      // Speak the AI response
-      await _voiceService.speak(response.content);
-      return true;
-    } catch (_) {
-      return false;
+      if (response.message.isNotEmpty) {
+        onResult(response.message);
+
+        // 2. Speak the response
+        await voiceService.speak(response.message);
+
+        // 3. Trigger downstream updates
+        await _triggerUpdates();
+      }
+    } catch (e) {
+      await _handleError(transcript, onResult, onError);
     }
   }
 
-  /// Speaks an AI mentor response for a given user message.
-  ///
-  /// This is the integration point between the AI chat and voice.
-  /// After the AI produces a response, pass it here to be spoken.
-  Future<bool> speakAiResponse(String userMessage) async {
-    if (!_voiceService.isAvailable) return false;
-
+  /// Sends unknown voice commands to AI for interpretation.
+  Future<void> _handleUnknownCommand(
+    String transcript,
+    ValueChanged<String> onResult,
+    ValueChanged<String>? onError,
+  ) async {
     try {
-      final response = await _aiService.chat(userMessage);
-      if (response.content.isEmpty) return false;
-      await _voiceService.speak(response.content);
-      return true;
-    } catch (_) {
-      return false;
+      final response = await assistantService.chat(
+        userMessage: 'The user said: "$transcript". '
+            'Interpret this as a command and respond helpfully.',
+      );
+
+      if (response.message.isNotEmpty) {
+        onResult(response.message);
+        await voiceService.speak(response.message);
+        await _triggerUpdates();
+      } else {
+        onResult("I didn't quite catch that. Could you try again?");
+      }
+    } catch (e) {
+      await _handleError(transcript, onResult, onError);
     }
   }
 
-  /// Speaks a greeting message.
-  Future<bool> speakGreeting() async {
-    if (!_voiceService.isAvailable) return false;
-
-    final greeting = _aiService.getGreeting();
-    final motivation = _aiService.getMotivation();
-    final message = '$greeting. $motivation';
-
-    return _speakSafe(message);
-  }
-
-  /// Speaks a daily focus summary.
-  Future<bool> speakDailyFocus() async {
-    if (!_voiceService.isAvailable) return false;
-
-    final focus = _aiService.getDailyFocus();
-    final guidance = _aiService.buildGuidance();
-    final message =
-        'Your daily focus is: $focus. '
-        'You are level ${guidance.level} with ${guidance.totalXp} XP. '
-        '${guidance.missionSummary}';
-
-    return _speakSafe(message);
-  }
-
-  Future<bool> _speakSafe(String text) async {
-    if (text.isEmpty) return false;
-    try {
-      await _voiceService.speak(text);
-      return true;
-    } catch (_) {
-      return false;
+  /// Handles errors with retry logic.
+  Future<void> _handleError(
+    String transcript,
+    ValueChanged<String> onResult,
+    ValueChanged<String>? onError,
+  ) async {
+    if (_retryCount < _maxRetries) {
+      _retryCount++;
+      await Future.delayed(Duration(milliseconds: 500 * _retryCount));
+      await _processWithAI(transcript, onResult, onError);
+    } else {
+      _retryCount = 0;
+      onError?.call(
+        'I\'m having trouble processing that right now. '
+        'Please try again in a moment.',
+      );
     }
+  }
+
+  /// Triggers downstream updates to knowledge, recommendation, and mission engines.
+  Future<void> _triggerUpdates() async {
+    await Future.wait([
+      // Knowledge context update requires AIContextSnapshot — skipped
+      // when no context is available at the time of voice command
+      if (recommendationEngine != null)
+        Future(() => recommendationEngine!.evaluate()),
+      if (missionEngine != null) Future(() => missionEngine!.refresh()),
+    ]);
+  }
+
+  /// Stops the current voice session.
+  Future<void> stopVoiceSession() async {
+    _retryCount = 0;
+    await voiceService.stopListening();
+  }
+
+  /// Cancels the current voice session.
+  Future<void> cancelVoiceSession() async {
+    _retryCount = 0;
+    await voiceService.cancel();
+  }
+
+  /// Returns diagnostic information.
+  Map<String, dynamic> diagnostics() {
+    return {
+      'retryCount': _retryCount,
+      'maxRetries': _maxRetries,
+      'voiceAvailable': voiceService.isAvailable,
+      'voiceActive': voiceService.isActive,
+    };
   }
 }

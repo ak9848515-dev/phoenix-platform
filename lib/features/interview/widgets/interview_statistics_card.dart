@@ -10,11 +10,17 @@ class InterviewStatisticsCard extends StatelessWidget {
     required this.questionCount,
     required this.estimatedPreparationDays,
     required this.interviewReadiness,
+    this.completedSessions = 0,
+    this.averageScore = 0.0,
+    this.weakTopicCount = 0,
   });
 
   final int questionCount;
   final int estimatedPreparationDays;
   final double interviewReadiness;
+  final int completedSessions;
+  final double averageScore;
+  final int weakTopicCount;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +46,27 @@ class InterviewStatisticsCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatTile(
+                  icon: Icons.checklist_rtl_rounded,
+                  value: '$completedSessions',
+                  label: 'Sessions',
+                  theme: theme,
+                ),
+              ),
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.analytics_outlined,
+                  value: '${(averageScore * 100).round()}%',
+                  label: 'Avg Score',
+                  theme: theme,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _StatTile(
                   icon: Icons.quiz_outlined,
                   value: '$questionCount',
                   label: 'Questions',
@@ -48,9 +75,9 @@ class InterviewStatisticsCard extends StatelessWidget {
               ),
               Expanded(
                 child: _StatTile(
-                  icon: Icons.calendar_today_outlined,
-                  value: '$estimatedPreparationDays',
-                  label: 'Prep Days',
+                  icon: Icons.priority_high_rounded,
+                  value: '$weakTopicCount',
+                  label: 'Weak Topics',
                   theme: theme,
                 ),
               ),

@@ -3,6 +3,8 @@ import '../models/mission_difficulty.dart';
 import '../models/mission_priority.dart';
 import '../models/mission_status.dart';
 import '../mission_engine.dart';
+import '../../growth_index/engine/growth_index_engine.dart';
+import '../../growth_index/models/growth_dimension.dart';
 import '../../knowledge_dna/knowledge_dna_service.dart';
 import '../../portfolio/services/portfolio_service.dart';
 import '../../resume/services/resume_service.dart';
@@ -14,8 +16,8 @@ import '../../recommendation/services/recommendation_service.dart';
 ///
 /// The generator does NOT duplicate business logic — it reads from
 /// existing services (KnowledgeDNA, Portfolio, Resume, Interview,
-/// Opportunity, Recommendation) and maps their output to mission
-/// structures.
+/// Opportunity, Recommendation, GrowthIndexEngine) and maps their
+/// output to mission structures.
 ///
 /// No service logic is reimplemented here.
 class MissionGenerator {
@@ -26,6 +28,7 @@ class MissionGenerator {
     required this._interviewService,
     required this._opportunityService,
     required this._recommendationService,
+    this._growthEngine,
   });
 
   final KnowledgeDNAService _knowledgeDnaService;
@@ -34,6 +37,7 @@ class MissionGenerator {
   final InterviewService _interviewService;
   final OpportunityService _opportunityService;
   final RecommendationService _recommendationService;
+  final GrowthIndexEngine? _growthEngine;
 
   // ── Public API ────────────────────────────────────────────────────
 
@@ -49,6 +53,7 @@ class MissionGenerator {
       ..._generateInterviewMissions(),
       ..._generateOpportunityMissions(),
       ..._generateRecommendationMissions(),
+      ..._generateGrowthMissions(),
       ..._generateDailyMaintenance(),
     ];
 
@@ -229,6 +234,73 @@ class MissionGenerator {
         sourceService: 'RecommendationService',
       ),
     ];
+  }
+
+  // ── Growth Index Missions ────────────────────────────────────────
+
+  /// Generates missions targeting the user's weakest growth dimension.
+  ///
+  /// Uses [GrowthIndexEngine.weakestDimension] to identify the area
+  /// most in need of improvement and creates a focused mission.
+  List<Mission> _generateGrowthMissions() {
+    final engine = _growthEngine;
+    if (engine == null || engine.snapshot == null) return [];
+
+    final snapshot = engine.snapshot!;
+    final weakest = snapshot.weakestDimension;
+
+    // Only generate if the weakest dimension score is below 0.7
+    if (weakest.score >= 0.7) return [];
+
+    final category = _dimensionToCategory(weakest.dimension);
+    final displayName = weakest.dimension.displayName;
+
+    return [
+      Mission(
+        id: 'gen-growth-weakest',
+        title: 'Improve Your $displayName',
+        description:
+            'Your $displayName score is '
+            '${(weakest.score * 100).round()}%. '
+            'Focus on this area to accelerate overall growth.',
+        category: category,
+        priority: MissionPriority.high,
+        difficulty: MissionDifficulty.medium,
+        estimatedDuration: 30,
+        rewardXP: 150,
+        status: MissionStatus.pending,
+        createdDate: DateTime.now(),
+        recommendationReason:
+            'Growth Index identifies $displayName as your weakest '
+            'area. Improving it will boost overall growth.',
+        sourceService: 'GrowthIndexEngine',
+      ),
+    ];
+  }
+
+  /// Maps a [GrowthDimension] to the closest [MissionCategory].
+  MissionCategory _dimensionToCategory(GrowthDimension dim) {
+    switch (dim) {
+      case GrowthDimension.knowledge:
+      case GrowthDimension.skills:
+        return MissionCategory.learning;
+      case GrowthDimension.projects:
+        return MissionCategory.build;
+      case GrowthDimension.career:
+        return MissionCategory.career;
+      case GrowthDimension.habits:
+        return MissionCategory.habit;
+      case GrowthDimension.interview:
+        return MissionCategory.interview;
+      case GrowthDimension.mission:
+        return MissionCategory.learning;
+      case GrowthDimension.portfolio:
+        return MissionCategory.portfolio;
+      case GrowthDimension.learningConsistency:
+        return MissionCategory.habit;
+      case GrowthDimension.overall:
+        return MissionCategory.learning;
+    }
   }
 
   // ── Daily Maintenance ─────────────────────────────────────────────
